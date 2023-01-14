@@ -21,21 +21,6 @@ class MyApp extends StatelessWidget {
           case '/':
             return CupertinoPageRoute(
                 builder: (_) => const Home(), settings: settings);
-          // case '/signin':
-          //   return CupertinoPageRoute(
-          //       builder: (_) => const SignInPage(), settings: settings);
-          // case '/register':
-          //   return CupertinoPageRoute(
-          //       builder: (_) => const RegisterPage(), settings: settings);
-          // case '/root':
-          //   return CupertinoPageRoute(
-          //       builder: (_) => const RootPage(), settings: settings);
-          // case '/shelter_detail':
-          //   return CupertinoPageRoute(
-          //       builder: (_) => const ShelterDetail(), settings: settings);
-          // case '/shelter_new':
-          //   return CupertinoPageRoute(
-          //       builder: (_) => const ShelterNew(), settings: settings);
         }
         return null;
       },
