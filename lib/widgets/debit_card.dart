@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 
-class DashboardWallet extends StatefulWidget {
-  const DashboardWallet({super.key});
+class DebitCard extends StatelessWidget {
+  const DebitCard({Key? key}) : super(key: key);
 
-  @override
-  State<DashboardWallet> createState() => _DashboardWalletState();
-}
-
-class _DashboardWalletState extends State<DashboardWallet> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,27 +17,34 @@ class _DashboardWalletState extends State<DashboardWallet> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              "EternalExpend",
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              "2.500 Point",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: Colors.black, blurRadius: 3)]),
             ),
-            const Text("Rp13.521",
+            const Text("Rp130.521",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white)),
+                    fontSize: 28,
+                    color: Colors.white,
+                    shadows: [Shadow(color: Colors.black, blurRadius: 3)])),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
                 Text(
                   "Abadi Suryo",
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 3)]),
                 ),
                 Text(
-                  "1.000 point",
+                  "EternalExpend",
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 3)]),
                 ),
               ],
             ),

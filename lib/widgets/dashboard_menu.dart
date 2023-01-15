@@ -15,37 +15,45 @@ class DashboardMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+      ),
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: menuList.map((item) {
             log('${item['name']}');
-            return Column(
-              children: [
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      backgroundColor: Colors.grey.shade200,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+            return IntrinsicHeight(
+              child: Column(
+                children: [
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        backgroundColor: Colors.grey.shade800,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
                       ),
-                    ),
-                    onPressed: () {},
-                    child: Icon(
-                      item['icon'],
-                      color: Colors.grey.shade600,
-                    )
-                    // child: Text('${item['name']}')
-                    ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  item['name'],
-                  style: TextStyle(color: Colors.grey.shade600),
-                )
-              ],
+                      onPressed: () {},
+                      child: Icon(
+                        item['icon'],
+                        color: Colors.grey.shade200,
+                      )
+                      // child: Text('${item['name']}')
+                      ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    item['name'],
+                    style: TextStyle(
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
             );
           }).toList()),
     );
