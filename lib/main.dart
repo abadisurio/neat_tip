@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
+import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/initialization.dart';
+import 'package:neat_tip/screens/profile.dart';
+import 'package:neat_tip/screens/vehicle_list.dart';
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +31,15 @@ class MyApp extends StatelessWidget {
           case '/home':
             return CupertinoPageRoute(
                 builder: (_) => const Home(), settings: settings);
+          case '/vehiclelist':
+            return CupertinoPageRoute(
+                builder: (_) => const VehicleList(), settings: settings);
+          case '/profile':
+            return CupertinoPageRoute(
+                builder: (_) => const Profile(), settings: settings);
+          case '/explorespot':
+            return CupertinoPageRoute(
+                builder: (_) => const ExploreSpot(), settings: settings);
         }
         return null;
       },
