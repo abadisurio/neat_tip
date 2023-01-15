@@ -7,9 +7,9 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CameraScanner extends StatefulWidget {
-  bool isScanning;
+  final bool isScanning;
   final void Function(String result) onComplete;
-  CameraScanner(
+  const CameraScanner(
       {super.key, required this.isScanning, required this.onComplete});
 
   @override
@@ -172,7 +172,7 @@ class _CameraScannerState extends State<CameraScanner>
       log(block.text);
       if (block.text == "B 3853 KZA") {
         // textRecognizer.close();
-        widget.isScanning = false;
+        // widget.isScanning = false;
         widget.onComplete(block.text);
       }
     }

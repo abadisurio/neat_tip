@@ -74,10 +74,31 @@ class _SmartCardState extends State<SmartCard> {
                 child: Container(color: Colors.pink.shade600.withOpacity(0.4)),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: DebitCard(),
+            AnimatedOpacity(
+              curve: Curves.easeOutCirc,
+              opacity: _isScanning ? 0 : 1.0,
+              duration: const Duration(milliseconds: 500),
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: DebitCard(),
+              ),
             ),
+            AnimatedOpacity(
+              curve: Curves.easeOutCirc,
+              opacity: !_isScanning ? 0 : 1.0,
+              duration: const Duration(milliseconds: 500),
+              child: const Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    '\nPindai plat motor Anda',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        shadows: [Shadow(color: Colors.black, blurRadius: 3)]),
+                  )),
+            ),
+
             SizedBox.expand(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
