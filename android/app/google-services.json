@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "988007689143",
+    "project_id": "neat-tip",
+    "storage_bucket": "neat-tip.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988007689143:android:59d9087619e8fec28c9632",
+        "android_client_info": {
+          "package_name": "com.example.neat_tip"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "988007689143-pfheh3dnjke5b0d92839gtmqtaea7huj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.neat_tip",
+            "certificate_hash": "2665031b002e5a2d2bc752f61dc57a31122d3126"
+          }
+        },
+        {
+          "client_id": "988007689143-jecscqvskm5kagfr9uobu4uh34mk99ad.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAz_XtG7P0v9jkPl100_CbBPsyZ32aG34"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "988007689143-jecscqvskm5kagfr9uobu4uh34mk99ad.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
