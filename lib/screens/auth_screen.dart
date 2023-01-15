@@ -11,15 +11,18 @@ class AuthScreen extends StatefulWidget {
 }
 
 const List<Widget> authName = <Widget>[Text('Masuk'), Text('Daftar')];
-const List<Map<String, dynamic>> authFields = [
-  {"fieldname": "Email", "value": null, "type": AuthInputType.signup},
-  {"fieldname": "Nama", "value": null, "type": AuthInputType.signup},
+const List<Map<String, dynamic>> signInFields = [
   {"fieldname": "Username", "value": null, "type": AuthInputType.both},
   {"fieldname": "Password", "value": null, "type": AuthInputType.both},
+];
+const List<Map<String, dynamic>> signUpFields = [
+  {"fieldname": "Email", "value": null, "type": AuthInputType.signup},
+  {"fieldname": "Nama", "value": null, "type": AuthInputType.signup},
 ];
 
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool isShowSingUp = false;
 
   final List<bool> authType = <bool>[true, false];
 
@@ -41,6 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       for (int i = 0; i < authType.length; i++) {
                         authType[i] = i == index;
                       }
+                      isShowSingUp = authType[1];
                     });
                   },
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -57,66 +61,51 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: authName,
                 ),
               ),
-              ...authFields.map(
-                (e) {
-                  return Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      curve: Curves.easeOutCirc,
-                      height: (authType[1] ||
-                              (e['type'] == AuthInputType.signin ||
-                                  e['type'] == AuthInputType.both))
-                          ? 70
-                          : 0,
-                      child: !(authType[1] ||
-                              (e['type'] == AuthInputType.signin ||
-                                  e['type'] == AuthInputType.both))
-                          ? const SizedBox()
-                          : TextFormField(
-                              decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: (authType[1] ||
-                                                (e['type'] ==
-                                                        AuthInputType.signin ||
-                                                    e['type'] ==
-                                                        AuthInputType.both))
-                                            ? const Color(0xFF000000)
-                                            : Colors.transparent),
-                                  ),
-                                  border: const OutlineInputBorder(),
-                                  hintText: 'Masukkan ${e['fieldname']}',
-                                  labelText: e['fieldname']),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
-                                }
-                                return null;
-                              },
-                            ),
-                    ),
-                  );
-                },
-              ).toList(),
-              const GoogleSignInButton(),
-              ElevatedButton(
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
-                    );
-                  }
-                },
-                child: Row(children: const [
-                  Icon(Icons.logo_dev),
-                  Expanded(
-                      child: Center(child: Text('Masuk menggunakan Google')))
-                ]),
-              ),
+              Column(mainAxisSize: MainAxisSize.min, children: [
+                ...signInFields
+                    .map((e) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                                border: const OutlineInputBorder(),
+                                hintText: 'Masukkan ${e['fieldname']}',
+                                labelText: e['fieldname']),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
+                              }
+                              return null;
+                            },
+                          ),
+                        ))
+                    .toList()
+              ]),
+              AnimatedSize(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutCirc,
+                  child: !isShowSingUp
+                      ? const SizedBox()
+                      : Column(mainAxisSize: MainAxisSize.min, children: [
+                          ...signUpFields
+                              .map((e) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                          border: const OutlineInputBorder(),
+                                          hintText:
+                                              'Masukkan ${e['fieldname']}',
+                                          labelText: e['fieldname']),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ))
+                              .toList()
+                        ])),
               ElevatedButton(
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
@@ -129,7 +118,29 @@ class _AuthScreenState extends State<AuthScreen> {
                   }
                 },
                 child: const Text('Submit'),
-              )
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Divider(
+                        thickness: 2,
+                      ),
+                    ),
+                    Text(
+                      ' atau cara lain ',
+                      style: TextStyle(color: Colors.grey.shade500),
+                    ),
+                    const Expanded(
+                      child: Divider(
+                        thickness: 2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const GoogleSignInButton(),
             ],
           ),
         ),
