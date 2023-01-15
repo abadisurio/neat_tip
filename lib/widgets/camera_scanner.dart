@@ -157,9 +157,9 @@ class _CameraScannerState extends State<CameraScanner>
     await _cameraController!.initialize().then((_) async =>
             await _cameraController!.startImageStream((CameraImage image) {
               // print(widget.isScanning);
-              print(_isScanning);
+              // print(_isScanning);
               if (widget.isScanning && _isScanning) {
-                print('sinisss');
+                // print('sinisss');
                 _processCameraImage(image);
               }
             }) // image processing and text recognition.

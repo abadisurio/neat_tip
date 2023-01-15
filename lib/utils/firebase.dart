@@ -92,7 +92,7 @@ class AppFirebase {
           email: emailAddress,
           password: password,
         );
-        print(credential);
+        user = FirebaseAuth.instance.currentUser;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           print('The password provided is too weak.');
@@ -129,7 +129,9 @@ class AppFirebase {
         final credential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
                 email: emailAddress, password: password);
+        print('credential');
         print(credential);
+        user = FirebaseAuth.instance.currentUser;
       } on FirebaseAuthException catch (e) {
         print(e);
         if (e.code == 'user-not-found') {

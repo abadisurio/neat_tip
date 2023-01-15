@@ -19,7 +19,7 @@ class _InitializationState extends State<Initialization> {
 
   Future<User?> initialization() async {
     await AppFirebase.initializeFirebase();
-    // FirebaseAuth.instance.signOut();
+    // await FirebaseAuth.instance.signOut();
     User? user = FirebaseAuth.instance.currentUser;
     // if (user != null) Navigator.of(context).pushReplacementNamed('/home');
     FlutterNativeSplash.remove();
@@ -31,7 +31,7 @@ class _InitializationState extends State<Initialization> {
     return FutureBuilder(
         future: initialization(),
         builder: ((context, snapshot) {
-          print('sini');
+          print('siniw');
           print(snapshot.data);
 
           // if (snapshot.data != null) {

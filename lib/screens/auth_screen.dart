@@ -17,10 +17,10 @@ class AuthScreen extends StatefulWidget {
 const List<Widget> authName = <Widget>[Text('Masuk'), Text('Daftar')];
 List<Map<String, dynamic>> signInFields = [
   {
-    "fieldname": "Username",
+    "fieldname": "Email",
     "value": null,
-    "type": TextInputType.text,
-    "validator": (str) => true
+    "type": TextInputType.emailAddress,
+    "validator": isEmail
   },
   {
     "fieldname": "Password",
@@ -30,12 +30,6 @@ List<Map<String, dynamic>> signInFields = [
   },
 ];
 List<Map<String, dynamic>> signUpFields = [
-  {
-    "fieldname": "Email",
-    "value": null,
-    "type": TextInputType.emailAddress,
-    "validator": isEmail
-  },
   {
     "fieldname": "Nama",
     "value": null,
@@ -51,7 +45,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final List<bool> authType = <bool>[true, false];
 
-  void submitAuth() {
+  void onSuccess() {
+    Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+  }
+
+  void submitAuth() async {
     // Validate returns true if the form is valid, or false otherwise.
     if (_formKey.currentState!.validate()) {
       // If the form is valid, display a snackbar. In the real world,
@@ -59,24 +57,22 @@ class _AuthScreenState extends State<AuthScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),
       );
-      print(authFieldControllers['Email']!.text);
-      if (isSingingUp) {
-        try {
-          AppFirebase.signUpWithEmailPassword(
+
+      try {
+        if (isSingingUp) {
+          await AppFirebase.signUpWithEmailPassword(
               authFieldControllers['Email']!.text,
               authFieldControllers['Password']!.text);
-        } catch (e) {
-          print(e);
-        }
-      } else {
-        try {
-          AppFirebase.signInWithEmailPassword(
+        } else {
+          await AppFirebase.signInWithEmailPassword(
               authFieldControllers['Email']!.text,
               authFieldControllers['Password']!.text);
-        } catch (e) {
-          print(e);
         }
+        onSuccess();
+      } catch (e) {
+        print(e);
       }
+
       // print(_formKey.currentState!.);
     }
   }
