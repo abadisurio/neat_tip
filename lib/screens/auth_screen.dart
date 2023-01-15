@@ -1,5 +1,9 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/widgets/google_sign_in_button.dart';
+import 'package:validators/validators.dart';
 
 enum AuthInputType { signin, signup, both }
 
@@ -11,20 +15,71 @@ class AuthScreen extends StatefulWidget {
 }
 
 const List<Widget> authName = <Widget>[Text('Masuk'), Text('Daftar')];
-const List<Map<String, dynamic>> signInFields = [
-  {"fieldname": "Username", "value": null, "type": AuthInputType.both},
-  {"fieldname": "Password", "value": null, "type": AuthInputType.both},
+List<Map<String, dynamic>> signInFields = [
+  {
+    "fieldname": "Username",
+    "value": null,
+    "type": TextInputType.text,
+    "validator": (str) => true
+  },
+  {
+    "fieldname": "Password",
+    "value": null,
+    "type": TextInputType.visiblePassword,
+    "validator": (str) => true
+  },
 ];
-const List<Map<String, dynamic>> signUpFields = [
-  {"fieldname": "Email", "value": null, "type": AuthInputType.signup},
-  {"fieldname": "Nama", "value": null, "type": AuthInputType.signup},
+List<Map<String, dynamic>> signUpFields = [
+  {
+    "fieldname": "Email",
+    "value": null,
+    "type": TextInputType.emailAddress,
+    "validator": isEmail
+  },
+  {
+    "fieldname": "Nama",
+    "value": null,
+    "type": TextInputType.text,
+    "validator": (str) => true
+  },
 ];
 
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool isShowSingUp = false;
+  bool isSingingUp = false;
+  Map<String, TextEditingController> authFieldControllers = {};
 
   final List<bool> authType = <bool>[true, false];
+
+  void submitAuth() {
+    // Validate returns true if the form is valid, or false otherwise.
+    if (_formKey.currentState!.validate()) {
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Processing Data')),
+      );
+      print(authFieldControllers['Email']!.text);
+      if (isSingingUp) {
+        try {
+          AppFirebase.signUpWithEmailPassword(
+              authFieldControllers['Email']!.text,
+              authFieldControllers['Password']!.text);
+        } catch (e) {
+          print(e);
+        }
+      } else {
+        try {
+          AppFirebase.signInWithEmailPassword(
+              authFieldControllers['Email']!.text,
+              authFieldControllers['Password']!.text);
+        } catch (e) {
+          print(e);
+        }
+      }
+      // print(_formKey.currentState!.);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       for (int i = 0; i < authType.length; i++) {
                         authType[i] = i == index;
                       }
-                      isShowSingUp = authType[1];
+                      isSingingUp = authType[1];
                     });
                   },
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -62,61 +117,62 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ),
               Column(mainAxisSize: MainAxisSize.min, children: [
-                ...signInFields
-                    .map((e) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                                border: const OutlineInputBorder(),
-                                hintText: 'Masukkan ${e['fieldname']}',
-                                labelText: e['fieldname']),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
-                              }
-                              return null;
-                            },
-                          ),
-                        ))
-                    .toList()
+                ...signInFields.map((e) {
+                  final controller = authFieldControllers.putIfAbsent(
+                      e['fieldname'], () => TextEditingController());
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: TextFormField(
+                      keyboardType: e['type'],
+                      controller: controller,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: 'Masukkan ${e['fieldname']}',
+                          labelText: e['fieldname']),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
+                        }
+                        return null;
+                      },
+                    ),
+                  );
+                }).toList()
               ]),
               AnimatedSize(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOutCirc,
-                  child: !isShowSingUp
+                  child: !isSingingUp
                       ? const SizedBox()
                       : Column(mainAxisSize: MainAxisSize.min, children: [
-                          ...signUpFields
-                              .map((e) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: TextFormField(
-                                      decoration: InputDecoration(
-                                          border: const OutlineInputBorder(),
-                                          hintText:
-                                              'Masukkan ${e['fieldname']}',
-                                          labelText: e['fieldname']),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ))
-                              .toList()
+                          ...signUpFields.map((e) {
+                            final controller = authFieldControllers.putIfAbsent(
+                                e['fieldname'], () => TextEditingController());
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: TextFormField(
+                                keyboardType: e['type'],
+                                controller: controller,
+                                decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    hintText: 'Masukkan ${e['fieldname']}',
+                                    labelText: e['fieldname']),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Tidak boleh kosong. Masukkan ${e['fieldname']} Anda!';
+                                  }
+                                  if (!e['validator'](value)) {
+                                    return 'Format ${e['fieldname']} tidak sesuai';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            );
+                          }).toList()
                         ])),
               ElevatedButton(
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
-                    );
-                  }
-                },
+                onPressed: submitAuth,
                 child: const Text('Submit'),
               ),
               Padding(

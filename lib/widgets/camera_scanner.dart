@@ -8,7 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class CameraScanner extends StatefulWidget {
   final bool isScanning;
-  final void Function(String result) onComplete;
+  final Future Function(String result) onComplete;
   const CameraScanner(
       {super.key, required this.isScanning, required this.onComplete});
 
@@ -20,6 +20,8 @@ class _CameraScannerState extends State<CameraScanner>
     with WidgetsBindingObserver {
   bool _isPermissionGranted = false;
   bool _isDetecting = false;
+  bool _isScanning = true;
+  List<CameraDescription> cameras = [];
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   late final Future<void> _future;
 
@@ -31,6 +33,9 @@ class _CameraScannerState extends State<CameraScanner>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _future = _requestCameraPermission();
+    // setState(() {
+    //   _isScanning = widget.isScanning;
+    // });
   }
 
   // We should stop the camera once this widget is disposed
@@ -55,6 +60,10 @@ class _CameraScannerState extends State<CameraScanner>
         _cameraController!.value.isInitialized) {
       _startCamera();
     }
+
+    // if (state == AppLifecycleState.resumed) {
+    //   _initCameraController(cameras);
+    // }
   }
 
   @override
@@ -72,6 +81,9 @@ class _CameraScannerState extends State<CameraScanner>
                 future: availableCameras(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    // setState(() {
+                    //   cameras = snapshot.data!;
+                    // });
                     _initCameraController(snapshot.data!);
 
                     // return Center(child: CameraPreview(_cameraController!));
@@ -144,7 +156,12 @@ class _CameraScannerState extends State<CameraScanner>
 
     await _cameraController!.initialize().then((_) async =>
             await _cameraController!.startImageStream((CameraImage image) {
-              _processCameraImage(image);
+              // print(widget.isScanning);
+              print(_isScanning);
+              if (widget.isScanning && _isScanning) {
+                print('sinisss');
+                _processCameraImage(image);
+              }
             }) // image processing and text recognition.
         );
     // Start streaming images from platform camera
@@ -155,9 +172,22 @@ class _CameraScannerState extends State<CameraScanner>
     setState(() {});
   }
 
+  void _itemDetected(String item) async {
+    // print("panggil 2");
+    setState(() {
+      _isScanning = false;
+    });
+    _cameraController!.stopImageStream();
+    await widget.onComplete(item);
+    _startCamera();
+    setState(() {
+      _isScanning = true;
+    });
+  }
+
   void _processCameraImage(CameraImage image) async {
     // getting InputImage from CameraImage
-    if (!widget.isScanning) return;
+    // if (!widget.isScanning) return;
     if (_isDetecting) return;
     InputImage inputImage = getInputImage(image);
     _isDetecting = true;
@@ -173,7 +203,7 @@ class _CameraScannerState extends State<CameraScanner>
       if (block.text == "B 3853 KZA") {
         // textRecognizer.close();
         // widget.isScanning = false;
-        widget.onComplete(block.text);
+        _itemDetected(block.text);
       }
     }
     setState(() {

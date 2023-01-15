@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -48,7 +50,7 @@ class _SmartCardState extends State<SmartCard> {
                 child: CameraScanner(
                   isScanning: _isScanning,
                   onComplete: (result) async {
-                    // log('panggil');
+                    print('panggil');
                     setState(() {
                       _isScanning = false;
                     });

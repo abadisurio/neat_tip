@@ -43,6 +43,7 @@ dependencies:
   firebase_core: ^2.4.1
   firebase_auth: ^4.2.5
   flutter_native_splash: ^2.2.16
+  validators: ^3.0.0
 
 
 dev_dependencies:

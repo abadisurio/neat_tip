@@ -19,7 +19,7 @@ class _InitializationState extends State<Initialization> {
 
   Future<User?> initialization() async {
     await AppFirebase.initializeFirebase();
-    FirebaseAuth.instance.signOut();
+    // FirebaseAuth.instance.signOut();
     User? user = FirebaseAuth.instance.currentUser;
     // if (user != null) Navigator.of(context).pushReplacementNamed('/home');
     FlutterNativeSplash.remove();
