@@ -9,7 +9,7 @@ class DashboardMenu extends StatelessWidget {
     {"name": "Spots", "route": "/spots", "icon": Icons.explore_outlined},
     {"name": "History", "route": "/history", "icon": Icons.list_alt_outlined},
     {"name": "Ewallet", "route": "/ewallet", "icon": Icons.wallet},
-    {"name": "Spots", "route": "/spots", "icon": Icons.explore_outlined},
+    // {"name": "Pro", "route": "/spots", "icon": Icons.explore_outlined},
   ];
 
   @override

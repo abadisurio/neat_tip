@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
                         child: DashboardMenu(),
                       ),
                     ),
-                    SmartCard()
+                    // SmartCard()
                   ],
                 ),
               ),
