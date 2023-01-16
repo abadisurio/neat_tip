@@ -4,9 +4,9 @@ class Review {
   late String senderId;
   String? headline;
   String? description;
-  List<String>? imgSrcPhotos;
-  List<String>? votersId;
   int? voteCount;
+  String? imgSrcPhotos;
+  String? votersId;
 
   Review(
       {required this.createdAt,
@@ -24,8 +24,8 @@ class Review {
     senderId = json['senderId'];
     headline = json['headline'];
     description = json['description'];
-    imgSrcPhotos = json['imgSrcPhotos'].cast<String>();
-    imgSrcPhotos = json['votersId'].cast<String>();
+    imgSrcPhotos = json['imgSrcPhotos'];
+    imgSrcPhotos = json['votersId'];
     voteCount = json['voteCount'];
   }
 

@@ -5,6 +5,7 @@ class Vehicle {
   late String name;
   late String plate;
   late int wheel;
+  String? imgSrcPhotos;
 
   Vehicle(
       {required this.createdAt,
@@ -12,6 +13,7 @@ class Vehicle {
       required this.ownerId,
       required this.name,
       required this.plate,
+      this.imgSrcPhotos,
       required this.wheel});
 
   Vehicle.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Vehicle {
     ownerId = json['ownerId'];
     name = json['name'];
     plate = json['plate'];
+    imgSrcPhotos = json['imgSrcPhotos'];
     wheel = json['wheel'];
   }
 
@@ -29,6 +32,7 @@ class Vehicle {
     data['createdAt'] = createdAt;
     data['ownerId'] = ownerId;
     data['name'] = name;
+    data['imgSrcPhotos'] = imgSrcPhotos;
     data['plate'] = plate;
     data['wheel'] = wheel;
     return data;
