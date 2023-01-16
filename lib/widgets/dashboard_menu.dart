@@ -7,13 +7,16 @@ class DashboardMenu extends StatelessWidget {
 
   static const List<Map<String, dynamic>> menuList = [
     {"name": "Spots", "route": "/spots", "icon": Icons.explore_outlined},
-    {"name": "History", "route": "/history", "icon": Icons.list_alt_outlined},
-    {"name": "Ewallet", "route": "/ewallet", "icon": Icons.wallet},
+    {"name": "Riwayat", "route": "/history", "icon": Icons.list_alt_outlined},
+    {"name": "E-wallet", "route": "/ewallet", "icon": Icons.wallet},
+    {"name": "Kendaraan", "route": "/vehiclelist", "icon": Icons.motorcycle},
     // {"name": "Pro", "route": "/spots", "icon": Icons.explore_outlined},
   ];
 
   @override
   Widget build(BuildContext context) {
+    final navigator = Navigator.of(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -36,7 +39,9 @@ class DashboardMenu extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        navigator.pushNamed(item['route']);
+                      },
                       child: Icon(
                         item['icon'],
                         color: Colors.grey.shade200,

@@ -44,6 +44,7 @@ dependencies:
   firebase_auth: ^4.2.5
   flutter_native_splash: ^2.2.16
   validators: ^3.0.0
+  firebase_storage: ^11.0.10
 
 
 dev_dependencies:

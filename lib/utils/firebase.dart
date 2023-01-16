@@ -1,7 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -10,6 +13,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AppFirebase {
   static Future<FirebaseApp> initializeFirebase() async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
+
     return firebaseApp;
   }
 
@@ -160,6 +164,20 @@ class AppFirebase {
       //   ),
       // );
     }
+  }
+
+  static Future<Reference> uploadPhoto(
+      File file, String path, String name) async {
+    // Create a storage reference from our app
+    final storageRef = FirebaseStorage.instance.ref();
+    final pathRef = storageRef.child(path);
+    final fileRef = pathRef.child(name);
+
+    try {
+      // Create a reference to "mountains.jpg"
+      await fileRef.putFile(file);
+    } catch (e) {}
+    return fileRef;
   }
 
   static SnackBar customSnackBar() {

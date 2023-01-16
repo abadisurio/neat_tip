@@ -6,6 +6,7 @@ import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/initialization.dart';
 import 'package:neat_tip/screens/profile.dart';
+import 'package:neat_tip/screens/vehicle_add.dart';
 import 'package:neat_tip/screens/vehicle_list.dart';
 
 void main() {
@@ -21,6 +22,20 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          toolbarHeight: 100,
+          elevation: 0,
+          titleTextStyle: TextStyle(
+              color: Colors.grey.shade800,
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
+          iconTheme: IconThemeData(
+            color: Colors.grey.shade800, //change your color here
+          ),
+          surfaceTintColor: Colors.grey.shade800,
+          foregroundColor: Colors.transparent,
+          backgroundColor: Colors.transparent,
+        ),
         primarySwatch: Colors.blue,
       ),
       onGenerateRoute: (RouteSettings settings) {
@@ -34,10 +49,13 @@ class MyApp extends StatelessWidget {
           case '/vehiclelist':
             return CupertinoPageRoute(
                 builder: (_) => const VehicleList(), settings: settings);
+          case '/vehicleadd':
+            return CupertinoPageRoute(
+                builder: (_) => const VehicleAdd(), settings: settings);
           case '/profile':
             return CupertinoPageRoute(
                 builder: (_) => const Profile(), settings: settings);
-          case '/explorespot':
+          case '/spots':
             return CupertinoPageRoute(
                 builder: (_) => const ExploreSpot(), settings: settings);
         }

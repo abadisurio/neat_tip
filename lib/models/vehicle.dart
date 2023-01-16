@@ -5,16 +5,21 @@ class Vehicle {
   late String name;
   late String plate;
   late int wheel;
+  String? brand;
+  String? model;
   String? imgSrcPhotos;
 
-  Vehicle(
-      {required this.createdAt,
-      required this.id,
-      required this.ownerId,
-      required this.name,
-      required this.plate,
-      this.imgSrcPhotos,
-      required this.wheel});
+  Vehicle({
+    required this.createdAt,
+    required this.id,
+    required this.ownerId,
+    required this.name,
+    required this.plate,
+    required this.wheel,
+    this.imgSrcPhotos,
+    this.brand,
+    this.model,
+  });
 
   Vehicle.fromJson(Map<String, dynamic> json) {
     createdAt = json['createdAt'];
@@ -22,8 +27,10 @@ class Vehicle {
     ownerId = json['ownerId'];
     name = json['name'];
     plate = json['plate'];
-    imgSrcPhotos = json['imgSrcPhotos'];
     wheel = json['wheel'];
+    brand = json['brand'];
+    model = json['model'];
+    imgSrcPhotos = json['imgSrcPhotos'];
   }
 
   Map<String, dynamic> toJson() {
@@ -34,6 +41,8 @@ class Vehicle {
     data['name'] = name;
     data['imgSrcPhotos'] = imgSrcPhotos;
     data['plate'] = plate;
+    data['brand'] = brand;
+    data['model'] = model;
     data['wheel'] = wheel;
     return data;
   }
