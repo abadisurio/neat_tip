@@ -24,22 +24,48 @@ class VehicleAddState extends State<VehicleAdd> {
   List<String> imgSrcPhotos = [];
   List<File> imgFilePhotos = [];
   bool isScreenActive = true;
+  bool isCapturing = false;
+  bool isFlashOn = false;
 
-  void addPhotoField() {
+  Future takePicture() async {
     setState(() {
-      imgSrcPhotos.add("hehe");
+      isCapturing = true;
     });
-    print('klik');
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    if (cameraController != null) {
+      final photo = await cameraController!.takePicture();
+      log('photo $photo');
+      setState(() {
+        imgSrcPhotos.add(photo.path);
+        imgFilePhotos.add(File(photo.path));
+      });
+      addPhotoField();
+    }
+  }
+
+  void addPhotoField() async {
+    await Future.delayed(const Duration(milliseconds: 500), () {
       _scrollController.scrollTo(
-          index: imgSrcPhotos.length,
+          index: imgFilePhotos.length,
           curve: Curves.easeOutCirc,
           duration: const Duration(milliseconds: 1500));
     });
+
+    setState(() {
+      isCapturing = false;
+    });
   }
 
-  Future takePicture() async {
-    addPhotoField();
+  removePhoto(int index) {
+    log('$index');
+    // _scrollController.scrollTo(
+    //     index: index + 1,
+    //     curve: Curves.easeOutCirc,
+    //     duration: const Duration(milliseconds: 1500));
+    // Future.delayed(const Duration(milliseconds: 1000), () {
+    // });
+    setState(() {
+      imgFilePhotos.removeAt(index);
+    });
   }
 
   File choosePhoto() {
@@ -57,10 +83,11 @@ class VehicleAddState extends State<VehicleAdd> {
         // padding: const EdgeInsets.all(16),
         children: [
           Stack(
+            fit: StackFit.loose,
             children: [
               if (isScreenActive)
                 Container(
-                  margin: const EdgeInsets.only(left: contentGap),
+                  margin: const EdgeInsets.only(left: contentGap * 0.5),
                   decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(16),
@@ -70,17 +97,21 @@ class VehicleAddState extends State<VehicleAdd> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Transform.scale(
-                      scale: 1.4,
-                      child: CameraCapturer(
-                        controller: (controller) {
-                          // cameraController = controller;
-                          // log('test $controller');
-                          // if (controller.value.isInitialized) {
-                          setState(() {
-                            cameraController = controller;
-                          });
-                          // }
-                        },
+                      scale: 1.5,
+                      child: Center(
+                        child: CameraCapturer(
+                          resolution: ResolutionPreset.medium,
+                          controller: (controller) {
+                            // cameraController = controller;
+                            // log('test $controller');
+                            // if (controller.value.isInitialized) {
+                            controller.setFlashMode(FlashMode.off);
+                            setState(() {
+                              cameraController = controller;
+                            });
+                            // }
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -96,9 +127,9 @@ class VehicleAddState extends State<VehicleAdd> {
                     itemScrollController: _scrollController,
                     // itemPositionsListener: _scrollListener,
                     scrollDirection: Axis.horizontal,
-                    itemCount: imgSrcPhotos.length + 1,
+                    itemCount: imgFilePhotos.length + 1,
                     itemBuilder: ((context, index) {
-                      if (index == imgSrcPhotos.length) {
+                      if (index == imgFilePhotos.length) {
                         return ClipPath(
                           clipper: ButtonClipper(),
                           child: Container(
@@ -118,11 +149,11 @@ class VehicleAddState extends State<VehicleAdd> {
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              Transform.scale(
-                                scale: 1.4,
-                                child: Image.network(
-                                    "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg"),
+                              Image.file(
+                                imgFilePhotos[index],
+                                fit: BoxFit.cover,
                               ),
+                              Text('$index'),
                               Align(
                                 alignment: Alignment.topRight,
                                 child: ElevatedButton(
@@ -131,6 +162,7 @@ class VehicleAddState extends State<VehicleAdd> {
                                       elevation: 0,
                                       shape: const CircleBorder()),
                                   onPressed: () {
+                                    removePhoto(index);
                                     // print('index');
                                     // print(index);
                                     // _scrollController.scrollTo(
@@ -163,32 +195,42 @@ class VehicleAddState extends State<VehicleAdd> {
             alignment: Alignment.centerLeft,
             child: Row(
               children: [
-                ElevatedButton(
-                    onPressed: () async {
-                      takePicture();
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.adjust,
-                          color: Colors.grey.shade200,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Text('Ambil Gambar'),
-                      ],
-                    )
-                    // child: Text('${item['name']}')
-                    ),
+                if (cameraController != null)
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (!isCapturing) {
+                          takePicture();
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCapturing ? Icons.adjust : Icons.circle,
+                            color: Colors.grey.shade200,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(isCapturing ? 'Tahan' : 'Ambil Gambar'),
+                        ],
+                      )
+                      // child: Text('${item['name']}')
+                      ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(shape: const CircleBorder()),
                   onPressed: () async {
-                    takePicture();
+                    if (isFlashOn) {
+                      cameraController?.setFlashMode(FlashMode.off);
+                    } else {
+                      cameraController?.setFlashMode(FlashMode.always);
+                    }
+                    setState(() {
+                      isFlashOn = !isFlashOn;
+                    });
                   },
                   child: Icon(
-                    Icons.flash_on,
+                    isFlashOn ? Icons.flash_on : Icons.flash_off,
                     color: Colors.grey.shade200,
                   ),
                   // child: Text('${item['name']}')

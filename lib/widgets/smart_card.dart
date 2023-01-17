@@ -124,11 +124,13 @@ class _SmartCardState extends State<SmartCard> {
               scale: _isScanning ? 1.5 : 2.1,
               curve: Curves.easeOutCirc,
               duration: const Duration(milliseconds: 500),
-              child: CameraCapturer(controller: (controller) {
-                setState(() {
-                  cameraController = controller;
-                });
-              }),
+              child: CameraCapturer(
+                  resolution: ResolutionPreset.low,
+                  controller: (controller) {
+                    setState(() {
+                      cameraController = controller;
+                    });
+                  }),
             ),
             AnimatedOpacity(
               curve: Curves.easeOutCirc,

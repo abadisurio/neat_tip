@@ -10,7 +10,9 @@ import 'package:permission_handler/permission_handler.dart';
 
 class CameraCapturer extends StatefulWidget {
   final Function(CameraController) controller;
-  const CameraCapturer({super.key, required this.controller});
+  final ResolutionPreset resolution;
+  const CameraCapturer(
+      {super.key, required this.controller, required this.resolution});
 
   @override
   State<CameraCapturer> createState() => _CameraCapturerState();
@@ -137,7 +139,7 @@ class _CameraCapturerState extends State<CameraCapturer>
   Future<void> _cameraSelected(CameraDescription camera) async {
     _cameraController = CameraController(
       cameraList.first,
-      ResolutionPreset.low,
+      widget.resolution,
       enableAudio: false,
     );
 
