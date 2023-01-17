@@ -173,13 +173,6 @@ class _SmartCardState extends State<SmartCard> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade800,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
                       onPressed: () {
                         setState(() {
                           _isScanning = !_isScanning;

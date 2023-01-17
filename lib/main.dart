@@ -71,6 +71,15 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.transparent,
           backgroundColor: Colors.transparent,
         ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey.shade800,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100.0),
+            ),
+          ),
+        ),
         primarySwatch: Colors.blue,
       ),
       onGenerateRoute: (RouteSettings settings) {

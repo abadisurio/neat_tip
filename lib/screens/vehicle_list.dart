@@ -19,13 +19,6 @@ class _VehicleListState extends State<VehicleList> {
             padding: const EdgeInsets.all(8.0),
             child: Center(
               child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade800,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100.0),
-                    ),
-                  ),
                   onPressed: () {
                     navigator.pushNamed('/vehicleadd');
                   },

@@ -72,7 +72,9 @@ class _CameraCapturerState extends State<CameraCapturer>
     return FutureBuilder(
       future: _future,
       builder: (context, snapshot) {
-        _initCameraController(cameraList);
+        if (snapshot.connectionState == ConnectionState.done) {
+          _initCameraController(cameraList);
+        }
         return Stack(
           fit: StackFit.loose,
           children: [

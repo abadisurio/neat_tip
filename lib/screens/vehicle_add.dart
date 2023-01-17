@@ -161,40 +161,40 @@ class VehicleAddState extends State<VehicleAdd> {
           Container(
             padding: const EdgeInsets.fromLTRB(contentGap, 8.0, 0, 0),
             alignment: Alignment.centerLeft,
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade800,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100.0),
+            child: Row(
+              children: [
+                ElevatedButton(
+                    onPressed: () async {
+                      takePicture();
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.adjust,
+                          color: Colors.grey.shade200,
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        const Text('Ambil Gambar'),
+                      ],
+                    )
+                    // child: Text('${item['name']}')
+                    ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(shape: const CircleBorder()),
+                  onPressed: () async {
+                    takePicture();
+                  },
+                  child: Icon(
+                    Icons.flash_on,
+                    color: Colors.grey.shade200,
                   ),
+                  // child: Text('${item['name']}')
                 ),
-                onPressed: () async {
-                  takePicture();
-                  // setState(() {
-                  //   isScreenActive = !isScreenActive;
-                  // });
-                  // await Navigator.of(context)
-                  //     .pushNamed('/vehiclelist');
-                  // setState(() {
-                  //   isScreenActive = !isScreenActive;
-                  // });
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.adjust,
-                      color: Colors.grey.shade200,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text('Ambil Gambar'),
-                  ],
-                )
-                // child: Text('${item['name']}')
-                ),
+              ],
+            ),
           ),
         ],
       )),
@@ -218,7 +218,7 @@ class ButtonClipper extends CustomClipper<Path> {
     path.addRRect(RRect.fromRectAndRadius(
         Rect.fromCircle(
             center: Offset(size.width / 2, size.height / 2),
-            radius: size.height / 2),
+            radius: (size.height / 2) - 1),
         const Radius.circular(16)));
     path.close();
     return path;
