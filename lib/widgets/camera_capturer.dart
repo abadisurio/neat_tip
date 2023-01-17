@@ -3,25 +3,24 @@ import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:neat_tip/bloc/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class CameraScanner extends StatefulWidget {
-  final bool isScanning;
-  final Future Function(String result) onComplete;
-  const CameraScanner(
-      {super.key, required this.isScanning, required this.onComplete});
+class CameraCapturer extends StatefulWidget {
+  final Function(CameraController) controller;
+  const CameraCapturer({super.key, required this.controller});
 
   @override
-  State<CameraScanner> createState() => _CameraScannerState();
+  State<CameraCapturer> createState() => _CameraCapturerState();
 }
 
-class _CameraScannerState extends State<CameraScanner>
+class _CameraCapturerState extends State<CameraCapturer>
     with WidgetsBindingObserver {
   bool _isPermissionGranted = false;
-  bool _isDetecting = false;
-  bool _isScanning = true;
   List<CameraDescription> cameras = [];
+  late List<CameraDescription> cameraList;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   late final Future<void> _future;
 
@@ -30,10 +29,9 @@ class _CameraScannerState extends State<CameraScanner>
 
   @override
   void initState() {
-    // ModalRoute.of(context)?.settings.name;
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // WidgetsBinding.instance.handlePushRoute('route');
+    cameraList = BlocProvider.of<CameraCubit>(context).cameraList;
     _future = _requestCameraPermission();
     // setState(() {
     //   _isScanning = widget.isScanning;
@@ -70,33 +68,18 @@ class _CameraScannerState extends State<CameraScanner>
 
   @override
   Widget build(BuildContext context) {
-    log('hehe ${widget.isScanning}');
+    // log('hehe ${widget.isScanning}');
     return FutureBuilder(
       future: _future,
       builder: (context, snapshot) {
+        _initCameraController(cameraList);
         return Stack(
           fit: StackFit.loose,
           children: [
             // Show the camera feed behind everything
             if (_isPermissionGranted)
-              FutureBuilder<List<CameraDescription>>(
-                future: availableCameras(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    // setState(() {
-                    //   cameras = snapshot.data!;
-                    // });
-                    _initCameraController(snapshot.data!);
-
-                    // return Center(child: CameraPreview(_cameraController!));
-                    return Center(child: CameraPreview(_cameraController!));
-                    // return Center(child: Text('${widget.isScanning}'));
-                  } else {
-                    return const LinearProgressIndicator();
-                  }
-                },
-              ),
-            if (!_isPermissionGranted)
+              Center(child: CameraPreview(_cameraController!))
+            else if (!_isPermissionGranted)
               Center(
                 child: Container(
                   padding: const EdgeInsets.only(left: 24.0, right: 24.0),
@@ -151,69 +134,21 @@ class _CameraScannerState extends State<CameraScanner>
 
   Future<void> _cameraSelected(CameraDescription camera) async {
     _cameraController = CameraController(
-      camera,
+      cameraList.first,
       ResolutionPreset.low,
       enableAudio: false,
     );
-    await _cameraController!.initialize().then((_) async =>
-            await _cameraController!.startImageStream((CameraImage image) {
-              log('mounted $mounted');
-              // print(widget.isScanning);
-              log('_isScanning $_isScanning');
-              log('widget.isScanning ${widget.isScanning}');
 
-              if (widget.isScanning && _isScanning) {
-                // print('sinisss');
-                _processCameraImage(image);
-              }
-            }) // image processing and text recognition.
-        );
+    await _cameraController!.initialize().then((_) {
+      widget.controller(_cameraController!);
+      return;
+    });
     // Start streaming images from platform camera
-    log('message $mounted');
+
     if (!mounted) {
-      // _stopCamera();
       return;
     }
     setState(() {});
-  }
-
-  void _itemDetected(String item) async {
-    // print("panggil 2");
-    setState(() {
-      _isScanning = false;
-    });
-    _cameraController!.stopImageStream();
-    await widget.onComplete(item);
-    _startCamera();
-    setState(() {
-      _isScanning = true;
-    });
-  }
-
-  void _processCameraImage(CameraImage image) async {
-    // getting InputImage from CameraImage
-    // if (!widget.isScanning) return;
-    if (_isDetecting) return;
-    InputImage inputImage = getInputImage(image);
-    _isDetecting = true;
-
-    final RecognizedText recognisedText =
-        await textRecognizer.processImage(inputImage);
-    log('message');
-    log('sini ${recognisedText.blocks}');
-    // Using the recognised text.
-    for (TextBlock block in recognisedText.blocks) {
-      // recognizedText = block.text + " ";
-      log(block.text);
-      if (block.text == "B 3853 KZA") {
-        // textRecognizer.close();
-        // widget.isScanning = false;
-        _itemDetected(block.text);
-      }
-    }
-    setState(() {
-      _isDetecting = false;
-    });
   }
 
   InputImage getInputImage(CameraImage cameraImage) {

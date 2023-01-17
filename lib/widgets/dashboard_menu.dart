@@ -39,8 +39,8 @@ class DashboardMenu extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      onPressed: () {
-                        navigator.pushNamed(item['route']);
+                      onPressed: () async {
+                        await navigator.pushNamed(item['route']);
                       },
                       child: Icon(
                         item['icon'],
