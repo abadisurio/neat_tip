@@ -17,6 +17,9 @@ class VehicleAdd extends StatefulWidget {
 
 class VehicleAddState extends State<VehicleAdd> {
   final ItemScrollController _scrollController = ItemScrollController();
+  // final ItemPositionsListener _scrollListener = ItemPositionsListener.create();
+  static const double boxSize = 300;
+  static const double contentGap = 16;
   CameraController? cameraController;
   List<String> imgSrcPhotos = [];
   List<File> imgFilePhotos = [];
@@ -31,14 +34,12 @@ class VehicleAddState extends State<VehicleAdd> {
       _scrollController.scrollTo(
           index: imgSrcPhotos.length,
           curve: Curves.easeOutCirc,
-          duration: const Duration(milliseconds: 1000));
+          duration: const Duration(milliseconds: 1500));
     });
   }
 
   Future takePicture() async {
-    if (cameraController != null) {
-      addPhotoField();
-    }
+    addPhotoField();
   }
 
   File choosePhoto() {
@@ -55,21 +56,63 @@ class VehicleAddState extends State<VehicleAdd> {
           child: ListView(
         // padding: const EdgeInsets.all(16),
         children: [
-          Text('${imgSrcPhotos.length}'),
-          SizedBox(
-              height: 300,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  ...imgSrcPhotos.map(
-                    (e) {
+          Stack(
+            children: [
+              if (isScreenActive)
+                Container(
+                  margin: const EdgeInsets.only(left: contentGap),
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade50)),
+                  width: boxSize,
+                  height: boxSize,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Transform.scale(
+                      scale: 1.4,
+                      child: CameraCapturer(
+                        controller: (controller) {
+                          // cameraController = controller;
+                          // log('test $controller');
+                          // if (controller.value.isInitialized) {
+                          setState(() {
+                            cameraController = controller;
+                          });
+                          // }
+                        },
+                      ),
+                    ),
+                  ),
+                  // width: 110,
+                ),
+              SizedBox(
+                  height: boxSize,
+                  width: MediaQuery.of(context).size.width,
+                  child: ScrollablePositionedList.builder(
+                    padding: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width - 316),
+                    reverse: true,
+                    itemScrollController: _scrollController,
+                    // itemPositionsListener: _scrollListener,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: imgSrcPhotos.length + 1,
+                    itemBuilder: ((context, index) {
+                      if (index == imgSrcPhotos.length) {
+                        return ClipPath(
+                          clipper: ButtonClipper(),
+                          child: Container(
+                            color: Colors.grey.shade50,
+                            width: boxSize + 16,
+                          ),
+                        );
+                      }
                       return Container(
-                        margin: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(left: contentGap),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.grey.shade50,
                         ),
-                        width: 300,
+                        width: boxSize + contentGap,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Stack(
@@ -109,104 +152,78 @@ class VehicleAddState extends State<VehicleAdd> {
                         ),
                         // width: 110,
                       );
-                    },
+                    }),
+                  )),
+            ],
+          ),
+
+          // Text('${_scrollListener.itemPositions.value.first.}'),
+          Container(
+            padding: const EdgeInsets.fromLTRB(contentGap, 8.0, 0, 0),
+            alignment: Alignment.centerLeft,
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade800,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0),
                   ),
-                  Container(
-                    // key: dataKey,
-                    margin: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
+                ),
+                onPressed: () async {
+                  takePicture();
+                  // setState(() {
+                  //   isScreenActive = !isScreenActive;
+                  // });
+                  // await Navigator.of(context)
+                  //     .pushNamed('/vehiclelist');
+                  // setState(() {
+                  //   isScreenActive = !isScreenActive;
+                  // });
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.adjust,
                       color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    width: 300,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // if (isScreenActive)
-                          Transform.scale(
-                            scale: 1.4,
-                            child: CameraCapturer(
-                              controller: (controller) {
-                                // cameraController = controller;
-                                // log('test $controller');
-                                // if (controller.value.isInitialized) {
-                                setState(() {
-                                  cameraController = controller;
-                                });
-                                // }
-                              },
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey.shade800,
-                                  elevation: 0,
-                                  shape: const CircleBorder()),
-                              onPressed: () {
-                                // addPhotoField();
-                                // captureImage(result);
-                                // navigator.pushNamed('/vehicleadd');
-                              },
-                              child: Icon(
-                                Icons.cancel_outlined,
-                                color: Colors.grey.shade200,
-                              ),
-                              // child: Text('${item['name']}')
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: cameraController == null
-                                ? null
-                                : ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey.shade800,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100.0),
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      // takePicture();
-                                      setState(() {
-                                        isScreenActive = !isScreenActive;
-                                      });
-                                      await Navigator.of(context)
-                                          .pushNamed('/vehiclelist');
-                                      setState(() {
-                                        isScreenActive = !isScreenActive;
-                                      });
-                                    },
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.adjust,
-                                          color: Colors.grey.shade200,
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        const Text('Ambil Gambar'),
-                                      ],
-                                    )
-                                    // child: Text('${item['name']}')
-                                    ),
-                          ),
-                        ],
-                      ),
+                    const SizedBox(
+                      width: 5,
                     ),
-                    // width: 110,
-                  )
-                ]),
-              ))
+                    const Text('Ambil Gambar'),
+                  ],
+                )
+                // child: Text('${item['name']}')
+                ),
+          ),
         ],
       )),
     );
   }
+}
+
+class ButtonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(0, 0);
+    // path.addRRect(RRect.fromRectAndRadius(Rect.largest, Radius.circular(32)));
+    // path.addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    // path.cubicTo(0, 1, size.width, size.height, 1, size.height);
+    // path.cubicTo(size.width, size.height, size.width, 0, 0, 0);
+    path.fillType = PathFillType.evenOdd;
+    path.addRect(Rect.largest);
+    // path.addOval(Rect.fromCircle(
+    //     center: Offset(size.width / 2, size.height / 2), radius: 16));
+    path.addRRect(RRect.fromRectAndRadius(
+        Rect.fromCircle(
+            center: Offset(size.width / 2, size.height / 2),
+            radius: size.height / 2),
+        const Radius.circular(16)));
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(ButtonClipper oldClipper) => false;
 }
