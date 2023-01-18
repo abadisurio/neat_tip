@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:neat_tip/bloc/camera.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
+import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
@@ -38,6 +39,8 @@ Future<void> main() async {
           create: (BuildContext context) => CameraCubit()),
       BlocProvider<RouteObserverCubit>(
           create: (BuildContext context) => RouteObserverCubit()),
+      BlocProvider<VehicleListCubit>(
+          create: (BuildContext context) => VehicleListCubit()),
     ],
     child: MyApp(
       cameras: cameras,

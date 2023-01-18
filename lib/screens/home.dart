@@ -84,7 +84,7 @@ class _HomeState extends State<Home> with RouteAware {
                         child: DashboardMenu(),
                       ),
                     ),
-                    if (isScreenActive) const SmartCard()
+                    if (false) const SmartCard()
                   ],
                 ),
               ),
