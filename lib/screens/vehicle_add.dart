@@ -51,7 +51,7 @@ List<Map<String, dynamic>> vehicleFields = [
     "value": null,
     "type": TextInputType.number,
     "validator": (str) {
-      return str < 20;
+      return true;
     },
     "required": false,
   },
@@ -112,18 +112,18 @@ class VehicleAddState extends State<VehicleAdd> {
     String imgSrcString = '';
     // _imgFilePhotos.map((e) {
     // });
-    log('vehicleFieldControllers $vehicleFieldControllers');
+    log('id ${BlocProvider.of<VehicleListCubit>(context).length.toString()}');
     for (var element in _imgFilePhotos) {
       log('hehe ');
       log('$element');
       imgSrcString += '${element.path},';
     }
-    if (imgSrcString == '') return;
+    // if (imgSrcString == '') return;
     if (_formKey.currentState!.validate()) {
       final newVehicle = Vehicle(
           ownerName: vehicleFieldControllers['Nama Pemilik *']!.text,
           createdAt: DateTime.now().toString(),
-          id: BlocProvider.of<VehicleListCubit>(context).length.toString(),
+          id: (BlocProvider.of<VehicleListCubit>(context).length).toString(),
           ownerId: FirebaseAuth.instance.currentUser!.uid,
           imgSrcPhotos: imgSrcString,
           plate: vehicleFieldControllers['Plat Nomor *']!.text,
@@ -131,6 +131,8 @@ class VehicleAddState extends State<VehicleAdd> {
           brand: vehicleFieldControllers['Merek *']!.text,
           model: vehicleFieldControllers['Model *']!.text);
       BlocProvider.of<VehicleListCubit>(context).addVehicle(newVehicle);
+      log('message ${BlocProvider.of<VehicleListCubit>(context).state}');
+      BlocProvider.of<VehicleListCubit>(context).pushDataToDB();
       log('success');
     }
   }

@@ -1,6 +1,11 @@
+import 'package:floor/floor.dart';
+
+@entity
 class Vehicle {
-  late String createdAt;
+  @primaryKey
   late String id;
+
+  late String createdAt;
   late String ownerId;
   late String plate;
   late String brand;

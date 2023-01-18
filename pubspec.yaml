@@ -42,12 +42,13 @@ dependencies:
   google_sign_in: ^5.4.3
   firebase_core: ^2.4.1
   firebase_auth: ^4.2.5
+  firebase_storage: ^11.0.10
   flutter_native_splash: ^2.2.16
   validators: ^3.0.0
-  firebase_storage: ^11.0.10
   scrollable_positioned_list: ^0.3.5
   flutter_bloc: ^8.1.1
   path_provider: ^2.0.11
+  floor: ^1.4.1
 
 
 dev_dependencies:
@@ -60,6 +61,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  floor_generator: ^1.4.1
+  build_runner: ^2.1.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
