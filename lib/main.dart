@@ -37,8 +37,6 @@ Future<void> main() async {
   User? user = FirebaseAuth.instance.currentUser;
   // initializeContexts();
 
-  FlutterNativeSplash.remove();
-
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider<CameraCubit>(
@@ -68,17 +66,20 @@ class MyApp extends StatelessWidget {
       required this.routeObserver,
       required this.database});
 
-  initializeContexts(context) {
+  initializeBlocs(BuildContext context) {
     BlocProvider.of<CameraCubit>(context).setCameraList(cameras);
     BlocProvider.of<RouteObserverCubit>(context)
         .setRouteObserver(routeObserver);
     BlocProvider.of<VehicleListCubit>(context).initializeDB(database);
-    BlocProvider.of<VehicleListCubit>(context).pullDataFromDB();
+  }
+
+  Future<void> initializeBlocsAsync(BuildContext context) async {
+    await BlocProvider.of<VehicleListCubit>(context).pullDataFromDB();
   }
 
   @override
   Widget build(BuildContext context) {
-    initializeContexts(context);
+    initializeBlocs(context);
     return MaterialApp(
       title: 'Flutter Demo',
       navigatorObservers: [routeObserver],
@@ -136,10 +137,22 @@ class MyApp extends StatelessWidget {
       //   child: const Initialization(),
       //   // child: BlocProvider(child: const Initialization()),
       // ),
-      home: (() {
-        if (user != null) return const Home();
-        return const Introduction();
-      }()),
+      // home: (() {
+      //   if (user != null) return const Home();
+      //   return const Introduction();
+      // }()),
+      home: FutureBuilder(
+        future: initializeBlocsAsync(context),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            FlutterNativeSplash.remove();
+            if (user != null) return const Home();
+            return const Introduction();
+          } else {
+            return Container();
+          }
+        },
+      ),
     );
   }
 }

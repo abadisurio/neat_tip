@@ -4,7 +4,10 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:neat_tip/bloc/vehicle_list.dart';
+import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/screens/result_screen.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/debit_card.dart';
@@ -17,6 +20,11 @@ class SmartCard extends StatefulWidget {
 }
 
 class _SmartCardState extends State<SmartCard> {
+  late List<Vehicle> vehicleList;
+  late List<String> plateNumbers;
+  final RegExp regexPlate =
+      RegExp(r'^([A-Za-z0-9]{1,4})(\s|-)*([0-9]{1,5})(\s|-)*([A-Za-z]{0,3})$');
+  String _detectedPlate = "";
   bool _isScanning = false;
   bool _isDetecting = false;
   CameraController? cameraController;
@@ -24,40 +32,59 @@ class _SmartCardState extends State<SmartCard> {
 
   startScanning() {
     cameraController?.startImageStream((image) {
-      log('streaming');
-      _processCameraImage(image);
+      log('gambar baru');
+      log('_detectedPlate $_detectedPlate');
+      // log('_isDetecting $_isDetecting');
+      if (_detectedPlate != "") {
+        setState(() {
+          _detectedPlate = "";
+        });
+        return;
+      }
+      if (!_isScanning) return;
+      if (!_isDetecting) _processCameraImage(image);
     });
   }
 
-  stopScanning() {
-    cameraController?.stopImageStream();
+  stopScanning() async {
+    setState(() {
+      _isScanning = false;
+    });
+    await cameraController?.stopImageStream();
   }
 
-  void _itemDetected(String item) async {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => ResultScreen(text: item)));
+  void _itemDetected(String plateNumber) async {
+    await cameraController?.stopImageStream();
+    setState(() {
+      _isScanning = false;
+      _detectedPlate = plateNumber;
+    });
   }
 
   void _processCameraImage(CameraImage image) async {
-    if (_isDetecting) return;
     InputImage inputImage = getInputImage(image);
+
     _isDetecting = true;
 
     final RecognizedText recognisedText =
         await textRecognizer.processImage(inputImage);
-    log('message');
-    log('sini ${recognisedText.blocks}');
 
-    for (TextBlock block in recognisedText.blocks) {
-      log(block.text);
-      if (block.text == "B 3853 KZA") {
-        await cameraController?.stopImageStream();
-        _itemDetected(block.text);
+    log('plateNumbers $plateNumbers');
+    if (recognisedText.blocks.isNotEmpty) {
+      for (TextBlock block in recognisedText.blocks) {
+        log('block.text ${block.text}');
+        if (regexPlate.hasMatch(block.text)) {
+          for (var number in plateNumbers) {
+            log('number $number');
+            if (number == block.text.replaceAll(' ', '')) {
+              _itemDetected(number);
+              // _isDetecting = false;
+            }
+          }
+        }
       }
     }
-    setState(() {
-      _isDetecting = false;
-    });
+    _isDetecting = false;
   }
 
   InputImage getInputImage(CameraImage cameraImage) {
@@ -95,8 +122,20 @@ class _SmartCardState extends State<SmartCard> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    vehicleList = context.read<VehicleListCubit>().state;
+    plateNumbers =
+        vehicleList.map((Vehicle e) => e.plate.replaceAll(' ', '')).toList();
+    // setState(() {
+    // });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final navigator = Navigator.of(context);
+    // final navigator = Navigator.of(context);
+    // log('plateNumberswww $plateNumbers');
     return AnimatedContainer(
       margin: EdgeInsets.only(
         top: _isScanning ? 0 : 16,
@@ -146,7 +185,7 @@ class _SmartCardState extends State<SmartCard> {
             ),
             AnimatedOpacity(
               curve: Curves.easeOutCirc,
-              opacity: _isScanning ? 0 : 1.0,
+              opacity: _isScanning || _detectedPlate != "" ? 0 : 1.0,
               duration: const Duration(milliseconds: 500),
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -155,7 +194,11 @@ class _SmartCardState extends State<SmartCard> {
             ),
             AnimatedOpacity(
               curve: Curves.easeOutCirc,
-              opacity: !_isScanning ? 0 : 1.0,
+              opacity: _detectedPlate != ""
+                  ? 0
+                  : _isScanning
+                      ? 1
+                      : 0,
               duration: const Duration(milliseconds: 500),
               child: const Align(
                   alignment: Alignment.topCenter,
