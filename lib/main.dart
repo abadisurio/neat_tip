@@ -1,9 +1,5 @@
-import 'dart:developer';
-
 import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:floor/floor.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -11,148 +7,95 @@ import 'package:neat_tip/bloc/camera.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/db/database.dart';
-import 'package:neat_tip/screens/auth_screen.dart';
-import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
-import 'package:neat_tip/screens/initialization.dart';
 import 'package:neat_tip/screens/introduction.dart';
-import 'package:neat_tip/screens/profile.dart';
-import 'package:neat_tip/screens/vehicle_add.dart';
-import 'package:neat_tip/screens/vehicle_list.dart';
+import 'package:neat_tip/screens/suspend.dart';
 import 'package:neat_tip/utils/firebase.dart';
+import 'package:neat_tip/utils/route_generator.dart';
+import 'package:neat_tip/utils/theme_data.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-Future<void> main() async {
+void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isCameraGranted = false;
   final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+  late User? user;
   late List<CameraDescription> cameras;
   late NeatTipDatabase database;
 
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  Future<void> initializeComponents() async {
+    await AppFirebase.initializeFirebase();
+    // await FirebaseAuth.instance.signOut();
+    cameras = await availableCameras();
+    isCameraGranted = await checkCameraPermission();
+    user = FirebaseAuth.instance.currentUser;
+    database =
+        await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
+  }
 
-  await AppFirebase.initializeFirebase();
-  // await FirebaseAuth.instance.signOut();
-  database = await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
-  cameras = await availableCameras();
-
-  User? user = FirebaseAuth.instance.currentUser;
-  // initializeContexts();
-
-  runApp(MultiBlocProvider(
-    providers: [
-      BlocProvider<CameraCubit>(
-          create: (BuildContext context) => CameraCubit()),
-      BlocProvider<RouteObserverCubit>(
-          create: (BuildContext context) => RouteObserverCubit()),
-      BlocProvider<VehicleListCubit>(
-          create: (BuildContext context) => VehicleListCubit()),
-    ],
-    child: MyApp(
-        cameras: cameras,
-        user: user,
-        routeObserver: routeObserver,
-        database: database),
-  ));
-}
-
-class MyApp extends StatelessWidget {
-  final List<CameraDescription> cameras;
-  final User? user;
-  final RouteObserver routeObserver;
-  final NeatTipDatabase database;
-  const MyApp(
-      {super.key,
-      required this.cameras,
-      required this.user,
-      required this.routeObserver,
-      required this.database});
-
-  initializeBlocs(BuildContext context) {
+  Future<void> initializeBloc(BuildContext context) async {
+    final blocDB = BlocProvider.of<VehicleListCubit>(context);
     BlocProvider.of<CameraCubit>(context).setCameraList(cameras);
     BlocProvider.of<RouteObserverCubit>(context)
         .setRouteObserver(routeObserver);
-    BlocProvider.of<VehicleListCubit>(context).initializeDB(database);
+    blocDB.initializeDB(database);
+    await blocDB.pullDataFromDB();
   }
 
-  Future<void> initializeBlocsAsync(BuildContext context) async {
-    await BlocProvider.of<VehicleListCubit>(context).pullDataFromDB();
+  Future<bool> checkCameraPermission() async {
+    final status = await Permission.camera.request();
+    return status == PermissionStatus.granted;
   }
 
   @override
   Widget build(BuildContext context) {
-    initializeBlocs(context);
-    return MaterialApp(
-      title: 'Flutter Demo',
-      navigatorObservers: [routeObserver],
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          toolbarHeight: 100,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-              color: Colors.grey.shade800,
-              fontSize: 20,
-              fontWeight: FontWeight.bold),
-          iconTheme: IconThemeData(
-            color: Colors.grey.shade800, //change your color here
-          ),
-          surfaceTintColor: Colors.grey.shade800,
-          foregroundColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade800,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100.0),
-            ),
-          ),
-        ),
-        primarySwatch: Colors.blue,
-      ),
-      onGenerateRoute: (RouteSettings settings) {
-        switch (settings.name) {
-          case '/auth':
-            return CupertinoPageRoute(
-                builder: (_) => const AuthScreen(), settings: settings);
-          case '/home':
-            return CupertinoPageRoute(
-                builder: (_) => const Home(), settings: settings);
-          case '/vehiclelist':
-            return CupertinoPageRoute(
-                builder: (_) => const VehicleList(), settings: settings);
-          case '/vehicleadd':
-            return CupertinoPageRoute(
-                builder: (_) => const VehicleAdd(), settings: settings);
-          case '/profile':
-            return CupertinoPageRoute(
-                builder: (_) => const Profile(), settings: settings);
-          case '/spots':
-            return CupertinoPageRoute(
-                builder: (_) => const ExploreSpot(), settings: settings);
-        }
-        return null;
-      },
-      // home: BlocProvider(
-      //   create: (_) => CameraCubit(),
-      //   child: const Initialization(),
-      //   // child: BlocProvider(child: const Initialization()),
-      // ),
-      // home: (() {
-      //   if (user != null) return const Home();
-      //   return const Introduction();
-      // }()),
-      home: FutureBuilder(
-        future: initializeBlocsAsync(context),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            FlutterNativeSplash.remove();
-            if (user != null) return const Home();
-            return const Introduction();
-          } else {
-            return Container();
-          }
-        },
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CameraCubit>(
+            create: (BuildContext context) => CameraCubit()),
+        BlocProvider<RouteObserverCubit>(
+            create: (BuildContext context) => RouteObserverCubit()),
+        BlocProvider<VehicleListCubit>(
+            create: (BuildContext context) => VehicleListCubit()),
+      ],
+      child: FutureBuilder<void>(
+          future: initializeComponents(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Container();
+            }
+            return MaterialApp(
+              title: 'Flutter Demo',
+              navigatorObservers: [routeObserver],
+              theme: getThemeData(),
+              onGenerateRoute: routeGenerator,
+              home: FutureBuilder(
+                future: initializeBloc(context),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    FlutterNativeSplash.remove();
+                    if (!isCameraGranted) return const Suspend();
+                    if (user != null) return const Home();
+                    return const Introduction();
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
+            );
+          }),
     );
   }
 }

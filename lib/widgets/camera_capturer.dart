@@ -24,7 +24,6 @@ class _CameraCapturerState extends State<CameraCapturer>
   List<CameraDescription> cameras = [];
   late List<CameraDescription> cameraList;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-  late final Future<void> _future;
 
   // Add this controller to be able to control de camera
   CameraController? _cameraController;
@@ -34,7 +33,7 @@ class _CameraCapturerState extends State<CameraCapturer>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     cameraList = BlocProvider.of<CameraCubit>(context).cameraList;
-    _future = _requestCameraPermission();
+    _initCameraController(cameraList);
     // setState(() {
     //   _isScanning = widget.isScanning;
     // });
@@ -71,37 +70,7 @@ class _CameraCapturerState extends State<CameraCapturer>
   @override
   Widget build(BuildContext context) {
     // log('hehe ${widget.isScanning}');
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          _initCameraController(cameraList);
-        }
-        return Stack(
-          fit: StackFit.loose,
-          children: [
-            // Show the camera feed behind everything
-            if (_isPermissionGranted)
-              Center(child: CameraPreview(_cameraController!))
-            else if (!_isPermissionGranted)
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                  child: const Text(
-                    'Camera permission denied',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _requestCameraPermission() async {
-    final status = await Permission.camera.request();
-    _isPermissionGranted = status == PermissionStatus.granted;
+    return Center(child: CameraPreview(_cameraController!));
   }
 
   void _startCamera() {
