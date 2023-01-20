@@ -1,19 +1,24 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/loading_window.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class PermissionWidnow extends StatefulWidget {
-  const PermissionWidnow({super.key});
+class PermissionWindow extends StatefulWidget {
+  final VoidCallback? onAllowedAll;
+  final bool showDoneButton;
+  const PermissionWindow(
+      {super.key, this.onAllowedAll, this.showDoneButton = false});
 
   @override
-  State<PermissionWidnow> createState() => _PermissionWidnowState();
+  State<PermissionWindow> createState() => _PermissionWindowState();
 }
 
 final List<Map<String, dynamic>> serviceList = [
   {'name': 'Kameraaa', 'type': Permission.camera}
 ];
 
-class _PermissionWidnowState extends State<PermissionWidnow> {
+class _PermissionWindowState extends State<PermissionWindow> {
   Map<Permission, PermissionStatus> permissionStatus = {};
   bool isChecking = true;
   bool isAllAllowed = true;
@@ -25,15 +30,23 @@ class _PermissionWidnowState extends State<PermissionWidnow> {
   }
 
   Future<void> checkPermission() async {
+    setState(() {
+      isAllAllowed = true;
+    });
     for (var service in serviceList) {
       final Permission permission = service['type'];
       final status = await permission.status;
       permissionStatus[permission] = status;
-      setState(() {
-        if (!status.isGranted) {
+      if (!status.isGranted) {
+        setState(() {
           isAllAllowed = false;
-        }
-      });
+        });
+      }
+    }
+
+    log('widget.onAllowedAll ${widget.onAllowedAll}');
+    if (widget.onAllowedAll != null && isAllAllowed) {
+      widget.onAllowedAll!();
     }
 
     setState(() {
@@ -46,7 +59,11 @@ class _PermissionWidnowState extends State<PermissionWidnow> {
     setState(() {
       permissionStatus[type] = camera;
     });
-    checkPermission();
+    await checkPermission();
+  }
+
+  returnToApp() {
+    Navigator.of(context).pop();
   }
 
   @override
@@ -56,7 +73,7 @@ class _PermissionWidnowState extends State<PermissionWidnow> {
     return Scaffold(
       body: SafeArea(
         child: ListView.builder(
-            itemCount: serviceList.length + 1,
+            itemCount: serviceList.length + 2,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemBuilder: (context, index) {
               if (index == 0) {
@@ -68,8 +85,13 @@ class _PermissionWidnowState extends State<PermissionWidnow> {
                   ],
                 );
               }
-              if (index == serviceList.length && isAllAllowed) {
-                return const Text('boleh semua');
+              if (index == serviceList.length + 1) {
+                return isAllAllowed && widget.showDoneButton
+                    ? ElevatedButton(
+                        onPressed: returnToApp, child: const Text('belom'))
+                    : const Center(
+                        child: Text('selesai'),
+                      );
               }
               final service = serviceList[index - 1];
               final isGranted = permissionStatus[service['type']]!.isGranted;
@@ -84,7 +106,7 @@ class _PermissionWidnowState extends State<PermissionWidnow> {
                         onPressed: () {
                           requestAccess(service['type']);
                         },
-                        child: Text("Minta Akses"),
+                        child: const Text("Minta Akses"),
                       ),
               );
             }),

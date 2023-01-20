@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:neat_tip/utils/firebase.dart';
 
 class GoogleSignInButton extends StatefulWidget {
-  const GoogleSignInButton({super.key});
+  final VoidCallback? onSuccess;
+  const GoogleSignInButton({super.key, this.onSuccess});
 
   @override
   State<GoogleSignInButton> createState() => _GoogleSignInButtonState();
@@ -37,7 +38,10 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                   _isSigningIn = false;
                 });
                 print(user);
-                navigator.pushNamedAndRemoveUntil('/home', (route) => false);
+                if (widget.onSuccess != null) {
+                  widget.onSuccess!();
+                }
+                // navigator.pop();
                 // navigator.pop();
                 // navigator.pushNamed('/home');
               } catch (e) {

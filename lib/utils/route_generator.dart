@@ -4,6 +4,7 @@ import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/introduction.dart';
+import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/screens/profile.dart';
 import 'package:neat_tip/screens/vehicle_add.dart';
 import 'package:neat_tip/screens/vehicle_list.dart';
@@ -13,6 +14,9 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/intro':
       return CupertinoPageRoute(
           builder: (_) => const Introduction(), settings: settings);
+    case '/permission':
+      return CupertinoPageRoute(
+          builder: (_) => const PermissionWindow(), settings: settings);
     case '/explorespot':
       return CupertinoPageRoute(
           builder: (_) => const ExploreSpot(), settings: settings);

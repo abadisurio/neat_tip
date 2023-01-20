@@ -41,12 +41,16 @@ List<Map<String, dynamic>> signUpFields = [
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isSingingUp = false;
+  bool isSuccess = false;
   Map<String, TextEditingController> authFieldControllers = {};
 
   final List<bool> authType = <bool>[true, false];
 
   void onSuccess() {
-    Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+    setState(() {
+      isSuccess = true;
+    });
+    Navigator.pop(context, true);
   }
 
   void submitAuth() async {
@@ -80,120 +84,131 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            children: [
-              Center(
-                child: ToggleButtons(
-                  direction: Axis.horizontal,
-                  onPressed: (int index) {
-                    setState(() {
-                      // The button that is tapped is set to true, and the others to false.
-                      for (int i = 0; i < authType.length; i++) {
-                        authType[i] = i == index;
-                      }
-                      isSingingUp = authType[1];
-                    });
-                  },
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  borderColor: Colors.grey.shade800,
-                  selectedBorderColor: Colors.grey.shade800,
-                  selectedColor: Colors.white,
-                  fillColor: Colors.grey.shade800,
-                  color: Colors.grey.shade600,
-                  constraints: const BoxConstraints(
-                    minHeight: 30.0,
-                    minWidth: 80.0,
-                  ),
-                  isSelected: authType,
-                  children: authName,
-                ),
-              ),
-              Column(mainAxisSize: MainAxisSize.min, children: [
-                ...signInFields.map((e) {
-                  final controller = authFieldControllers.putIfAbsent(
-                      e['fieldname'], () => TextEditingController());
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: TextFormField(
-                      keyboardType: e['type'],
-                      controller: controller,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          hintText: 'Masukkan ${e['fieldname']}',
-                          labelText: e['fieldname']),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
+      appBar: AppBar(),
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, isSuccess);
+          return isSuccess;
+        },
+        child: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              children: [
+                Center(
+                  child: ToggleButtons(
+                    direction: Axis.horizontal,
+                    onPressed: (int index) {
+                      setState(() {
+                        // The button that is tapped is set to true, and the others to false.
+                        for (int i = 0; i < authType.length; i++) {
+                          authType[i] = i == index;
                         }
-                        return null;
-                      },
+                        isSingingUp = authType[1];
+                      });
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    borderColor: Colors.grey.shade800,
+                    selectedBorderColor: Colors.grey.shade800,
+                    selectedColor: Colors.white,
+                    fillColor: Colors.grey.shade800,
+                    color: Colors.grey.shade600,
+                    constraints: const BoxConstraints(
+                      minHeight: 30.0,
+                      minWidth: 80.0,
                     ),
-                  );
-                }).toList()
-              ]),
-              AnimatedSize(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOutCirc,
-                  child: !isSingingUp
-                      ? const SizedBox()
-                      : Column(mainAxisSize: MainAxisSize.min, children: [
-                          ...signUpFields.map((e) {
-                            final controller = authFieldControllers.putIfAbsent(
-                                e['fieldname'], () => TextEditingController());
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: TextFormField(
-                                keyboardType: e['type'],
-                                controller: controller,
-                                decoration: InputDecoration(
-                                    border: const OutlineInputBorder(),
-                                    hintText: 'Masukkan ${e['fieldname']}',
-                                    labelText: e['fieldname']),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Tidak boleh kosong. Masukkan ${e['fieldname']} Anda!';
-                                  }
-                                  if (!e['validator'](value)) {
-                                    return 'Format ${e['fieldname']} tidak sesuai';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            );
-                          }).toList()
-                        ])),
-              ElevatedButton(
-                onPressed: submitAuth,
-                child: const Text('Submit'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Divider(
-                        thickness: 2,
-                      ),
-                    ),
-                    Text(
-                      ' atau cara lain ',
-                      style: TextStyle(color: Colors.grey.shade500),
-                    ),
-                    const Expanded(
-                      child: Divider(
-                        thickness: 2,
-                      ),
-                    ),
-                  ],
+                    isSelected: authType,
+                    children: authName,
+                  ),
                 ),
-              ),
-              const GoogleSignInButton(),
-            ],
+                Column(mainAxisSize: MainAxisSize.min, children: [
+                  ...signInFields.map((e) {
+                    final controller = authFieldControllers.putIfAbsent(
+                        e['fieldname'], () => TextEditingController());
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                        keyboardType: e['type'],
+                        controller: controller,
+                        decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: 'Masukkan ${e['fieldname']}',
+                            labelText: e['fieldname']),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';
+                          }
+                          return null;
+                        },
+                      ),
+                    );
+                  }).toList()
+                ]),
+                AnimatedSize(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOutCirc,
+                    child: !isSingingUp
+                        ? const SizedBox()
+                        : Column(mainAxisSize: MainAxisSize.min, children: [
+                            ...signUpFields.map((e) {
+                              final controller =
+                                  authFieldControllers.putIfAbsent(
+                                      e['fieldname'],
+                                      () => TextEditingController());
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: TextFormField(
+                                  keyboardType: e['type'],
+                                  controller: controller,
+                                  decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      hintText: 'Masukkan ${e['fieldname']}',
+                                      labelText: e['fieldname']),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Tidak boleh kosong. Masukkan ${e['fieldname']} Anda!';
+                                    }
+                                    if (!e['validator'](value)) {
+                                      return 'Format ${e['fieldname']} tidak sesuai';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              );
+                            }).toList()
+                          ])),
+                ElevatedButton(
+                  onPressed: submitAuth,
+                  child: const Text('Submit'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Divider(
+                          thickness: 2,
+                        ),
+                      ),
+                      Text(
+                        ' atau cara lain ',
+                        style: TextStyle(color: Colors.grey.shade500),
+                      ),
+                      const Expanded(
+                        child: Divider(
+                          thickness: 2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GoogleSignInButton(
+                  onSuccess: onSuccess,
+                ),
+              ],
+            ),
           ),
         ),
       ),

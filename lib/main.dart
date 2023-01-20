@@ -31,17 +31,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isPermissionGranted = false;
+  bool isNeedPermission = false;
   final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
   late User? user;
   late List<CameraDescription> cameras;
   late NeatTipDatabase database;
+  bool isAllAllowed = true;
 
   Future<void> initializeComponents() async {
     await AppFirebase.initializeFirebase();
     // await FirebaseAuth.instance.signOut();
     cameras = await availableCameras();
-    isPermissionGranted = await checkPermission();
+    isNeedPermission = await checkPermission();
     user = FirebaseAuth.instance.currentUser;
     database =
         await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
@@ -58,13 +59,18 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<bool> checkPermission() async {
-    final camera = await Permission.camera.status;
-    return camera == PermissionStatus.granted;
+    bool isAllAllowed = true;
+    for (var service in serviceList) {
+      final Permission permission = service['type'];
+      final status = await permission.status;
+      if (!status.isGranted) isAllAllowed = false;
+    }
+    return isAllAllowed;
   }
 
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
@@ -102,9 +108,12 @@ class _MyAppState extends State<MyApp> {
                       return const LoadingWindow();
                     } else {
                       FlutterNativeSplash.remove();
-                      if (!isPermissionGranted) return const PermissionWidnow();
-                      if (user != null) return const Home();
-                      return const Introduction();
+                      if (user == null) {
+                        return const Introduction();
+                      } else if (!isNeedPermission) {
+                        return const PermissionWindow();
+                      }
+                      return const Home();
                     }
                   },
                 );

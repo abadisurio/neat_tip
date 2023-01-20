@@ -20,7 +20,7 @@ class CameraCapturer extends StatefulWidget {
 
 class _CameraCapturerState extends State<CameraCapturer>
     with WidgetsBindingObserver {
-  bool _isPermissionGranted = false;
+  // bool _isPermissionGranted = false;
   List<CameraDescription> cameras = [];
   late List<CameraDescription> cameraList;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
