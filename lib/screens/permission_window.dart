@@ -8,7 +8,7 @@ class PermissionWindow extends StatefulWidget {
   final VoidCallback? onAllowedAll;
   final bool showDoneButton;
   const PermissionWindow(
-      {super.key, this.onAllowedAll, this.showDoneButton = false});
+      {super.key, this.onAllowedAll, this.showDoneButton = true});
 
   @override
   State<PermissionWindow> createState() => _PermissionWindowState();
@@ -63,7 +63,7 @@ class _PermissionWindowState extends State<PermissionWindow> {
   }
 
   returnToApp() {
-    Navigator.of(context).pop();
+    Navigator.pop(context, isAllAllowed);
   }
 
   @override
@@ -71,45 +71,51 @@ class _PermissionWindowState extends State<PermissionWindow> {
     if (isChecking) return const LoadingWindow();
 
     return Scaffold(
-      body: SafeArea(
-        child: ListView.builder(
-            itemCount: serviceList.length + 2,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Column(
-                  children: const [
-                    Text(
-                        'Neat Tip memerlukan akses berikut untuk dapat berjalan'),
-                    Text('Izinkan permintaan untuk melanjutkan'),
-                  ],
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, isAllAllowed);
+          return isAllAllowed;
+        },
+        child: SafeArea(
+          child: ListView.builder(
+              itemCount: serviceList.length + 2,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Column(
+                    children: const [
+                      Text(
+                          'Neat Tip memerlukan akses berikut untuk dapat berjalan'),
+                      Text('Izinkan permintaan untuk melanjutkan'),
+                    ],
+                  );
+                }
+                if (index == serviceList.length + 1) {
+                  return isAllAllowed && widget.showDoneButton
+                      ? ElevatedButton(
+                          onPressed: returnToApp, child: const Text('selesai'))
+                      : const Center(
+                          child: Text('belom'),
+                        );
+                }
+                final service = serviceList[index - 1];
+                final isGranted = permissionStatus[service['type']]!.isGranted;
+                return ListTile(
+                  leading: Icon(Icons.camera_alt),
+                  title: Text(service['name']),
+                  subtitle:
+                      Text(isGranted ? "sudah diizinkan" : "tidak diizinkan"),
+                  trailing: isGranted
+                      ? null
+                      : ElevatedButton(
+                          onPressed: () {
+                            requestAccess(service['type']);
+                          },
+                          child: const Text("Minta Akses"),
+                        ),
                 );
-              }
-              if (index == serviceList.length + 1) {
-                return isAllAllowed && widget.showDoneButton
-                    ? ElevatedButton(
-                        onPressed: returnToApp, child: const Text('belom'))
-                    : const Center(
-                        child: Text('selesai'),
-                      );
-              }
-              final service = serviceList[index - 1];
-              final isGranted = permissionStatus[service['type']]!.isGranted;
-              return ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text(service['name']),
-                subtitle:
-                    Text(isGranted ? "sudah diizinkan" : "tidak diizinkan"),
-                trailing: isGranted
-                    ? null
-                    : ElevatedButton(
-                        onPressed: () {
-                          requestAccess(service['type']);
-                        },
-                        child: const Text("Minta Akses"),
-                      ),
-              );
-            }),
+              }),
+        ),
       ),
     );
   }

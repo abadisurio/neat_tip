@@ -50,15 +50,18 @@ class _SmartCardState extends State<SmartCard> {
     setState(() {
       _isScanning = false;
     });
-    await cameraController?.stopImageStream();
+    if (cameraController!.value.isStreamingImages) {
+      await cameraController?.stopImageStream();
+    }
   }
 
   void _itemDetected(String plateNumber) async {
-    await cameraController?.stopImageStream();
     setState(() {
-      _isScanning = false;
+      // _isScanning = false;
       _detectedPlate = plateNumber;
     });
+    stopScanning();
+    // await cameraController?.stopImageStream();
   }
 
   void _processCameraImage(CameraImage image) async {
@@ -76,7 +79,7 @@ class _SmartCardState extends State<SmartCard> {
         if (regexPlate.hasMatch(block.text)) {
           for (var number in plateNumbers) {
             log('number $number');
-            if (number == block.text.replaceAll(' ', '')) {
+            if (number.replaceAll(' ', '') == block.text.replaceAll(' ', '')) {
               _itemDetected(number);
               // _isDetecting = false;
             }
@@ -126,8 +129,7 @@ class _SmartCardState extends State<SmartCard> {
     super.initState();
 
     vehicleList = context.read<VehicleListCubit>().state;
-    plateNumbers =
-        vehicleList.map((Vehicle e) => e.plate.replaceAll(' ', '')).toList();
+    plateNumbers = vehicleList.map((Vehicle e) => e.plate).toList();
     // setState(() {
     // });
   }
@@ -205,6 +207,22 @@ class _SmartCardState extends State<SmartCard> {
                   child: Text(
                     '\nPindai plat motor Anda',
                     style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        shadows: [Shadow(color: Colors.black, blurRadius: 3)]),
+                  )),
+            ),
+            AnimatedOpacity(
+              curve: Curves.easeOutCirc,
+              opacity: _detectedPlate == "" ? 0 : 1,
+              duration: const Duration(milliseconds: 500),
+              child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    '\nKendaraan Terdeteksi\n\n$_detectedPlate',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

@@ -134,6 +134,7 @@ class VehicleAddState extends State<VehicleAdd> {
       log('message ${BlocProvider.of<VehicleListCubit>(context).state}');
       BlocProvider.of<VehicleListCubit>(context).pushDataToDB();
       log('success');
+      Navigator.pop(context, true);
     }
   }
 

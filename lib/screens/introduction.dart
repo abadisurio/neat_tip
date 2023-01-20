@@ -16,52 +16,27 @@ class _IntroductionState extends State<Introduction> {
   bool _isPermissionsAllowed = false;
   bool _isLoggedIn = false;
   bool _isVehicleAdded = false;
-
-  List<PageViewModel> listPagesViewModel = [
-    PageViewModel(
-        title: " ",
-        bodyWidget: const Center(
-          child: Text('hehehe'),
-        )),
-    PageViewModel(
-        useScrollView: false,
-        title: " ",
-        bodyWidget: Column(
-          children: [
-            SizedBox(
-                height: 300,
-                width: 500,
-                child: Card(
-                    child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: PermissionWindow(
-                    onAllowedAll: () {
-                      // setState(() {
-                      //   log('boleh');
-                      // });
-                    },
-                  ),
-                ))),
-          ],
-        )),
-    PageViewModel(
-        title: " ",
-        bodyWidget: const Center(
-          child: Text('hehehe'),
-        )),
-  ];
-
-  setPermissionsAllowed() {
-    setState(() {
-      _isPermissionsAllowed = true;
-    });
-  }
+  bool _isPageSuspended = false;
 
   navigateToAuthPage() async {
     final isLoggedIn = await Navigator.pushNamed(context, '/auth') as bool;
     log('isLoggedIn $isLoggedIn');
     setState(() {
       _isLoggedIn = isLoggedIn;
+      _isPageSuspended = !isLoggedIn;
+    });
+  }
+
+  navigatoToPermissionPage() async {
+    final isPermissionsAllowed =
+        await Navigator.pushNamed(context, '/permission') as bool;
+    log('isPermissionsAllowed $isPermissionsAllowed');
+    //  PermissionWindow(
+    //         onAllowedAll: setPermissionsAllowed,
+    //       ),
+    setState(() {
+      _isPermissionsAllowed = isPermissionsAllowed;
+      _isPageSuspended = !isPermissionsAllowed;
     });
   }
 
@@ -74,17 +49,24 @@ class _IntroductionState extends State<Introduction> {
     });
   }
 
+  setSuspend(int page) {
+    log('page $page');
+    bool suspend = false;
+    if (page < 2 && !_isLoggedIn) suspend = true;
+    if (page < 3 && !_isPermissionsAllowed) suspend = true;
+    if (page < 4 && !_isVehicleAdded) suspend = true;
+    setState(() {
+      _isPageSuspended = suspend;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    log('_isPageSuspended $_isPageSuspended');
     // log('_isLoggedIn $_isLoggedIn');
 
     return SafeArea(
       child: IntroductionScreen(
-        // canProgress: () {
-        //   return true;
-        // },
-        // freeze: true,
-        // pages: listPagesViewModel,
         rawPages: [
           const Center(
             child: Text('hehehe'),
@@ -95,11 +77,11 @@ class _IntroductionState extends State<Introduction> {
               child: const Text('Masuk'),
             ),
           ),
-          const Center(
-            child: Text('hehehe'),
-          ),
-          PermissionWindow(
-            onAllowedAll: setPermissionsAllowed,
+          Center(
+            child: ElevatedButton(
+              onPressed: navigatoToPermissionPage,
+              child: const Text('izin'),
+            ),
           ),
           Center(
             child: ElevatedButton(
@@ -107,21 +89,17 @@ class _IntroductionState extends State<Introduction> {
               child: const Text('Tambah Kendaraan'),
             ),
           ),
-          // const VehicleAdd()
         ],
-        canProgress: (double page) {
-          log('page $page');
-          // if (!(page > 1 && !_isLoggedIn)) {
-          //   return false;
-          // } else if (!(page > 2 && !_isPermissionsAllowed)) {
-          //   return false;
-          // }
-          return true;
-        },
-        // showNextButton: false,
+        onChange: setSuspend,
+        showNextButton: !_isPageSuspended,
+        showDoneButton: _isVehicleAdded,
         next: const Text("Lanjut"),
-        allowImplicitScrolling: true,
+        back: const Text("Kembali"),
         done: const Text("Mulai Neat Tip"),
+        freeze: true,
+        showBackButton: true,
+        allowImplicitScrolling: false,
+        // allowImplicitScrolling: true,
         onDone: () {
           // On button pressed
           // setState(() {
