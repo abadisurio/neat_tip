@@ -10,12 +10,14 @@ part of 'database.dart';
 class $FloorNeatTipDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
+  // ignore: library_private_types_in_public_api
   static _$NeatTipDatabaseBuilder databaseBuilder(String name) =>
       _$NeatTipDatabaseBuilder(name);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
+  // ignore: library_private_types_in_public_api
   static _$NeatTipDatabaseBuilder inMemoryDatabaseBuilder() =>
       _$NeatTipDatabaseBuilder(null);
 }
