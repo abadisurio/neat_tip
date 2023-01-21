@@ -35,7 +35,6 @@ class _HomeState extends State<Home> with RouteAware {
     setState(() {
       isScreenActive = false;
     });
-    // TODO: implement didPushNext
     super.didPushNext();
   }
 
@@ -51,7 +50,6 @@ class _HomeState extends State<Home> with RouteAware {
 
   @override
   void deactivate() {
-    // TODO: implement deactivate
     log('deact');
     super.deactivate();
   }

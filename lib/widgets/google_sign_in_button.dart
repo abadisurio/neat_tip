@@ -17,7 +17,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
 
   @override
   Widget build(BuildContext context) {
-    final navigator = Navigator.of(context);
+    // final navigator = Navigator.of(context);
     return _isSigningIn
         ? const Center(
             child: CircularProgressIndicator(

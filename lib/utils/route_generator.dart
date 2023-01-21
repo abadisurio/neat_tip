@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:neat_tip/models/spot.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';

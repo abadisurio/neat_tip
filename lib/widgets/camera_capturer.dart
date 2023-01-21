@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:neat_tip/bloc/camera.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class CameraCapturer extends StatefulWidget {
   final Function(CameraController) controller;

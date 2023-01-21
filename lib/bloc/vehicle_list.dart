@@ -1,8 +1,4 @@
 import 'dart:developer';
-
-import 'package:camera/camera.dart';
-import 'package:floor/floor.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/vehicle.dart';

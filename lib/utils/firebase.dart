@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -91,8 +92,8 @@ class AppFirebase {
       }
     } else {
       try {
-        final UserCredential credential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        // final UserCredential credential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailAddress,
           password: password,
         );
@@ -176,7 +177,9 @@ class AppFirebase {
     try {
       // Create a reference to "mountains.jpg"
       await fileRef.putFile(file);
-    } catch (e) {}
+    } catch (e) {
+      log('$e');
+    }
     return fileRef;
   }
 

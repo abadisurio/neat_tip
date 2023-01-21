@@ -13,7 +13,6 @@ import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/loading_window.dart';
 import 'package:neat_tip/screens/permission_window.dart';
-import 'package:neat_tip/screens/suspend.dart';
 import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/utils/route_generator.dart';
 import 'package:neat_tip/utils/theme_data.dart';

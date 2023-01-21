@@ -101,7 +101,7 @@ class _PermissionWindowState extends State<PermissionWindow> {
                 final service = serviceList[index - 1];
                 final isGranted = permissionStatus[service['type']]!.isGranted;
                 return ListTile(
-                  leading: Icon(Icons.camera_alt),
+                  leading: const Icon(Icons.camera_alt),
                   title: Text(service['name']),
                   subtitle:
                       Text(isGranted ? "sudah diizinkan" : "tidak diizinkan"),

@@ -2,8 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:neat_tip/screens/permission_window.dart';
-import 'package:neat_tip/screens/vehicle_add.dart';
 
 class Introduction extends StatefulWidget {
   const Introduction({super.key});

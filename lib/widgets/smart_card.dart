@@ -8,7 +8,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
-import 'package:neat_tip/screens/result_screen.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/debit_card.dart';
 
