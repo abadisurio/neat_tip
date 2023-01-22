@@ -14,7 +14,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with RouteAware {
-  bool isScreenActive = true;
+  late bool isScreenActive;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -27,6 +27,7 @@ class _HomeState extends State<Home> with RouteAware {
   @override
   void initState() {
     super.initState();
+    isScreenActive = true;
   }
 
   @override
@@ -74,15 +75,15 @@ class _HomeState extends State<Home> with RouteAware {
                 width: MediaQuery.of(context).size.width,
                 child: Stack(
                   alignment: Alignment.topCenter,
-                  children: [
-                    const Align(
+                  children: const [
+                    Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(8, 0, 8, 30),
                         child: DashboardMenu(),
                       ),
                     ),
-                    if (isScreenActive) const SmartCard()
+                    // if (isScreenActive) const SmartCard()
                   ],
                 ),
               ),

@@ -10,11 +10,8 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   get collection => state;
   get length => state.length;
 
-  // void increment() => emit(state.ad);
-  // List<CameraDescription> _routeObserver = [];
   void initializeDB(NeatTipDatabase db) {
     _db = db;
-    // emit(cameras);
   }
 
   Future<void> pushDataToDB() async {
@@ -22,9 +19,6 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     for (var vehicle in newData) {
       await _db.vehicleDao.insertVehicle(vehicle);
     }
-    // return ;
-    // _db = db;
-    // emit(cameras);
   }
 
   Future<void> pullDataFromDB() async {
@@ -32,38 +26,38 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _dbList = dataDB;
     emit([...state, ...dataDB]);
     log('tarikMang $state');
-    // _db = db;
-    // emit(cameras);
   }
 
   void setList(List<Vehicle> list) {
     emit(list);
-    // state = list;
-    // emit(cameras);
   }
 
   Vehicle findByIndex(int index) {
     return state.elementAt(index);
-    // emit(cameras);
   }
 
   void removeByIndex(int index) {
     state.removeAt(index);
+    emit([...state]);
   }
 
-  // void length(Vehicle vehicle) {
-  //   _collection.add(vehicle);
-  // }
+  void removeById(String id) {
+    final newList = state.where((element) => element.id != id).toList();
+    emit([...newList]);
+  }
+
+  void updateByIndex(int index, Vehicle newVehicle) {
+    state[index] = newVehicle;
+    emit([...state]);
+  }
+
+  void updateById(String id, Vehicle newVehicle) {
+    final listIndex = state.indexWhere((Vehicle vehicle) => vehicle.id == id);
+    state[listIndex] = newVehicle;
+    emit([...state]);
+  }
+
   void addVehicle(Vehicle vehicle) {
-    log('sini');
-    // state.add(vehicle);
     emit([...state, vehicle]);
-    log('state sini $state');
-    // return emit(_collection);
   }
-
-  // void addMultipleVehicle(List<Vehicle> vehicleList) {
-  //   _collection.addAll(vehicleList);
-  // }
-  // void decrement() => emit(state - 1);
 }
