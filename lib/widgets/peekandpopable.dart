@@ -28,6 +28,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   bool isLongPressDown = false;
   bool isScaleWidget = false;
   bool isDismissing = false;
+  bool isOpened = false;
 
   late Timer onHold;
 
@@ -95,46 +96,57 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   Future<void> showMoreOptions() async {
     final size = MediaQuery.of(context).size;
     final widgetPosition = getWigetPosition();
-    const duration = Duration(milliseconds: 200);
-    const curve = Curves.easeOutCirc;
+    const duration = Duration(milliseconds: 350);
+    const curve = Curves.easeInOutCubic;
     final border = BorderRadius.circular(16);
+    setState(() {
+      isOpened = true;
+    });
     await showGeneralDialog(
       barrierDismissible: true,
       barrierLabel: '',
       barrierColor: Colors.black38,
       transitionDuration: duration,
       pageBuilder: (ctx, anim1, anim2) {
-        // log('anim1 1 $anim1');
-        // anim1.drive(CurveTween(curve: curve));
         return AnimatedBuilder(
           animation: anim1,
           builder: (BuildContext context, Widget? child) {
-            log('anim1 2 $anim1');
-            // log('anim1 ${context.}');
-            // bool isAnimationDone = anim1.value == 1;
+            log('isOpened0 $isOpened');
+            if (anim1.value == 1) {
+              isOpened = false;
+            }
+            // bool isPeekOpening = anim1.value != 0;
+            log('isOpened $isOpened');
+            log(' anim1.value ${anim1.value}');
+            log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
+            // bool isPeekOpening = anim1.value > 0 || isOpened; // awal
+            bool isPeekOpening = isOpened
+                ? anim1.value > 0 || anim1.value >= 1 // awal
+                : anim1.value > 0 && anim1.value >= 1; // akhir
+            // bool isPeekOpening = anim1.value > 0 || anim1.value >= 1;
+            // bool isPeekClosing = anim1.value <= 1;
+            // // bool isPeekOpen = isPeekOpening && isPeekClosing;
             return DraggableCard(
               onState: dragStateChange,
-              child: Container(
-                // color: Colors.red,
+              child: AnimatedContainer(
                 padding: EdgeInsets.only(
-                  left: widgetPosition!.left < 0
+                  left: isPeekOpening || widgetPosition!.left < 0
                       ? 0
-                      : widgetPosition.left * (1 - anim1.value),
-                  top: widgetPosition!.top < 0
+                      : widgetPosition.left,
+                  top: isPeekOpening || widgetPosition!.top < 0
                       ? 0
-                      : widgetPosition.top * (1 - anim1.value),
-                  right: widgetPosition!.right > size.width
+                      : widgetPosition.top,
+                  right: isPeekOpening || widgetPosition!.right > size.width
                       ? 0
-                      : (size.width - widgetPosition.right) * (1 - anim1.value),
-                  bottom: widgetPosition!.bottom > size.height
+                      : size.width - widgetPosition.right,
+                  bottom: isPeekOpening || widgetPosition!.bottom > size.height
                       ? 0
-                      : (size.height - widgetPosition.bottom) *
-                          (1 - anim1.value),
+                      : size.height - widgetPosition.bottom,
                 ),
-                // curve: curve,
-                // duration: duration,
-                height: size.height - size.height * (anim1.value * 0.25),
-                width: size.width - (32 * anim1.value),
+                curve: curve,
+                duration: duration,
+                height: !isPeekOpening ? size.height : size.height * 3 / 4,
+                width: size.width - (isPeekOpening ? 32 : 0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
@@ -153,22 +165,24 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                                     borderRadius: BorderRadius.circular(16),
                                     child: widget.childToPeek),
                               ),
-                            Transform.scale(
-                              // curve: curve,
-                              // duration: duration,
-                              // scale: (widget.childToPeek != null ? 1 : 1.05) *
-                              //     anim1.value,
-                              scale: 1.05 - 0.05 * (anim1.value),
-                              child: Opacity(
-                                // curve: curve,
-                                // duration: duration,
-                                opacity: widget.childToPeek != null
-                                    ? 1 * (1 - anim1.value)
-                                    : 1,
-                                child: Container(
-                                  // curve: curve,
-                                  // duration: duration,
-                                  padding: EdgeInsets.all(8 * anim1.value),
+                            AnimatedScale(
+                              curve: curve,
+                              duration: duration,
+                              scale: isPeekOpening && widget.childToPeek != null
+                                  ? 1
+                                  : 1.05,
+                              child: AnimatedOpacity(
+                                curve: curve,
+                                duration: duration,
+                                opacity:
+                                    isPeekOpening && widget.childToPeek != null
+                                        ? 0
+                                        : 1,
+                                child: AnimatedContainer(
+                                  curve: curve,
+                                  duration: duration,
+                                  padding:
+                                      EdgeInsets.all(isPeekOpening ? 8 : 0),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(8),
@@ -184,17 +198,17 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                           ],
                         ),
                       ),
-                      Container(
+                      AnimatedContainer(
                         // color: Colors.red,
-                        // curve: curve,
-                        // duration: duration,
-                        height: 16 * anim1.value,
+                        curve: curve,
+                        duration: duration,
+                        height: isPeekOpening ? 16 : 0,
                       ),
-                      Container(
-                        // curve: curve,
-                        // duration: duration,
-                        height: 100 * anim1.value,
+                      AnimatedContainer(
+                        curve: curve,
+                        height: isPeekOpening ? 100 : 0,
                         width: double.infinity,
+                        duration: duration,
                         child: FittedBox(
                           fit: BoxFit.contain,
                           child: Container(
@@ -245,7 +259,6 @@ class _PeekAndPopableState extends State<PeekAndPopable>
         );
       },
       transitionBuilder: (ctx, anim1, anim2, child) {
-        anim1.drive(CurveTween(curve: curve));
         return BackdropFilter(
             filter: ImageFilter.blur(
                 sigmaX: 7 * anim1.value, sigmaY: 7 * anim1.value),

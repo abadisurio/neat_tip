@@ -79,7 +79,7 @@ class _DraggableCardState extends State<DraggableCard>
         // log('animation ${_animation.value}');
       });
 
-      if (_animation.value.y > 0.8) {
+      if (_animation.value.y > 0.5) {
         if (isChangingState) return;
         isChangingState = true;
         if (widget.onState != null) {
