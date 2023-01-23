@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
-import 'package:neat_tip/widgets/peekandpopable.dart';
+import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 
 class VehicleList extends StatelessWidget {
   const VehicleList({super.key});
@@ -66,20 +66,18 @@ class VehicleList extends StatelessWidget {
                       //   height: 300,
                       //   color: Colors.red,
                       // ),
-                      childToPeek: Image.asset(
-                        'assets/dummy.png',
-                        // height: 400,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                      child: Container(
-                        color: Colors.grey.shade100,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                        child: VehicleItem(
-                          vehicle: vehicleList[index],
-                        ),
-                      ));
+                      // childToPeek: Image.asset(
+                      //   'assets/dummy.png',
+                      //   // height: 400,
+                      //   width: double.infinity,
+                      //   fit: BoxFit.cover,
+                      // ),
+                      child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: VehicleItem(
+                      vehicle: vehicleList[index],
+                    ),
+                  ));
                   // return VehicleItem(
                   //   vehicle: vehicleList[index],
                   // );

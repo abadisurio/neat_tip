@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:neat_tip/widgets/peekandpopable.dart';
+import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 
 class DashboardMenu extends StatelessWidget {
   const DashboardMenu({super.key});

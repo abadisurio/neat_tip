@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:neat_tip/widgets/draggable_card.dart';
 
 class PeekAndPopable extends StatefulWidget {
@@ -96,9 +97,11 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   Future<void> showMoreOptions() async {
     final size = MediaQuery.of(context).size;
     final widgetPosition = getWigetPosition();
-    const duration = Duration(milliseconds: 350);
+    const duration = Duration(milliseconds: 200);
     const curve = Curves.easeInOutCubic;
     final border = BorderRadius.circular(16);
+
+    HapticFeedback.lightImpact();
     setState(() {
       isOpened = true;
     });
@@ -116,9 +119,9 @@ class _PeekAndPopableState extends State<PeekAndPopable>
               isOpened = false;
             }
             // bool isPeekOpening = anim1.value != 0;
-            log('isOpened $isOpened');
-            log(' anim1.value ${anim1.value}');
-            log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
+            // log('isOpened $isOpened');
+            // log(' anim1.value ${anim1.value}');
+            // log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
             // bool isPeekOpening = anim1.value > 0 || isOpened; // awal
             bool isPeekOpening = isOpened
                 ? anim1.value > 0 || anim1.value >= 1 // awal
@@ -129,6 +132,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             return DraggableCard(
               onState: dragStateChange,
               child: AnimatedContainer(
+                // color: Colors.red,
                 padding: EdgeInsets.only(
                   left: isPeekOpening || widgetPosition!.left < 0
                       ? 0
@@ -145,7 +149,8 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                 ),
                 curve: curve,
                 duration: duration,
-                height: !isPeekOpening ? size.height : size.height * 3 / 4,
+                height:
+                    !isPeekOpening ? size.height : 124 + widgetPosition!.height,
                 width: size.width - (isPeekOpening ? 32 : 0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -168,9 +173,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                             AnimatedScale(
                               curve: curve,
                               duration: duration,
-                              scale: isPeekOpening && widget.childToPeek != null
-                                  ? 1
-                                  : 1.05,
+                              scale: !isPeekOpening ? 1 : 1.05,
                               child: AnimatedOpacity(
                                 curve: curve,
                                 duration: duration,
@@ -182,7 +185,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                                   curve: curve,
                                   duration: duration,
                                   padding:
-                                      EdgeInsets.all(isPeekOpening ? 8 : 0),
+                                      EdgeInsets.all(isPeekOpening ? 4 : 0),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(8),
