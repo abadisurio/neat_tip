@@ -107,53 +107,70 @@ class _PeekAndPopableState extends State<PeekAndPopable>
         return AnimatedBuilder(
           animation: anim1,
           builder: (BuildContext context, Widget? child) {
-            // log('anim1 ${anim1.value}');
             bool isAnimationDone = anim1.value == 1;
-            // bool isAnimationDone =
-            //     snapshot.connectionState == ConnectionState.done;
             return DraggableCard(
               onState: dragStateChange,
               child: AnimatedContainer(
+                padding: EdgeInsets.only(
+                  left: isAnimationDone || widgetPosition!.left < 0
+                      ? 0
+                      : widgetPosition.left,
+                  top: isAnimationDone || widgetPosition!.top < 0
+                      ? 0
+                      : widgetPosition.top,
+                  right: isAnimationDone || widgetPosition!.right > size.width
+                      ? 0
+                      : size.width - widgetPosition.right,
+                  bottom:
+                      isAnimationDone || widgetPosition!.bottom > size.height
+                          ? 0
+                          : size.height - widgetPosition.bottom,
+                ),
                 curve: curve,
                 duration: duration,
-                // color: Colors.blue,
                 height: !isAnimationDone ? size.height : size.height * 3 / 4,
-                // padding: EdgeInsets.only(
-                //     top: isAnimationDone ? 0 : widgetPosition!.top,
-                //     bottom: isAnimationDone
-                //         ? 0
-                //         : size.height - widgetPosition!.bottom),
-                width: widgetPosition!.right -
-                    widgetPosition.left -
-                    (isAnimationDone ? 32 : 0),
+                width: size.width - (isAnimationDone ? 32 : 0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (widgetPosition.height > 0)
-                        AnimatedContainer(
-                          // // color: Colors.blue,
-                          height: isAnimationDone ? 0 : widgetPosition.top,
-                          curve: curve,
-                          duration: duration,
-                        ),
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Stack(
-                            children: [
-                              if (widget.childToPeek != null)
-                                SizedBox(
-                                  child: widget.childToPeek,
+                        flex: widget.childToPeek != null ? 1 : 0,
+                        child: Stack(
+                          children: [
+                            if (widget.childToPeek != null)
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                              AnimatedScale(
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: widget.childToPeek),
+                              ),
+                            AnimatedScale(
+                              curve: curve,
+                              duration: duration,
+                              scale:
+                                  isAnimationDone && widget.childToPeek != null
+                                      ? 1
+                                      : 1.05,
+                              child: AnimatedOpacity(
                                 curve: curve,
                                 duration: duration,
-                                scale: isAnimationDone ? 1 : 1.05,
-                                child: AnimatedOpacity(
+                                opacity: isAnimationDone &&
+                                        widget.childToPeek != null
+                                    ? 0
+                                    : 1,
+                                child: AnimatedContainer(
                                   curve: curve,
                                   duration: duration,
-                                  opacity: isAnimationDone ? 0 : 1,
+                                  padding:
+                                      EdgeInsets.all(isAnimationDone ? 8 : 0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                   child: Column(
                                     children: [
                                       widget.child,
@@ -161,11 +178,12 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                       AnimatedContainer(
+                        // color: Colors.red,
                         curve: curve,
                         duration: duration,
                         height: isAnimationDone ? 16 : 0,
@@ -175,9 +193,6 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                         height: isAnimationDone ? 100 : 0,
                         width: double.infinity,
                         duration: duration,
-                        // height: ,
-                        // curve: curve,
-                        // duration: duration,
                         child: FittedBox(
                           fit: BoxFit.contain,
                           child: Container(
@@ -221,14 +236,6 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                           ),
                         ),
                       ),
-                      if (widgetPosition.bottom < size.height)
-                        AnimatedContainer(
-                          curve: curve,
-                          duration: duration,
-                          height: isAnimationDone
-                              ? 0
-                              : size.height - widgetPosition.bottom,
-                        ),
                     ]),
               ),
             );

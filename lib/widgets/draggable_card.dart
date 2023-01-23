@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -81,7 +79,7 @@ class _DraggableCardState extends State<DraggableCard>
         // log('animation ${_animation.value}');
       });
 
-      if (_animation.value.y > 1) {
+      if (_animation.value.y > 0.8) {
         if (isChangingState) return;
         isChangingState = true;
         if (widget.onState != null) {

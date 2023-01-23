@@ -59,8 +59,8 @@ class VehicleList extends StatelessWidget {
               return ListView.builder(
                 itemCount: vehicleList.length,
                 itemBuilder: (context, index) {
-                  String coverImageSrc = vehicleList[index].imgSrcPhotos;
-                  File coverImage = File(coverImageSrc.split(',').first);
+                  // String coverImageSrc = vehicleList[index].imgSrcPhotos;
+                  // File coverImage = File(coverImageSrc.split(',').first);
                   return PeekAndPopable(
                       // childToPeek: Container(
                       //   height: 300,

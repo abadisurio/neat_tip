@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:neat_tip/widgets/peekandpopable.dart';
 
 class DashboardMenu extends StatelessWidget {
   const DashboardMenu({super.key});
@@ -27,37 +28,39 @@ class DashboardMenu extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: menuList.map((item) {
             log('${item['name']}');
-            return IntrinsicHeight(
-              child: Column(
-                children: [
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        backgroundColor: Colors.grey.shade800,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+            return PeekAndPopable(
+              child: IntrinsicHeight(
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          backgroundColor: Colors.grey.shade800,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
                         ),
-                      ),
-                      onPressed: () async {
-                        await navigator.pushNamed(item['route']);
-                      },
-                      child: Icon(
-                        item['icon'],
-                        color: Colors.grey.shade200,
-                      )
-                      // child: Text('${item['name']}')
-                      ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    item['name'],
-                    style: TextStyle(
-                        color: Colors.grey.shade800,
-                        fontWeight: FontWeight.bold),
-                  )
-                ],
+                        onPressed: () async {
+                          await navigator.pushNamed(item['route']);
+                        },
+                        child: Icon(
+                          item['icon'],
+                          color: Colors.grey.shade200,
+                        )
+                        // child: Text('${item['name']}')
+                        ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      item['name'],
+                      style: TextStyle(
+                          color: Colors.grey.shade800,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
               ),
             );
           }).toList()),
