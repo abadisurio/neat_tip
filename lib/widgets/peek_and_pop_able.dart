@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:neat_tip/widgets/draggable_card.dart';
 
+const duration = Duration(milliseconds: 200);
+const curve = Curves.easeInOutCubic;
+final border = BorderRadius.circular(16);
+
 class PeekAndPopable extends StatefulWidget {
   final Widget child;
   final Widget? childToPeek;
@@ -67,10 +71,11 @@ class _PeekAndPopableState extends State<PeekAndPopable>
     });
 
     log('globalPaintBounds ${context.globalPaintBounds}');
-    onHold = Timer(const Duration(milliseconds: 500), () {
+    onHold = Timer(const Duration(milliseconds: 300), () {
+      HapticFeedback.lightImpact();
       onLongPress();
     });
-    // Future.delayed(const Duration(milliseconds: 500), () {});
+    // Future.delayed(const Duration(milliseconds: 300), () {});
   }
 
   void onTapUp(TapUpDetails details) {
@@ -97,11 +102,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   Future<void> showMoreOptions() async {
     final size = MediaQuery.of(context).size;
     final widgetPosition = getWigetPosition();
-    const duration = Duration(milliseconds: 200);
-    const curve = Curves.easeInOutCubic;
-    final border = BorderRadius.circular(16);
 
-    HapticFeedback.lightImpact();
     setState(() {
       isOpened = true;
     });
@@ -173,7 +174,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                             AnimatedScale(
                               curve: curve,
                               duration: duration,
-                              scale: !isPeekOpening ? 1 : 1.05,
+                              scale: !isOpened || isPeekOpening ? 1 : 1.05,
                               child: AnimatedOpacity(
                                 curve: curve,
                                 duration: duration,
@@ -282,7 +283,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
         onTapDown: onTapDown,
         onTapUp: onTapUp,
         child: AnimatedScale(
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.decelerate,
             scale: isScaleWidget ? 1.05 : 1,
             child: widget.child),
