@@ -33,9 +33,11 @@ class _HomeState extends State<Home> with RouteAware {
   @override
   void didPushNext() {
     log('didPushNext');
-    setState(() {
-      isScreenActive = false;
-    });
+    if (mounted) {
+      setState(() {
+        isScreenActive = false;
+      });
+    }
     super.didPushNext();
   }
 
@@ -43,9 +45,11 @@ class _HomeState extends State<Home> with RouteAware {
   // Called when the top route has been popped off, and the current route shows up.
   void didPopNext() {
     log('didPopNext');
-    setState(() {
-      isScreenActive = true;
-    });
+    if (mounted) {
+      setState(() {
+        isScreenActive = true;
+      });
+    }
     super.didPopNext();
   }
 

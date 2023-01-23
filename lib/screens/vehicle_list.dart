@@ -62,9 +62,13 @@ class VehicleList extends StatelessWidget {
                   String coverImageSrc = vehicleList[index].imgSrcPhotos;
                   File coverImage = File(coverImageSrc.split(',').first);
                   return PeekAndPopable(
-                      childToPeek: Image.file(
-                        coverImage,
-                        height: 400,
+                      // childToPeek: Container(
+                      //   height: 300,
+                      //   color: Colors.red,
+                      // ),
+                      childToPeek: Image.asset(
+                        'assets/dummy.png',
+                        // height: 400,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
@@ -158,25 +162,24 @@ class VehicleItem extends StatelessWidget {
                   ),
                 ],
               ),
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4.0),
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                          color: Colors.grey.shade900,
-                          borderRadius: BorderRadius.circular(8.0)),
-                      child: Text(
-                        vehicle.plate,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade100),
-                      )),
-                  Text('${vehicle.wheel} wheel'),
-                ],
+              subtitle: Text(
+                '${vehicle.wheel} wheel',
+                maxLines: 1,
+                textAlign: TextAlign.left,
+                overflow: TextOverflow.ellipsis,
               ),
-              // trailing: IconButton,
+              trailing: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4.0),
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(8.0)),
+                  child: Text(
+                    vehicle.plate,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade100),
+                  )),
             ),
           )
         ],

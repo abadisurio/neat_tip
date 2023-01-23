@@ -1,11 +1,27 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+
+enum DragState {
+  willDismiss,
+  willCancelDismiss,
+  idle,
+  dismiss,
+}
 
 /// A draggable card that moves back to [Alignment.center] when it's
 /// released.
 class DraggableCard extends StatefulWidget {
   final VoidCallback? onDismiss;
-  const DraggableCard({required this.child, super.key, this.onDismiss});
+  final Function(DragState)? onState;
+  final Function(Alignment)? onAlignmentChange;
+  const DraggableCard(
+      {required this.child,
+      super.key,
+      this.onDismiss,
+      this.onState,
+      this.onAlignmentChange});
 
   final Widget child;
 
@@ -23,6 +39,8 @@ class _DraggableCardState extends State<DraggableCard>
   /// in the GestureDetector onPanUpdate callback. If the animation is running,
   /// this value is set to the value of the [_animation].
   Alignment _dragAlignment = Alignment.center;
+  bool isChangingState = false;
+  Offset yPosition = const Offset(0, 0);
 
   late Animation<Alignment> _animation;
 
@@ -62,9 +80,15 @@ class _DraggableCardState extends State<DraggableCard>
         _dragAlignment = _animation.value;
         // log('animation ${_animation.value}');
       });
-      if (widget.onDismiss != null && _animation.value.y > 1.0) {
-        widget.onDismiss!();
+
+      if (_animation.value.y > 1) {
+        if (isChangingState) return;
+        isChangingState = true;
+        if (widget.onState != null) {
+          widget.onState!(DragState.dismiss);
+        }
       }
+      // isChangingState = false;
     });
   }
 
@@ -82,12 +106,17 @@ class _DraggableCardState extends State<DraggableCard>
         _controller.stop();
       },
       onPanUpdate: (details) {
+        // details.po
         setState(() {
+          yPosition = details.globalPosition;
           _dragAlignment += Alignment(
             details.delta.dx / (size.width / 2),
             details.delta.dy / (size.height / 2),
           );
         });
+        if (widget.onAlignmentChange != null) {
+          widget.onAlignmentChange!(_dragAlignment);
+        }
       },
       onPanEnd: (details) {
         _runAnimation(details.velocity.pixelsPerSecond, size);
