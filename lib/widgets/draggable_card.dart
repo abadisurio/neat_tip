@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -12,6 +14,7 @@ enum DragState {
 /// released.
 class DraggableCard extends StatefulWidget {
   final VoidCallback? onDismiss;
+  final Alignment? aligmentOverride;
   final Function(DragState)? onState;
   final Function(Alignment)? onAlignmentChange;
   const DraggableCard(
@@ -19,7 +22,8 @@ class DraggableCard extends StatefulWidget {
       super.key,
       this.onDismiss,
       this.onState,
-      this.onAlignmentChange});
+      this.onAlignmentChange,
+      this.aligmentOverride});
 
   final Widget child;
 
@@ -38,6 +42,7 @@ class _DraggableCardState extends State<DraggableCard>
   /// this value is set to the value of the [_animation].
   Alignment _dragAlignment = Alignment.center;
   bool isChangingState = false;
+  DragState dragState = DragState.idle;
   Offset yPosition = const Offset(0, 0);
 
   late Animation<Alignment> _animation;
@@ -47,7 +52,9 @@ class _DraggableCardState extends State<DraggableCard>
     _animation = _controller.drive(
       AlignmentTween(
         begin: _dragAlignment,
-        end: Alignment.center,
+        end: dragState == DragState.dismiss
+            ? widget.aligmentOverride ?? Alignment.center
+            : Alignment.center,
       ),
     );
     // Calculate the velocity relative to the unit interval, [0,1],
@@ -76,16 +83,8 @@ class _DraggableCardState extends State<DraggableCard>
     _controller.addListener(() {
       setState(() {
         _dragAlignment = _animation.value;
-        // log('animation ${_animation.value}');
       });
 
-      if (_animation.value.y > 0.5) {
-        if (isChangingState) return;
-        isChangingState = true;
-        if (widget.onState != null) {
-          widget.onState!(DragState.dismiss);
-        }
-      }
       // isChangingState = false;
     });
   }
@@ -116,11 +115,22 @@ class _DraggableCardState extends State<DraggableCard>
           widget.onAlignmentChange!(_dragAlignment);
         }
       },
+      onPanStart: (details) {},
       onPanEnd: (details) {
+        log('details $details');
         _runAnimation(details.velocity.pixelsPerSecond, size);
+        if (details.velocity.pixelsPerSecond.dy > 1000) {
+          if (widget.onState != null) {
+            setState(() {
+              dragState = DragState.dismiss;
+            });
+            widget.onState!(DragState.dismiss);
+          }
+        }
       },
       child: Align(
-        alignment: _dragAlignment,
+        alignment:
+            _dragAlignment + (widget.aligmentOverride ?? const Alignment(0, 0)),
         child: Material(
           type: MaterialType.transparency,
           child: widget.child,

@@ -63,10 +63,15 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   }
 
   void onLongPress() async {
-    showMoreOptions();
     setState(() {
       isScaleWidget = false;
     });
+    await showMoreOptions();
+    if (mounted) {
+      await Future.delayed(const Duration(milliseconds: 300), () {
+        setState(() {});
+      });
+    }
   }
 
   void onTapDown(TapDownDetails details) async {
@@ -91,7 +96,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
     log('up ${onHold.isActive}');
     onHold.cancel();
     setState(() {
-      isScaleWidget = false;
+      // isScaleWidget = false;
     });
   }
 
@@ -121,8 +126,10 @@ class _PeekAndPopableState extends State<PeekAndPopable>
       barrierColor: Colors.black38,
       transitionDuration: duration,
       pageBuilder: (ctx, anim1, anim2) {
+        final animController = CurvedAnimation(
+            parent: anim1, curve: curve, reverseCurve: Curves.easeInOutCirc);
         return AnimatedBuilder(
-          animation: anim1,
+          animation: animController,
           builder: (BuildContext context, Widget? child) {
             log('isOpened0 $isOpened');
             if (anim1.value == 1) {
@@ -133,161 +140,193 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             log(' menuItem.entries.length ${menuItem.entries.length}');
             // log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
             // bool isPeekOpening = anim1.value > 0 || isOpened; // awal
-            bool isPeekOpening = isOpened
-                ? anim1.value > 0 || anim1.value >= 1 // awal
-                : anim1.value > 0 && anim1.value >= 1; // akhir
+            // bool isPeekOpening = isOpened
+            //     ? animController.value > 0 || animController.value >= 1 // awal
+            //     : animController.value > 0 &&
+            //         animController.value >= 1; // akhir
             // bool isPeekOpening = anim1.value > 0 || anim1.value >= 1;
             // bool isPeekClosing = anim1.value <= 1;
             // // bool isPeekOpen = isPeekOpening && isPeekClosing;
-            return DraggableCard(
-              onState: dragStateChange,
-              child: AnimatedContainer(
-                // color: Colors.red,
-                padding: EdgeInsets.only(
-                  left: isPeekOpening || widgetPosition!.left < 0
-                      ? 0
-                      : widgetPosition.left,
-                  top: isPeekOpening || widgetPosition!.top < 0
-                      ? widget.childToPeek != null
-                          ? 32
-                          : 0
-                      : widgetPosition.top,
-                  right: isPeekOpening || widgetPosition!.right > size.width
-                      ? 0
-                      : size.width - widgetPosition.right,
-                  bottom: isPeekOpening || widgetPosition!.bottom > size.height
-                      ? 0
-                      : size.height - widgetPosition.bottom,
-                ),
-                curve: curve,
-                duration: duration,
-                height: !isPeekOpening
-                    ? size.height
-                    : widget.childToPeek != null
-                        ? size.height / 1.5
-                        : 124 + widgetPosition!.height,
-                width: size.width - (isPeekOpening ? 32 : 0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        flex: widget.childToPeek != null ? 1 : 0,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (widget.childToPeek != null)
-                              AnimatedOpacity(
-                                curve: curve,
-                                duration: duration,
-                                opacity: !isPeekOpening ? 0 : 1,
-                                child: Container(
-                                  // height: size.height - 64 - menuItem.length * 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: ClipRRect(
+            final dx = ((widgetPosition!.center.dx) * 2 - size.width) /
+                (size.width - (widgetPosition.width));
+            final dy = ((widgetPosition!.center.dy) * 2 - size.height) /
+                (size.height - (widgetPosition.height));
+
+            log(' dx ${((widgetPosition!.center.dx) * 2 - size.width) / (size.width - (widgetPosition.right - widgetPosition.left))}');
+            log(' dx ${dx}');
+            log(' animController.value ${animController.value}');
+            log('alignn ${Alignment((1 - animController.value) * dx, (1 - animController.value) * dy)}');
+            return Container(
+              // color: Colors.red,
+              child: DraggableCard(
+                aligmentOverride: Alignment(
+                    (1 - animController.value) * (dx.isNaN ? 0 : dx),
+                    (1 - animController.value) * (dy.isNaN ? 0 : dy)),
+                onState: dragStateChange,
+                child: Container(
+                  // color: Colors.red,
+                  margin: EdgeInsets.only(top: animController.value * 48),
+                  // padding: EdgeInsets.only(
+                  //   left: isPeekOpening || widgetPosition!.left < 0
+                  //       ? 0
+                  //       : widgetPosition.left,
+                  //   top: isPeekOpening || widgetPosition!.top < 0
+                  //       ? widget.childToPeek != null
+                  //           ? 32
+                  //           : 0
+                  //       : widgetPosition.top,
+                  //   right: isPeekOpening || widgetPosition!.right > size.width
+                  //       ? 0
+                  //       : size.width - widgetPosition.right,
+                  //   bottom: isPeekOpening || widgetPosition!.bottom > size.height
+                  //       ? 0
+                  //       : size.height - widgetPosition.bottom,
+                  // ),
+                  // curve: curve,
+                  // duration: duration,
+                  // height: !isPeekOpening
+                  //     ? size.height
+                  //     : widget.childToPeek != null
+                  //         ? size.height / 1.5
+                  //         : 124 + widgetPosition!.height,
+                  height: 124 * animController.value +
+                      (widget.childToPeek != null
+                          ? widgetPosition.height * (1 - animController.value) +
+                              size.height * 0.60 * animController.value
+                          : widgetPosition.height),
+                  width: ((1 - animController.value) * widgetPosition!.width +
+                      (size.width - 64) * animController.value),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          flex: widget.childToPeek != null ? 1 : 0,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              if (widget.childToPeek != null)
+                                Opacity(
+                                  // curve: curve,
+                                  // duration: duration,
+                                  opacity: animController.value,
+                                  child: Container(
+                                    // height: size.height - 64 - menuItem.length * 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
                                       borderRadius: BorderRadius.circular(16),
-                                      child: widget.childToPeek),
-                                ),
-                              ),
-                            AnimatedScale(
-                              curve: curve,
-                              duration: duration,
-                              scale: !isOpened || isPeekOpening ? 1 : 1.05,
-                              child: AnimatedOpacity(
-                                curve: curve,
-                                duration: duration,
-                                opacity:
-                                    isPeekOpening && widget.childToPeek != null
-                                        ? 0
-                                        : 1,
-                                child: AnimatedContainer(
-                                  curve: curve,
-                                  duration: duration,
-                                  padding:
-                                      EdgeInsets.all(isPeekOpening ? 4 : 0),
-                                  decoration: BoxDecoration(
-                                    color: widget.childToPeek != null
-                                        ? null
-                                        : Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      widget.child,
-                                    ],
+                                    ),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: widget.childToPeek),
                                   ),
                                 ),
+                              Transform.scale(
+                                // curve: curve,
+                                // duration: duration,
+                                // scale: !isOpened || isPeekOpening ? 1 : 1.05,
+                                scale: 1.05 -
+                                    (!isOpened
+                                        ? 0.05
+                                        : (animController.value) * 0.05),
+                                child: Opacity(
+                                  // curve: curve,
+                                  // duration: duration,
+                                  // opacity: !isPeekOpening || widget.childToPeek != null
+                                  //         ? 0
+                                  //         : 1,
+                                  opacity: widget.childToPeek == null
+                                      ? 1
+                                      : (1 - animController.value),
+                                  child: Container(
+                                    // curve: curve,
+                                    // duration: duration,
+                                    padding: EdgeInsets.all(
+                                        animController.value * 4),
+                                    decoration: BoxDecoration(
+                                      color: widget.childToPeek != null
+                                          ? null
+                                          : Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        widget.child,
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      AnimatedContainer(
-                        // color: Colors.red,
-                        curve: curve,
-                        duration: duration,
-                        height: isPeekOpening ? 16 : 0,
-                      ),
-                      AnimatedContainer(
-                        curve: curve,
-                        height:
-                            isPeekOpening ? menuItem.entries.length * 50 : 0,
-                        width: double.infinity,
-                        duration: duration,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: AnimatedOpacity(
-                            opacity: isPeekOpening ? 1 : 0,
-                            duration: duration,
-                            curve: curve,
-                            child: Container(
-                                width: 250,
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: border),
-                                child: ListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: menuItem.entries.length,
-                                  padding: const EdgeInsets.all(0.0),
-                                  itemBuilder: (context, index) {
-                                    log('index $index');
-                                    return TextButton(
-                                        style: ButtonStyle(
-                                          foregroundColor:
-                                              MaterialStateProperty.all(menuItem
-                                                      .entries
-                                                      .elementAt(index)
-                                                      .value['color'] ??
-                                                  Colors.blue),
-                                          shape: MaterialStateProperty.all(
-                                            const RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.zero),
-                                          ),
-                                        ),
-                                        onPressed: () {},
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(menuItem.entries
-                                                .elementAt(index)
-                                                .key),
-                                            Icon(menuItem.entries
-                                                .elementAt(index)
-                                                .value['icon'])
-                                          ],
-                                        ));
-                                  },
-                                )),
+                            ],
                           ),
                         ),
-                      ),
-                    ]),
+                        Container(
+                          // color: Colors.red,
+                          // curve: curve,
+                          // duration: duration,
+                          height: animController.value * 16,
+                        ),
+                        SizedBox(
+                          // curve: curve,
+                          // duration: duration,
+                          height: animController.value *
+                              menuItem.entries.length *
+                              50,
+                          // isPeekOpening ? menuItem.entries.length * 50 : 0,
+                          width: double.infinity,
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: Opacity(
+                              // duration: duration,
+                              // curve: curve,
+                              opacity: animController.value,
+                              child: Container(
+                                  width: 250,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: border),
+                                  child: ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: menuItem.entries.length,
+                                    padding: const EdgeInsets.all(0.0),
+                                    itemBuilder: (context, index) {
+                                      log('index $index');
+                                      return TextButton(
+                                          style: ButtonStyle(
+                                            foregroundColor:
+                                                MaterialStateProperty.all(
+                                                    menuItem.entries
+                                                            .elementAt(index)
+                                                            .value['color'] ??
+                                                        Colors.blue),
+                                            shape: MaterialStateProperty.all(
+                                              const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.zero),
+                                            ),
+                                          ),
+                                          onPressed: () {},
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(menuItem.entries
+                                                  .elementAt(index)
+                                                  .key),
+                                              Icon(menuItem.entries
+                                                  .elementAt(index)
+                                                  .value['icon'])
+                                            ],
+                                          ));
+                                    },
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ]),
+                ),
               ),
             );
           },
@@ -304,8 +343,6 @@ class _PeekAndPopableState extends State<PeekAndPopable>
       },
       context: context,
     );
-    await Future.delayed(const Duration(milliseconds: 300));
-    setState(() {});
   }
 
   @override
@@ -320,7 +357,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             curve: Curves.decelerate,
             scale: isScaleWidget ? 1.05 : 1,
             child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 0),
+                duration: const Duration(milliseconds: 50),
                 curve: Curves.decelerate,
                 opacity: isOpened ? 0 : 1,
                 child: widget.child)),
