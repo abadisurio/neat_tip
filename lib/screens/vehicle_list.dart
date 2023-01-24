@@ -59,25 +59,29 @@ class VehicleList extends StatelessWidget {
               return ListView.builder(
                 itemCount: vehicleList.length,
                 itemBuilder: (context, index) {
-                  // String coverImageSrc = vehicleList[index].imgSrcPhotos;
-                  // File coverImage = File(coverImageSrc.split(',').first);
+                  final firstPath =
+                      vehicleList[index].imgSrcPhotos.split(',').first;
+                  final File cover = File(firstPath);
                   return PeekAndPopable(
                       // childToPeek: Container(
                       //   height: 300,
                       //   color: Colors.red,
                       // ),
-                      // childToPeek: Image.asset(
-                      //   'assets/dummy.png',
-                      //   // height: 400,
-                      //   width: double.infinity,
-                      //   fit: BoxFit.cover,
-                      // ),
+                      childToPeek: firstPath == ''
+                          ? null
+                          : Image.file(
+                              cover,
+                              // height: 300,
+                              width: double.infinity,
+                              // width: 150,
+                              fit: BoxFit.cover,
+                            ),
                       child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: VehicleItem(
-                      vehicle: vehicleList[index],
-                    ),
-                  ));
+                        padding: const EdgeInsets.all(8.0),
+                        child: VehicleItem(
+                          vehicle: vehicleList[index],
+                        ),
+                      ));
                   // return VehicleItem(
                   //   vehicle: vehicleList[index],
                   // );

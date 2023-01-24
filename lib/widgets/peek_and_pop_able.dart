@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:neat_tip/widgets/draggable_card.dart';
 
-const duration = Duration(milliseconds: 200);
-const curve = Curves.easeInOutCubic;
+const duration = Duration(milliseconds: 350);
+const curve = Curves.easeInOutExpo;
 final border = BorderRadius.circular(16);
 
 class PeekAndPopable extends StatefulWidget {
@@ -34,6 +34,11 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   bool isScaleWidget = false;
   bool isDismissing = false;
   bool isOpened = false;
+
+  Map<String, dynamic> menuItem = {
+    'Hapus': {'icon': Icons.delete, 'color': Colors.red, 'action': () {}},
+    'Edit': {'icon': Icons.edit, 'color': null, 'action': () {}},
+  };
 
   late Timer onHold;
 
@@ -72,6 +77,10 @@ class _PeekAndPopableState extends State<PeekAndPopable>
 
     log('globalPaintBounds ${context.globalPaintBounds}');
     onHold = Timer(const Duration(milliseconds: 300), () {
+      Future.delayed(
+        const Duration(milliseconds: 100),
+        () => HapticFeedback.lightImpact(),
+      );
       HapticFeedback.lightImpact();
       onLongPress();
     });
@@ -121,7 +130,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             }
             // bool isPeekOpening = anim1.value != 0;
             // log('isOpened $isOpened');
-            // log(' anim1.value ${anim1.value}');
+            log(' menuItem.entries.length ${menuItem.entries.length}');
             // log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
             // bool isPeekOpening = anim1.value > 0 || isOpened; // awal
             bool isPeekOpening = isOpened
@@ -139,7 +148,9 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                       ? 0
                       : widgetPosition.left,
                   top: isPeekOpening || widgetPosition!.top < 0
-                      ? 0
+                      ? widget.childToPeek != null
+                          ? 32
+                          : 0
                       : widgetPosition.top,
                   right: isPeekOpening || widgetPosition!.right > size.width
                       ? 0
@@ -150,8 +161,11 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                 ),
                 curve: curve,
                 duration: duration,
-                height:
-                    !isPeekOpening ? size.height : 124 + widgetPosition!.height,
+                height: !isPeekOpening
+                    ? size.height
+                    : widget.childToPeek != null
+                        ? size.height / 1.5
+                        : 124 + widgetPosition!.height,
                 width: size.width - (isPeekOpening ? 32 : 0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -160,16 +174,23 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                       Expanded(
                         flex: widget.childToPeek != null ? 1 : 0,
                         child: Stack(
+                          alignment: Alignment.center,
                           children: [
                             if (widget.childToPeek != null)
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: ClipRRect(
+                              AnimatedOpacity(
+                                curve: curve,
+                                duration: duration,
+                                opacity: !isPeekOpening ? 0 : 1,
+                                child: Container(
+                                  // height: size.height - 64 - menuItem.length * 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(16),
-                                    child: widget.childToPeek),
+                                  ),
+                                  child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: widget.childToPeek),
+                                ),
                               ),
                             AnimatedScale(
                               curve: curve,
@@ -188,7 +209,9 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                                   padding:
                                       EdgeInsets.all(isPeekOpening ? 4 : 0),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
+                                    color: widget.childToPeek != null
+                                        ? null
+                                        : Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Column(
@@ -210,49 +233,57 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                       ),
                       AnimatedContainer(
                         curve: curve,
-                        height: isPeekOpening ? 100 : 0,
+                        height:
+                            isPeekOpening ? menuItem.entries.length * 50 : 0,
                         width: double.infinity,
                         duration: duration,
                         child: FittedBox(
                           fit: BoxFit.contain,
-                          child: Container(
-                            width: 200,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: border),
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TextButton(
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            MaterialStateProperty.all(
-                                                Colors.red),
-                                        shape: MaterialStateProperty.all(
-                                          const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.zero),
+                          child: AnimatedOpacity(
+                            opacity: isPeekOpening ? 1 : 0,
+                            duration: duration,
+                            curve: curve,
+                            child: Container(
+                                width: 250,
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: border),
+                                child: ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: menuItem.entries.length,
+                                  padding: const EdgeInsets.all(0.0),
+                                  itemBuilder: (context, index) {
+                                    log('index $index');
+                                    return TextButton(
+                                        style: ButtonStyle(
+                                          foregroundColor:
+                                              MaterialStateProperty.all(menuItem
+                                                      .entries
+                                                      .elementAt(index)
+                                                      .value['color'] ??
+                                                  Colors.blue),
+                                          shape: MaterialStateProperty.all(
+                                            const RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.zero),
+                                          ),
                                         ),
-                                      ),
-                                      onPressed: () {},
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: const [
-                                          Text("Hapus"),
-                                          Icon(Icons.delete)
-                                        ],
-                                      )),
-                                  TextButton(
-                                      onPressed: () {},
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: const [
-                                          Text("Ubah Rincian"),
-                                          Icon(Icons.edit)
-                                        ],
-                                      )),
-                                ]),
+                                        onPressed: () {},
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(menuItem.entries
+                                                .elementAt(index)
+                                                .key),
+                                            Icon(menuItem.entries
+                                                .elementAt(index)
+                                                .value['icon'])
+                                          ],
+                                        ));
+                                  },
+                                )),
                           ),
                         ),
                       ),
@@ -273,6 +304,8 @@ class _PeekAndPopableState extends State<PeekAndPopable>
       },
       context: context,
     );
+    await Future.delayed(const Duration(milliseconds: 300));
+    setState(() {});
   }
 
   @override
@@ -286,7 +319,11 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             duration: const Duration(milliseconds: 300),
             curve: Curves.decelerate,
             scale: isScaleWidget ? 1.05 : 1,
-            child: widget.child),
+            child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 0),
+                curve: Curves.decelerate,
+                opacity: isOpened ? 0 : 1,
+                child: widget.child)),
       ),
     );
   }
