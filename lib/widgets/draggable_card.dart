@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -13,13 +15,15 @@ enum DragState {
 class DraggableCard extends StatefulWidget {
   final VoidCallback? onDismiss;
   final Function(DragState)? onState;
-  final Function(Alignment)? onAlignmentChange;
+  final Function(DragEndDetails)? onDragEnd;
+  final Function(Alignment)? onDragChange;
   const DraggableCard(
       {required this.child,
       super.key,
       this.onDismiss,
       this.onState,
-      this.onAlignmentChange});
+      this.onDragChange,
+      this.onDragEnd});
 
   final Widget child;
 
@@ -112,12 +116,20 @@ class _DraggableCardState extends State<DraggableCard>
             details.delta.dy / (size.height / 2),
           );
         });
-        if (widget.onAlignmentChange != null) {
-          widget.onAlignmentChange!(_dragAlignment);
+
+        // widget.onDragChange(details) ??
+        // log('detail ${_dragAlignment.y}');
+
+        if (widget.onDragChange != null) {
+          widget.onDragChange!(_dragAlignment);
         }
       },
       onPanEnd: (details) {
+        // log('detail $details');
         _runAnimation(details.velocity.pixelsPerSecond, size);
+        if (widget.onDragEnd != null) {
+          widget.onDragEnd!(details);
+        }
       },
       child: Align(
         alignment: _dragAlignment,
