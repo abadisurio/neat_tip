@@ -125,7 +125,7 @@ class _DraggableCardState extends State<DraggableCard>
         }
       },
       onPanEnd: (details) {
-        // log('detail $details');
+        log('primaryVelocity ${details.primaryVelocity}}');
         _runAnimation(details.velocity.pixelsPerSecond, size);
         if (widget.onDragEnd != null) {
           widget.onDragEnd!(details);

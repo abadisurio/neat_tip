@@ -20,18 +20,12 @@ class PeekAndPopable extends StatefulWidget {
 
 class _PeekAndPopableState extends State<PeekAndPopable>
     with SingleTickerProviderStateMixin {
-  // late AnimationController _controller;
+  // late AnimationController innerController;
   // late Animation<Alignment> _animation;
   final stopwatch = Stopwatch();
   bool isScaleWidget = false;
   bool isDismissing = false;
   bool isOpened = false;
-  double childScale = 1;
-
-  Map<String, dynamic> menuItem = {
-    'Hapus': {'icon': Icons.delete, 'color': Colors.red, 'action': () {}},
-    'Edit': {'icon': Icons.edit, 'color': null, 'action': () {}},
-  };
 
   late Timer onHold;
 
@@ -95,240 +89,43 @@ class _PeekAndPopableState extends State<PeekAndPopable>
   }
 
   Future<void> showMoreOptions() async {
-    final size = MediaQuery.of(context).size;
-    final widgetPosition = getWigetPosition();
-    final innerChildScale = childScale;
-
     setState(() {
       isOpened = true;
     });
 
-    Navigator.push(
+    await Navigator.push(
         context,
         PageRouteBuilder(
             transitionsBuilder: (ctx, anim1, anim2, child) {
               return BackdropFilter(
                   filter: ImageFilter.blur(
                       sigmaX: 7 * anim1.value, sigmaY: 7 * anim1.value),
-                  child: child
-                  // child: SizeTransition(sizeFactor: anim1, child: child)
-                  //
-                  );
+                  child: child);
             },
+            fullscreenDialog: true,
             opaque: false,
             barrierDismissible: true,
             barrierLabel: '',
             barrierColor: Colors.black38,
             transitionDuration: duration,
-            pageBuilder: (context, anim1, anim2) =>
-                PeekPage(transitionAnimation: anim1)));
-    // await showGeneralDialog(
-    //   barrierDismissible: true,
-    //   barrierLabel: '',
-    //   barrierColor: Colors.black38,
-    //   transitionDuration: duration,
-    //   pageBuilder: (ctx, anim1, anim2) {
-    //     return AnimatedBuilder(
-    //       animation: anim1,
-    //       builder: (BuildContext context, Widget? child) {
-    //         log('isOpened0 $isOpened');
-    //         if (anim1.value == 1) {
-    //           isOpened = false;
-    //         }
-    //         // bool isPeekOpening = anim1.value != 0;
-    //         // log('isOpened $isOpened');
-    //         log(' menuItem.entries.length ${menuItem.entries.length}');
-    //         // log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
-    //         // bool isPeekOpening = anim1.value > 0 || isOpened; // awal
-    //         bool isPeekOpening = isOpened
-    //             ? anim1.value > 0 || anim1.value >= 1 // awal
-    //             : anim1.value > 0 && anim1.value >= 1; // akhir
-    //         // bool isPeekOpening = anim1.value > 0 || anim1.value >= 1;
-    //         // bool isPeekClosing = anim1.value <= 1;
-    //         // // bool isPeekOpen = isPeekOpening && isPeekClosing;
-    //         return DraggableCard(
-    //           onDragChange: (p0) {
-    //             log('detail ${p0.y}');
-    //             setState(() {
-    //               childScale = (1 - p0.y);
-    //             });
-    //           },
-    //           onState: dragStateChange,
-    //           child: Transform.scale(
-    //             scale: innerChildScale,
-    //             child: AnimatedContainer(
-    //               // color: Colors.red,
-    //               padding: EdgeInsets.only(
-    //                 left: isPeekOpening || widgetPosition!.left < 0
-    //                     ? 0
-    //                     : widgetPosition.left,
-    //                 top: isPeekOpening || widgetPosition!.top < 0
-    //                     ? widget.childToPeek != null
-    //                         ? 32
-    //                         : 0
-    //                     : widgetPosition.top,
-    //                 right: isPeekOpening || widgetPosition!.right > size.width
-    //                     ? 0
-    //                     : size.width - widgetPosition.right,
-    //                 bottom:
-    //                     isPeekOpening || widgetPosition!.bottom > size.height
-    //                         ? 0
-    //                         : size.height - widgetPosition.bottom,
-    //               ),
-    //               curve: curve,
-    //               duration: duration,
-    //               height: !isPeekOpening
-    //                   ? size.height
-    //                   : widget.childToPeek != null
-    //                       ? size.height / 1.5
-    //                       : 124 + widgetPosition!.height,
-    //               width: size.width - (isPeekOpening ? 32 : 0),
-    //               child: Column(
-    //                   mainAxisAlignment: MainAxisAlignment.center,
-    //                   mainAxisSize: MainAxisSize.min,
-    //                   children: [
-    //                     Expanded(
-    //                       flex: widget.childToPeek != null ? 1 : 0,
-    //                       child: Stack(
-    //                         alignment: Alignment.center,
-    //                         children: [
-    //                           if (widget.childToPeek != null)
-    //                             AnimatedOpacity(
-    //                               curve: curve,
-    //                               duration: duration,
-    //                               opacity: !isPeekOpening ? 0 : 1,
-    //                               child: Container(
-    //                                 // height: size.height - 64 - menuItem.length * 50,
-    //                                 decoration: BoxDecoration(
-    //                                   color: Colors.grey.shade100,
-    //                                   borderRadius: BorderRadius.circular(16),
-    //                                 ),
-    //                                 child: ClipRRect(
-    //                                     borderRadius: BorderRadius.circular(16),
-    //                                     child: widget.childToPeek),
-    //                               ),
-    //                             ),
-    //                           AnimatedScale(
-    //                             curve: curve,
-    //                             duration: duration,
-    //                             scale: !isOpened || isPeekOpening ? 1 : 1.05,
-    //                             child: AnimatedOpacity(
-    //                               curve: curve,
-    //                               duration: duration,
-    //                               opacity: isPeekOpening &&
-    //                                       widget.childToPeek != null
-    //                                   ? 0
-    //                                   : 1,
-    //                               child: AnimatedContainer(
-    //                                 curve: curve,
-    //                                 duration: duration,
-    //                                 padding:
-    //                                     EdgeInsets.all(isPeekOpening ? 4 : 0),
-    //                                 decoration: BoxDecoration(
-    //                                   color: widget.childToPeek != null
-    //                                       ? null
-    //                                       : Colors.grey.shade100,
-    //                                   borderRadius: BorderRadius.circular(8),
-    //                                 ),
-    //                                 child: Column(
-    //                                   children: [
-    //                                     widget.child,
-    //                                   ],
-    //                                 ),
-    //                               ),
-    //                             ),
-    //                           ),
-    //                         ],
-    //                       ),
-    //                     ),
-    //                     AnimatedContainer(
-    //                       // color: Colors.red,
-    //                       curve: curve,
-    //                       duration: duration,
-    //                       height: isPeekOpening ? 16 : 0,
-    //                     ),
-    //                     AnimatedContainer(
-    //                       curve: curve,
-    //                       height:
-    //                           isPeekOpening ? menuItem.entries.length * 50 : 0,
-    //                       width: double.infinity,
-    //                       duration: duration,
-    //                       child: FittedBox(
-    //                         fit: BoxFit.contain,
-    //                         child: AnimatedOpacity(
-    //                           opacity: isPeekOpening ? 1 : 0,
-    //                           duration: duration,
-    //                           curve: curve,
-    //                           child: Container(
-    //                               width: 250,
-    //                               decoration: BoxDecoration(
-    //                                   color: Colors.grey.shade100,
-    //                                   borderRadius: border),
-    //                               child: ListView.builder(
-    //                                 physics:
-    //                                     const NeverScrollableScrollPhysics(),
-    //                                 shrinkWrap: true,
-    //                                 itemCount: menuItem.entries.length,
-    //                                 padding: const EdgeInsets.all(0.0),
-    //                                 itemBuilder: (context, index) {
-    //                                   log('index $index');
-    //                                   return TextButton(
-    //                                       style: ButtonStyle(
-    //                                         foregroundColor:
-    //                                             MaterialStateProperty.all(
-    //                                                 menuItem.entries
-    //                                                         .elementAt(index)
-    //                                                         .value['color'] ??
-    //                                                     Colors.blue),
-    //                                         shape: MaterialStateProperty.all(
-    //                                           const RoundedRectangleBorder(
-    //                                               borderRadius:
-    //                                                   BorderRadius.zero),
-    //                                         ),
-    //                                       ),
-    //                                       onPressed: () {},
-    //                                       child: Row(
-    //                                         mainAxisAlignment:
-    //                                             MainAxisAlignment.spaceBetween,
-    //                                         children: [
-    //                                           Text(menuItem.entries
-    //                                               .elementAt(index)
-    //                                               .key),
-    //                                           Icon(menuItem.entries
-    //                                               .elementAt(index)
-    //                                               .value['icon'])
-    //                                         ],
-    //                                       ));
-    //                                 },
-    //                               )),
-    //                         ),
-    //                       ),
-    //                     ),
-    //                   ]),
-    //             ),
-    //           ),
-    //         );
-    //       },
-    //     );
-    //   },
-    //   transitionBuilder: (ctx, anim1, anim2, child) {
-    //     return BackdropFilter(
-    //         filter: ImageFilter.blur(
-    //             sigmaX: 7 * anim1.value, sigmaY: 7 * anim1.value),
-    //         child: child
-    //         // child: SizeTransition(sizeFactor: anim1, child: child)
-    //         //
-    //         );
-    //   },
-    //   context: context,
-    // );
-    // await Future.delayed(const Duration(milliseconds: 300));
-    // setState(() {});
+            pageBuilder: (context, anim1, anim2) => PeekPage(
+                  childToPeek: widget.childToPeek,
+                  transitionAnimation: anim1,
+                  childPosition: getWigetPosition()!,
+                  child: widget.child,
+                )));
+    if (mounted) {
+      Future.delayed(const Duration(milliseconds: 250), () {
+        setState(() {
+          isOpened = false;
+        });
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    log('childScale $childScale');
+    // log('isOpened $isOpened');
 
     return ClipRect(
       child: InkWell(
@@ -340,8 +137,8 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             curve: Curves.decelerate,
             scale: isScaleWidget ? 1.05 : 1,
             child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 0),
-                curve: Curves.decelerate,
+                curve: curve,
+                duration: const Duration(milliseconds: 50),
                 opacity: isOpened ? 0 : 1,
                 child: widget.child)),
       ),
@@ -364,113 +161,154 @@ extension GlobalPaintBounds on BuildContext {
 
 class PeekPage extends StatefulWidget {
   final Animation<double> transitionAnimation;
-  const PeekPage({super.key, required this.transitionAnimation});
+  final Widget? childToPeek;
+  final Widget child;
+  final Rect childPosition;
+  const PeekPage(
+      {super.key,
+      required this.transitionAnimation,
+      required this.childPosition,
+      this.childToPeek,
+      required this.child});
 
   @override
   State<PeekPage> createState() => _PeekPageState();
 }
 
-class _PeekPageState extends State<PeekPage> {
+class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
+  late AnimationController controller;
+  double offsetY = 0;
+  bool isOpened = false;
+  bool isOpened2 = false;
+  double cardScale = 1;
+  Map<String, dynamic> menuItem = {
+    'Hapus': {'icon': Icons.delete, 'color': Colors.red, 'action': () {}},
+    'Edit': {'icon': Icons.edit, 'color': null, 'action': () {}},
+  };
+
+  @override
+  void initState() {
+    controller = AnimationController(vsync: this, duration: duration);
+    controller.value = 0;
+    Future.delayed(duration, () {
+      setState(() {
+        isOpened = true;
+        isOpened2 = true;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final childToPeek = widget.childToPeek;
     final anim1 = widget.transitionAnimation;
-    final controller = CurvedAnimation(parent: anim1, curve: curve);
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (BuildContext context, Widget? child) {
-        // log('isOpened0 ${context.anima}');
-        if (anim1.value == 1) {
+    final childPosition = widget.childPosition;
+    final innerController = CurvedAnimation(parent: anim1, curve: curve);
+    // log('message $childPosition');
+    return WillPopScope(
+      onWillPop: () {
+        setState(() {
           isOpened = false;
-        }
-        // bool isPeekOpening = anim1.value != 0;
-        // log('isOpened $isOpened');
-        log(' menuItem.entries.length ${menuItem.entries.length}');
-        // log(' anim1.value ${anim1.value > 0} ${anim1.value >= 1}');
-        // bool isPeekOpening = anim1.value > 0 || isOpened; // awal
-        bool isPeekOpening = isOpened
-            ? anim1.value > 0 || anim1.value >= 1 // awal
-            : anim1.value > 0 && anim1.value >= 1; // akhir
-        // bool isPeekOpening = anim1.value > 0 || anim1.value >= 1;
-        // bool isPeekClosing = anim1.value <= 1;
-        // // bool isPeekOpen = isPeekOpening && isPeekClosing;
-        return DraggableCard(
-          onDragChange: (p0) {
-            log('detail ${p0.y}');
-            setState(() {
-              childScale = (1 - p0.y);
-            });
-          },
-          onState: dragStateChange,
-          child: Transform.scale(
-            scale: innerChildScale,
-            child: AnimatedContainer(
+          // cardScale = 1;
+        });
+        Navigator.pop(context);
+        return Future.value(false);
+      },
+      child: AnimatedBuilder(
+        animation: innerController,
+        builder: (BuildContext context, Widget? child) {
+          log('innerController ${innerController.value}');
+          log('isOpened2 $isOpened2');
+          log('cardScale ${1 + ((1 - innerController.value) * 0.05)}');
+          return DraggableCard(
+            onDragChange: (p0) {
+              log('detail ${p0.y}');
+              if (p0.y < 0) return;
+              setState(() {
+                offsetY = p0.y;
+                cardScale = (1 - p0.y / 2.5);
+              });
+            },
+            onDragEnd: (p0) {
+              // log('message ${p0}');
+              setState(() {
+                offsetY = 0;
+                cardScale = 1;
+              });
+              if (p0.velocity.pixelsPerSecond.dy > 1) {
+                setState(() {
+                  isOpened = false;
+                });
+                Navigator.pop(context);
+              }
+            },
+            // onState: dragStateChange,
+            child: Container(
               // color: Colors.red,
               padding: EdgeInsets.only(
-                left: isPeekOpening || widgetPosition!.left < 0
-                    ? 0
-                    : widgetPosition.left,
-                top: isPeekOpening || widgetPosition!.top < 0
-                    ? widget.childToPeek != null
-                        ? 32
-                        : 0
-                    : widgetPosition.top,
-                right: isPeekOpening || widgetPosition!.right > size.width
-                    ? 0
-                    : size.width - widgetPosition.right,
-                bottom: isPeekOpening || widgetPosition!.bottom > size.height
-                    ? 0
-                    : size.height - widgetPosition.bottom,
+                left: childPosition.left * (1 - innerController.value),
+                top: childPosition.top * (1 - innerController.value),
+                right: (size.width - childPosition.right) *
+                    (1 - innerController.value),
+                bottom: (size.height - childPosition.bottom) *
+                    (1 - innerController.value),
               ),
-              curve: curve,
-              duration: duration,
-              height: !isPeekOpening
-                  ? size.height
-                  : widget.childToPeek != null
-                      ? size.height / 1.5
-                      : 124 + widgetPosition!.height,
-              width: size.width - (isPeekOpening ? 32 : 0),
+              height: 24 +
+                  (menuItem.length * 50) * innerController.value +
+                  size.height -
+                  innerController.value *
+                      (widget.childToPeek != null
+                          ? size.height * 0.4
+                          : childPosition.top +
+                              (size.height - childPosition.bottom)),
+              width: size.width * ((1 - innerController.value) + 9) / 10,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Expanded(
-                      flex: widget.childToPeek != null ? 1 : 0,
+                      flex: childToPeek != null ? 1 : 0,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          if (widget.childToPeek != null)
-                            AnimatedOpacity(
-                              curve: curve,
-                              duration: duration,
-                              opacity: !isPeekOpening ? 0 : 1,
+                          if (childToPeek != null)
+                            Opacity(
+                              opacity: innerController.value,
                               child: Container(
-                                // height: size.height - 64 - menuItem.length * 50,
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
-                                    child: widget.childToPeek),
+                                    child: childToPeek),
                               ),
                             ),
-                          AnimatedScale(
-                            curve: curve,
-                            duration: duration,
-                            scale: !isOpened || isPeekOpening ? 1 : 1.05,
-                            child: AnimatedOpacity(
-                              curve: curve,
-                              duration: duration,
-                              opacity:
-                                  isPeekOpening && widget.childToPeek != null
-                                      ? 0
-                                      : 1,
-                              child: AnimatedContainer(
-                                curve: curve,
-                                duration: duration,
-                                padding: EdgeInsets.all(isPeekOpening ? 4 : 0),
+                          Transform.scale(
+                            alignment: Alignment.bottomCenter,
+                            // curve: Curves.easeOutCubic,
+                            // duration: cardScale < 1 && isOpened
+                            //     ? const Duration(milliseconds: 0)
+                            //     : duration,
+                            scale: cardScale +
+                                (isOpened2
+                                    ? 0
+                                    : (1 - innerController.value) * 0.05),
+                            child: Opacity(
+                              opacity: 1,
+                              child: Container(
+                                padding:
+                                    EdgeInsets.all(innerController.value * 4),
                                 decoration: BoxDecoration(
-                                  color: widget.childToPeek != null
+                                  color: childToPeek != null
                                       ? null
                                       : Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(8),
@@ -486,23 +324,23 @@ class _PeekPageState extends State<PeekPage> {
                         ],
                       ),
                     ),
-                    AnimatedContainer(
-                      // color: Colors.red,
-                      curve: curve,
-                      duration: duration,
-                      height: isPeekOpening ? 16 : 0,
+                    SizedBox(
+                      height: innerController.value * 16,
                     ),
                     AnimatedContainer(
-                      curve: curve,
-                      height: isPeekOpening ? menuItem.entries.length * 50 : 0,
+                      curve: Curves.easeOutCubic,
+                      duration:
+                          isOpened ? duration : const Duration(milliseconds: 0),
+                      height: offsetY > 0.6
+                          ? 0
+                          : innerController.value *
+                              menuItem.entries.length *
+                              50,
                       width: double.infinity,
-                      duration: duration,
                       child: FittedBox(
                         fit: BoxFit.contain,
-                        child: AnimatedOpacity(
-                          opacity: isPeekOpening ? 1 : 0,
-                          duration: duration,
-                          curve: curve,
+                        child: Opacity(
+                          opacity: innerController.value,
                           child: Container(
                               width: 250,
                               decoration: BoxDecoration(
@@ -514,7 +352,6 @@ class _PeekPageState extends State<PeekPage> {
                                 itemCount: menuItem.entries.length,
                                 padding: const EdgeInsets.all(0.0),
                                 itemBuilder: (context, index) {
-                                  log('index $index');
                                   return TextButton(
                                       style: ButtonStyle(
                                         foregroundColor:
@@ -548,9 +385,9 @@ class _PeekPageState extends State<PeekPage> {
                     ),
                   ]),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
