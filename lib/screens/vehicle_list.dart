@@ -59,23 +59,24 @@ class VehicleList extends StatelessWidget {
               return ListView.builder(
                 itemCount: vehicleList.length,
                 itemBuilder: (context, index) {
-                  final firstPath =
-                      vehicleList[index].imgSrcPhotos.split(',').first;
-                  final File cover = File(firstPath);
+                  // final firstPath =
+                  //     vehicleList[index].imgSrcPhotos.split(',').first;
+                  // final File cover = File(firstPath);
                   return PeekAndPopable(
+                      peekPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 150),
+
                       // childToPeek: Container(
                       //   height: 300,
                       //   color: Colors.red,
                       // ),
-                      childToPeek: firstPath == ''
-                          ? null
-                          : Image.file(
-                              cover,
-                              // height: 300,
-                              width: double.infinity,
-                              // width: 150,
-                              fit: BoxFit.cover,
-                            ),
+                      childToPeek: Image.network(
+                        "https://helios-i.mashable.com/imagery/articles/036SM7saRgnSGmvT3XNLYXQ/hero-image.fill.size_1200x900.v1623372406.jpg",
+                        height: double.infinity,
+                        width: double.infinity,
+                        // width: 150,
+                        fit: BoxFit.cover,
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: VehicleItem(

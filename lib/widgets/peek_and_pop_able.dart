@@ -10,9 +10,11 @@ const curve = Curves.easeInOutExpo;
 final border = BorderRadius.circular(16);
 
 class PeekAndPopable extends StatefulWidget {
+  final EdgeInsets? peekPadding;
   final Widget child;
   final Widget? childToPeek;
-  const PeekAndPopable({super.key, required this.child, this.childToPeek});
+  const PeekAndPopable(
+      {super.key, required this.child, this.childToPeek, this.peekPadding});
 
   @override
   State<PeekAndPopable> createState() => _PeekAndPopableState();
@@ -109,6 +111,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             barrierColor: Colors.black38,
             transitionDuration: duration,
             pageBuilder: (context, anim1, anim2) => PeekPage(
+                  peekPadding: widget.peekPadding,
                   childToPeek: widget.childToPeek,
                   transitionAnimation: anim1,
                   childPosition: getWigetPosition()!,
@@ -164,12 +167,14 @@ class PeekPage extends StatefulWidget {
   final Widget? childToPeek;
   final Widget child;
   final Rect childPosition;
+  final EdgeInsets? peekPadding;
   const PeekPage(
       {super.key,
       required this.transitionAnimation,
       required this.childPosition,
       this.childToPeek,
-      required this.child});
+      required this.child,
+      this.peekPadding});
 
   @override
   State<PeekPage> createState() => _PeekPageState();
@@ -225,12 +230,15 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
       child: AnimatedBuilder(
         animation: innerController,
         builder: (BuildContext context, Widget? child) {
-          log('innerController ${innerController.value}');
-          log('isOpened2 $isOpened2');
-          log('cardScale ${1 + ((1 - innerController.value) * 0.05)}');
+          // log('innerController ${innerController.value}');
+          // log('isOpened2 $isOpened2');
+          // log('cardScale ${1 + ((1 - innerController.value) * 0.05)}');
+          // log('isOpened2 ${widget.peekPadding!.top + widget.peekPadding!.bottom}');
+          // log('isOpened3 ${size.height * 0.4}');
+          // log('isOpened3 ${const ViewConfiguration().devicePixelRatio}');
           return DraggableCard(
             onDragChange: (p0) {
-              log('detail ${p0.y}');
+              // log('detail ${p0.y}');
               if (p0.y < 0) return;
               setState(() {
                 offsetY = p0.y;
@@ -254,21 +262,31 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
             child: Container(
               // color: Colors.red,
               padding: EdgeInsets.only(
-                left: childPosition.left * (1 - innerController.value),
-                top: childPosition.top * (1 - innerController.value),
-                right: (size.width - childPosition.right) *
-                    (1 - innerController.value),
-                bottom: (size.height - childPosition.bottom) *
-                    (1 - innerController.value),
+                left: childPosition.left > 0
+                    ? childPosition.left * (1 - innerController.value)
+                    : 0,
+                top: childPosition.top > 0
+                    ? childPosition.top * (1 - innerController.value)
+                    : 0,
+                right: childPosition.right < size.width
+                    ? (size.width - childPosition.right) *
+                        (1 - innerController.value)
+                    : 0,
+                bottom: childPosition.bottom < size.height
+                    ? (size.height - childPosition.bottom) *
+                        (1 - innerController.value)
+                    : 0,
               ),
-              height: 24 +
-                  (menuItem.length * 50) * innerController.value +
-                  size.height -
+              height: size.height +
                   innerController.value *
-                      (widget.childToPeek != null
-                          ? size.height * 0.4
-                          : childPosition.top +
-                              (size.height - childPosition.bottom)),
+                      ((menuItem.length * 50 + 24) -
+                          ((widget.childToPeek != null
+                              ? widget.peekPadding != null
+                                  ? (widget.peekPadding!.top +
+                                      widget.peekPadding!.bottom)
+                                  : size.height * 0.4
+                              : childPosition.top +
+                                  (size.height - childPosition.bottom)))),
               width: size.width * ((1 - innerController.value) + 9) / 10,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -276,34 +294,38 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                   children: [
                     Expanded(
                       flex: childToPeek != null ? 1 : 0,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (childToPeek != null)
-                            Opacity(
-                              opacity: innerController.value,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: ClipRRect(
+                      child: AnimatedScale(
+                        alignment: isOpened2
+                            ? Alignment.bottomCenter
+                            : Alignment.center,
+                        curve: Curves.easeOutCubic,
+                        duration: cardScale < 1 || !isOpened2
+                            ? const Duration(milliseconds: 0)
+                            : duration,
+                        scale: cardScale +
+                            (isOpened2
+                                ? 0
+                                : (1 - innerController.value) * 0.05),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            if (childToPeek != null)
+                              Opacity(
+                                opacity: innerController.value,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(16),
-                                    child: childToPeek),
+                                  ),
+                                  child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: childToPeek),
+                                ),
                               ),
-                            ),
-                          Transform.scale(
-                            alignment: Alignment.bottomCenter,
-                            // curve: Curves.easeOutCubic,
-                            // duration: cardScale < 1 && isOpened
-                            //     ? const Duration(milliseconds: 0)
-                            //     : duration,
-                            scale: cardScale +
-                                (isOpened2
-                                    ? 0
-                                    : (1 - innerController.value) * 0.05),
-                            child: Opacity(
-                              opacity: 1,
+                            Opacity(
+                              opacity: childToPeek != null
+                                  ? (1 - innerController.value)
+                                  : 1,
                               child: Container(
                                 padding:
                                     EdgeInsets.all(innerController.value * 4),
@@ -320,8 +342,8 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -331,7 +353,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                       curve: Curves.easeOutCubic,
                       duration:
                           isOpened ? duration : const Duration(milliseconds: 0),
-                      height: offsetY > 0.6
+                      height: offsetY > 0.5
                           ? 0
                           : innerController.value *
                               menuItem.entries.length *
@@ -339,8 +361,12 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                       width: double.infinity,
                       child: FittedBox(
                         fit: BoxFit.contain,
-                        child: Opacity(
-                          opacity: innerController.value,
+                        child: AnimatedOpacity(
+                          curve: Curves.easeOutCubic,
+                          duration: isOpened
+                              ? duration
+                              : const Duration(milliseconds: 0),
+                          opacity: offsetY > 0.5 ? 0 : innerController.value,
                           child: Container(
                               width: 250,
                               decoration: BoxDecoration(
