@@ -64,7 +64,7 @@ class VehicleList extends StatelessWidget {
                   // final File cover = File(firstPath);
                   return PeekAndPopable(
                       peekPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 150),
+                          horizontal: 16, vertical: 300),
 
                       // childToPeek: Container(
                       //   height: 300,

@@ -25,7 +25,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     final dataDB = await _db.vehicleDao.findAllVehicle();
     _dbList = dataDB;
     emit([...state, ...dataDB]);
-    log('tarikMang $state');
+    // log('tarikMang $state');
   }
 
   void setList(List<Vehicle> list) {

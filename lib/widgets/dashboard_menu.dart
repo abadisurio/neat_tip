@@ -27,7 +27,7 @@ class DashboardMenu extends StatelessWidget {
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: menuList.map((item) {
-            log('${item['name']}');
+            // log('${item['name']}');
             return PeekAndPopable(
               child: IntrinsicHeight(
                 child: Column(

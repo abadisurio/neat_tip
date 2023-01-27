@@ -58,7 +58,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
     });
 
     log('globalPaintBounds ${context.globalPaintBounds}');
-    onHold = Timer(const Duration(milliseconds: 300), () {
+    onHold = Timer(const Duration(milliseconds: 500), () {
       Future.delayed(
         const Duration(milliseconds: 100),
         () => HapticFeedback.lightImpact(),
@@ -136,7 +136,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
         onTapDown: onTapDown,
         onTapUp: onTapUp,
         child: AnimatedScale(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.decelerate,
             scale: isScaleWidget ? 1.05 : 1,
             child: AnimatedOpacity(
@@ -231,7 +231,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
         animation: innerController,
         builder: (BuildContext context, Widget? child) {
           // log('innerController ${innerController.value}');
-          // log('isOpened2 $isOpened2');
+          log('isCollapsed ${offsetY > 0.5 || !isOpened}');
           // log('cardScale ${1 + ((1 - innerController.value) * 0.05)}');
           // log('isOpened2 ${widget.peekPadding!.top + widget.peekPadding!.bottom}');
           // log('isOpened3 ${size.height * 0.4}');
@@ -248,7 +248,6 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
             onDragEnd: (p0) {
               // log('message ${p0}');
               setState(() {
-                offsetY = 0;
                 cardScale = 1;
               });
               if (p0.velocity.pixelsPerSecond.dy > 1) {
@@ -256,6 +255,10 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                   isOpened = false;
                 });
                 Navigator.pop(context);
+              } else {
+                setState(() {
+                  offsetY = 0;
+                });
               }
             },
             // onState: dragStateChange,
@@ -298,7 +301,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                         alignment: isOpened2
                             ? Alignment.bottomCenter
                             : Alignment.center,
-                        curve: Curves.easeOutCubic,
+                        curve: isOpened ? Curves.easeOutCubic : curve,
                         duration: cardScale < 1 || !isOpened2
                             ? const Duration(milliseconds: 0)
                             : duration,
@@ -350,10 +353,10 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                       height: innerController.value * 16,
                     ),
                     AnimatedContainer(
-                      curve: Curves.easeOutCubic,
+                      curve: isOpened ? Curves.easeOutCubic : curve,
                       duration:
                           isOpened ? duration : const Duration(milliseconds: 0),
-                      height: offsetY > 0.5
+                      height: offsetY > 0.3 * menuItem.length
                           ? 0
                           : innerController.value *
                               menuItem.entries.length *
@@ -362,11 +365,13 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: AnimatedOpacity(
-                          curve: Curves.easeOutCubic,
+                          curve: isOpened ? Curves.easeOutCubic : curve,
                           duration: isOpened
                               ? duration
                               : const Duration(milliseconds: 0),
-                          opacity: offsetY > 0.5 ? 0 : innerController.value,
+                          opacity: offsetY > 0.3 * menuItem.length
+                              ? 0
+                              : innerController.value,
                           child: Container(
                               width: 250,
                               decoration: BoxDecoration(

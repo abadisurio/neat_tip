@@ -20,7 +20,7 @@ class _HomeState extends State<Home> with RouteAware {
     super.didChangeDependencies();
     final routeObserver =
         BlocProvider.of<RouteObserverCubit>(context).routeObserver;
-    log('routeObserver $routeObserver');
+    // log('routeObserver $routeObserver');
     routeObserver.subscribe(this, ModalRoute.of(context));
   }
 
@@ -55,14 +55,14 @@ class _HomeState extends State<Home> with RouteAware {
 
   @override
   void deactivate() {
-    log('deact');
+    // log('deact');
     super.deactivate();
   }
 
   @override
   Widget build(BuildContext context) {
     // bool isScreenActive = true;
-    log('isScreenActive $isScreenActive');
+    // log('isScreenActive $isScreenActive');
     // final routeNow = ModalRoute.of(context)?.settings.name;
     // Navigator.of(context).
     // log('$routeNow');

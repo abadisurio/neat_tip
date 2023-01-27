@@ -35,26 +35,28 @@ class _MyAppState extends State<MyApp> {
   late User? user;
   late List<CameraDescription> cameras;
   late NeatTipDatabase database;
-  bool isAllAllowed = true;
+  late VehicleListCubit vehicleListCubit;
+  late CameraCubit cameraCubit;
+  late RouteObserverCubit routeObserverCubit;
 
   Future<void> initializeComponents() async {
+    // log('panggil');
     await AppFirebase.initializeFirebase();
     // await FirebaseAuth.instance.signOut();
-    cameras = await availableCameras();
     isNeedPermission = await checkPermission();
     user = FirebaseAuth.instance.currentUser;
     database =
         await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
-  }
+    vehicleListCubit = VehicleListCubit();
+    vehicleListCubit.initializeDB(database);
+    vehicleListCubit.pullDataFromDB();
 
-  Future<void> initializeBloc(BuildContext context) async {
-    final blocDB = BlocProvider.of<VehicleListCubit>(context);
-    BlocProvider.of<CameraCubit>(context).setCameraList(cameras);
-    BlocProvider.of<RouteObserverCubit>(context)
-        .setRouteObserver(routeObserver);
-    blocDB.initializeDB(database);
-    await blocDB.pullDataFromDB();
-    // await Future.delayed(const Duration(milliseconds: 1000));
+    cameras = await availableCameras();
+    cameraCubit = CameraCubit();
+    cameraCubit.setCameraList(cameras);
+
+    routeObserverCubit = RouteObserverCubit();
+    routeObserverCubit.setRouteObserver(routeObserver);
   }
 
   Future<bool> checkPermission() async {
@@ -79,14 +81,14 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
         providers: [
           BlocProvider<CameraCubit>(
-              create: (BuildContext context) => CameraCubit()),
+              create: (BuildContext context) => cameraCubit),
           BlocProvider<RouteObserverCubit>(
-              create: (BuildContext context) => RouteObserverCubit()),
+              create: (BuildContext context) => routeObserverCubit),
           BlocProvider<VehicleListCubit>(
-              create: (BuildContext context) => VehicleListCubit()),
+              create: (BuildContext context) => vehicleListCubit),
         ],
         child: MaterialApp(
-            title: 'Flutter Demo',
+            title: 'Neat Tip',
             navigatorObservers: [routeObserver],
             theme: getThemeData(),
             onGenerateRoute: routeGenerator,
@@ -96,26 +98,17 @@ class _MyAppState extends State<MyApp> {
                 // FlutterNativeSplash.remove();
                 // return LoadingWindow();
                 if (snapshot.connectionState != ConnectionState.done) {
+                  //  FlutterNativeSplash.remove();
                   return const LoadingWindow();
+                } else {
+                  FlutterNativeSplash.remove();
+                  if (user == null) {
+                    return const Introduction();
+                  } else if (!isNeedPermission) {
+                    return const PermissionWindow();
+                  }
+                  return const Home();
                 }
-                return FutureBuilder(
-                  future: initializeBloc(context),
-                  builder: (context, snapshot) {
-                    log('snapshot.connectionState ${snapshot.connectionState}');
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      //  FlutterNativeSplash.remove();
-                      return const LoadingWindow();
-                    } else {
-                      FlutterNativeSplash.remove();
-                      if (user == null) {
-                        return const Introduction();
-                      } else if (!isNeedPermission) {
-                        return const PermissionWindow();
-                      }
-                      return const Home();
-                    }
-                  },
-                );
               },
             )));
   }
