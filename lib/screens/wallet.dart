@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/transaction_list.dart';
 import 'package:neat_tip/models/transactions.dart';
+import 'package:neat_tip/widgets/smart_card.dart';
 
 class Wallet extends StatelessWidget {
   const Wallet({Key? key}) : super(key: key);
@@ -16,8 +17,9 @@ class Wallet extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
+            const SmartCard(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

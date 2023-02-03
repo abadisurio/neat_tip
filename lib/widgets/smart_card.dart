@@ -6,18 +6,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/debit_card.dart';
 
-class SmartCard extends StatefulWidget {
+class SmartCard extends StatefulWidget with RouteAware {
   const SmartCard({Key? key}) : super(key: key);
 
   @override
   State<SmartCard> createState() => _SmartCardState();
 }
 
-class _SmartCardState extends State<SmartCard> {
+class _SmartCardState extends State<SmartCard> with RouteAware {
+  bool isScreenActive = false;
   late List<Vehicle> vehicleList;
   late List<String> plateNumbers;
   final RegExp regexPlate =
@@ -27,6 +30,40 @@ class _SmartCardState extends State<SmartCard> {
   bool _isDetecting = false;
   CameraController? cameraController;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final routeObserver =
+        BlocProvider.of<RouteObserverCubit>(context).routeObserver;
+    // log('routeObserver $routeObserver');
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+  @override
+  void didPushNext() {
+    log('didPushNext');
+    if (mounted) {
+      setState(() {
+        isScreenActive = false;
+      });
+    }
+    super.didPushNext();
+  }
+
+  @override
+  // Called when the top route has been popped off, and the current route shows up.
+  void didPopNext() {
+    log('didPopNext');
+    if (mounted) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        setState(() {
+          isScreenActive = true;
+        });
+      });
+    }
+    super.didPopNext();
+  }
 
   startScanning() {
     cameraController?.startImageStream((image) {
@@ -125,7 +162,11 @@ class _SmartCardState extends State<SmartCard> {
   @override
   void initState() {
     super.initState();
-
+    Future.delayed(const Duration(milliseconds: 200), () {
+      setState(() {
+        isScreenActive = true;
+      });
+    });
     vehicleList = context.read<VehicleListCubit>().state;
     plateNumbers = vehicleList.map((Vehicle e) => e.plate).toList();
     // setState(() {
@@ -136,6 +177,7 @@ class _SmartCardState extends State<SmartCard> {
   Widget build(BuildContext context) {
     // final navigator = Navigator.of(context);
     // log('plateNumberswww $plateNumbers');
+    log('isScreenActive $isScreenActive');
     return AnimatedContainer(
       margin: EdgeInsets.only(
         top: _isScanning ? 0 : 16,
@@ -163,13 +205,15 @@ class _SmartCardState extends State<SmartCard> {
               scale: _isScanning ? 1.5 : 2.1,
               curve: Curves.easeOutCirc,
               duration: const Duration(milliseconds: 500),
-              // child: CameraCapturer(
-              //     resolution: ResolutionPreset.low,
-              //     controller: (controller) {
-              //       setState(() {
-              //         cameraController = controller;
-              //       });
-              //     }),
+              child: !isScreenActive
+                  ? null
+                  : CameraCapturer(
+                      resolution: ResolutionPreset.low,
+                      controller: (controller) {
+                        setState(() {
+                          cameraController = controller;
+                        });
+                      }),
             ),
             AnimatedOpacity(
               curve: Curves.easeOutCirc,
@@ -180,7 +224,7 @@ class _SmartCardState extends State<SmartCard> {
                   sigmaX: 30.0,
                   sigmaY: 30.0,
                 ),
-                child: Container(color: Colors.pink.shade600.withOpacity(0.4)),
+                child: Container(color: Colors.blue.shade600.withOpacity(0.4)),
               ),
             ),
             AnimatedOpacity(

@@ -121,6 +121,44 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     }
   }
 
+  void addInfo(Map<Symbol, dynamic> newInfo) {
+    firebaseUser = FirebaseAuth.instance.currentUser;
+    try {
+      // final coba = newInfo.map((key, value) {
+      //   return MapEntry(Symbol(key), value);
+      // });
+      final oldInfo = _currentUser
+          ?.toJson()
+          .map((key, value) => MapEntry(Symbol(key), value));
+      log('oldInfo $oldInfo');
+      _currentUser = Function.apply(NeatTipUser.new, [], {
+        #createdAt:
+            firebaseUser?.metadata.creationTime!.toIso8601String() ?? '',
+        #updatedAt: DateTime.now().toUtc().toIso8601String(),
+        #id: firebaseUser?.uid ?? '',
+        #role: 'customer',
+        #displayName: 'Neat Tip User',
+        ...(oldInfo ?? {}),
+        ...newInfo,
+      });
+      // currentUser = NeatTipUser(
+      //     createdAt: firebaseUser?.metadata.creationTime.toString() ?? '',
+      //     updatedAt: DateTime.now().toIso8601String(),
+      //     id: firebaseUser?.uid ?? '',
+      //     role: 'customer',
+      //     fullName: 'bejo');
+      log('currentUser $_currentUser');
+      firestore.collection("users").add(_currentUser!.toJson()).then(
+          (DocumentReference doc) =>
+              log('DocumentSnapshot added with ID: ${doc.id}'));
+      sharedPreferences.setString(
+          'currentUser', json.encode(_currentUser?.toJson()));
+    } catch (e) {
+      log('eee $e');
+      throw Exception(e);
+    }
+  }
+
   Future firebaseSignOut() async {
     await FirebaseAuth.instance.signOut();
   }

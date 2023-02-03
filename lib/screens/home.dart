@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/transaction_list.dart';
 import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
@@ -16,44 +15,11 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with RouteAware {
-  late bool isScreenActive;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final routeObserver =
-        BlocProvider.of<RouteObserverCubit>(context).routeObserver;
-    // log('routeObserver $routeObserver');
-    routeObserver.subscribe(this, ModalRoute.of(context));
-  }
-
+class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    isScreenActive = true;
-  }
-
-  @override
-  void didPushNext() {
-    log('didPushNext');
-    if (mounted) {
-      setState(() {
-        isScreenActive = false;
-      });
-    }
-    super.didPushNext();
-  }
-
-  @override
-  // Called when the top route has been popped off, and the current route shows up.
-  void didPopNext() {
-    log('didPopNext');
-    if (mounted) {
-      setState(() {
-        isScreenActive = true;
-      });
-    }
-    super.didPopNext();
+    // isScreenActive = true;
   }
 
   @override
@@ -94,7 +60,7 @@ class _HomeState extends State<Home> with RouteAware {
                       child: DashboardMenu(),
                     ),
                   ),
-                  if (isScreenActive) const SmartCard()
+                  if (false) const SmartCard()
                 ],
               ),
             ),

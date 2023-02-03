@@ -67,16 +67,16 @@ class _HomeRootState extends State<HomeRoot> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.motorcycle),
-              label: 'Wahana',
+              icon: Icon(Icons.public_outlined),
+              label: 'Sosial',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.remove),
               label: 'Pindai',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.public),
-              label: 'Sosial',
+              icon: Icon(Icons.notifications_outlined),
+              label: 'Notif',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.grid_view_outlined),
