@@ -28,6 +28,7 @@ List<Map<String, dynamic>> signInFields = [
   {
     "fieldname": "Password",
     "value": null,
+    "obscure": true,
     "type": TextInputType.visiblePassword,
     "validator": (str) => true
   },
@@ -44,6 +45,7 @@ List<Map<String, dynamic>> signUpFields = [
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   late NeatTipUserCubit neatTipUserCubit;
+  bool _passwordVisible = false;
   bool isSingingUp = false;
   bool isSuccess = false;
   Map<String, TextEditingController> authFieldControllers = {};
@@ -74,6 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
           await neatTipUserCubit.signUpEmailPassword(email, password);
           await neatTipUserCubit
               .updateDisplayName(authFieldControllers['Nama']!.text);
+          await neatTipUserCubit.addUserToFirestore();
         } else {
           await neatTipUserCubit.signInEmailPassword(email, password);
         }
@@ -164,12 +167,32 @@ class _AuthScreenState extends State<AuthScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: TextFormField(
+                        obscureText:
+                            (e['obscure'] ?? false) && !_passwordVisible,
                         keyboardType: e['type'],
                         controller: controller,
                         decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            hintText: 'Masukkan ${e['fieldname']}',
-                            labelText: e['fieldname']),
+                          border: const OutlineInputBorder(),
+                          hintText: 'Masukkan ${e['fieldname']}',
+                          labelText: e['fieldname'],
+                          suffixIcon: e['obscure'] == null
+                              ? null
+                              : IconButton(
+                                  icon: Icon(
+                                    // Based on passwordVisible state choose the icon
+                                    _passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Theme.of(context).primaryColorDark,
+                                  ),
+                                  onPressed: () {
+                                    // Update the state i.e. toogle the state of passwordVisible variable
+                                    setState(() {
+                                      _passwordVisible = !_passwordVisible;
+                                    });
+                                  },
+                                ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Tidak Boleh Kosong. Masukkan ${e['fieldname']} Anda!';

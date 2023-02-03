@@ -141,7 +141,7 @@ class _MyAppState extends State<MyApp> {
                                 case 'host_owner':
                                   return '/homehost';
                                 default:
-                                  return '/home';
+                                  return '/homeroot';
                               }
                             }(), (route) => false);
                           },

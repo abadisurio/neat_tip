@@ -112,7 +112,7 @@ class _IntroductionState extends State<Introduction> {
 
           // });
           Navigator.of(context)
-              .pushNamedAndRemoveUntil('/home', (route) => false);
+              .pushNamedAndRemoveUntil('/homeroot', (route) => false);
         },
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
+import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/wallet.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
@@ -28,6 +29,9 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/home':
       return CupertinoPageRoute(
           builder: (_) => const Home(), settings: settings);
+    case '/homeroot':
+      return CupertinoPageRoute(
+          builder: (_) => const HomeRoot(), settings: settings);
     case '/homehost':
       return CupertinoPageRoute(
           builder: (_) => const Home(), settings: settings);

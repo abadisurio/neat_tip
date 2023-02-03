@@ -21,16 +21,28 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   Future<void> initialize() async {
     sharedPreferences = await SharedPreferences.getInstance();
     firebaseUser = FirebaseAuth.instance.currentUser;
-    final currentUser = sharedPreferences.getString('currentUser');
+
     firestore = FirebaseFirestore.instance;
-    // log('firebaseUser $firebaseUser');
-    log('currentUser $currentUser');
-    if (firebaseUser != null) {
-      updateInfo({});
+    final currentUser = sharedPreferences.getString('currentUser');
+
+    try {
+      firebaseUser
+          ?.reload()
+          .onError((error, stackTrace) => throw error.toString());
+      log('currentUser $currentUser');
+      if (currentUser == null && firebaseUser != null) {
+        updateLocalInfo({});
+      }
+      final userFromFirestore = await fetchUserFromFirestore(firebaseUser!.uid);
+      log('${userFromFirestore?.displayName}');
+      if (currentUser != null) {
+        _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
+        // if(userFromFirestore)
+      }
+    } catch (e) {
+      log('$e');
     }
-    if (currentUser != null) {
-      _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
-    }
+    // log('firebaseUser ${await  }');
     // return NeatTipUser.fromJson(json.decode(currentUser));
   }
 
@@ -51,7 +63,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       if (user == null) {
         throw Exception('User not found!');
       }
-      updateInfo({});
+      // updateInfo({});
       log('user $user');
     } catch (e) {
       log('sinii $e');
@@ -61,17 +73,17 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
   Future<void> updateDisplayName(String newInfo) async {
     await firebaseUser?.updateDisplayName(newInfo);
-    updateInfo({#displayName: newInfo});
+    updateLocalInfo({#displayName: newInfo});
   }
 
   Future<void> updateEmail(String newInfo) async {
     await firebaseUser?.updateEmail(newInfo);
-    updateInfo({#email: newInfo});
+    updateLocalInfo({#email: newInfo});
   }
 
   Future<void> updatePhotoURL(String newInfo) async {
     await firebaseUser?.updatePhotoURL(newInfo);
-    updateInfo({#photoURL: newInfo});
+    updateLocalInfo({#photoURL: newInfo});
   }
 
   Future<void> updatePassword(String newInfo) async {
@@ -83,7 +95,81 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   //   firebaseUser?.updatePhoneNumber(newInfo);
   // }
 
-  void updateInfo(Map<Symbol, dynamic> newInfo) {
+  Future<void> addUserToFirestore() async {
+    try {
+      log('currentUser $_currentUser');
+      DocumentReference doc =
+          await firestore.collection("users").add(_currentUser!.toJson());
+      log('DocumentSnapshot added with ID: ${doc.id}');
+      sharedPreferences.setString(
+          'currentUser', json.encode(_currentUser?.toJson()));
+    } catch (e) {
+      log('eee $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<NeatTipUser?> fetchUserFromFirestore(String id) async {
+    try {
+      final fetch = await firestore.collection("users").doc(id).get();
+      final data = fetch.data();
+      if (data == null) {
+        // log('sinii $data');
+        return throw 'User exists, but User Info not found!';
+      }
+      return Function.apply(NeatTipUser.new, [],
+          data.map((key, value) => MapEntry(Symbol(key), value)));
+      // return NeatTipUser(createdAt: createdAt, updatedAt: updatedAt, id: id, role: role, displayName: displayName)
+    } catch (e) {
+      log('eee $e');
+      // throw Exception(e);
+    }
+    return null;
+  }
+
+  Future<void> updateLocalInfo(Map<Symbol, dynamic> newInfo) async {
+    firebaseUser = FirebaseAuth.instance.currentUser;
+    try {
+      // final coba = newInfo.map((key, value) {
+      //   return MapEntry(Symbol(key), value);
+      // });
+      final oldInfo = _currentUser
+          ?.toJson()
+          .map((key, value) => MapEntry(Symbol(key), value));
+      log('oldInfo $oldInfo');
+      _currentUser = Function.apply(NeatTipUser.new, [], {
+        #createdAt:
+            firebaseUser?.metadata.creationTime!.toIso8601String() ?? '',
+        #updatedAt: DateTime.now().toUtc().toIso8601String(),
+        #id: firebaseUser?.uid ?? '',
+        #role: 'customer',
+        #displayName: 'Neat Tip User',
+        ...(oldInfo ?? {}),
+        ...newInfo,
+      });
+      // currentUser = NeatTipUser(
+      //     createdAt: firebaseUser?.metadata.creationTime.toString() ?? '',
+      //     updatedAt: DateTime.now().toIso8601String(),
+      //     id: firebaseUser?.uid ?? '',
+      //     role: 'customer',
+      //     fullName: 'bejo');
+      // log('currentUser $_currentUser');
+      // await firestore
+      //     .collection("users")
+      //     .doc(_currentUser!.id)
+      //     .update(_currentUser!.toJson())
+      //     .then((value) => log("DocumentSnapshot successfully updated!"),
+      //         onError: (e) => log("Error updating document $e"));
+
+      // sharedPreferences.setString(
+      //     'currentUser', json.encode(_currentUser?.toJson()));
+    } catch (e) {
+      log('eee $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<void> updateUserToFirebase(Map<Symbol, dynamic> newInfo) async {
     firebaseUser = FirebaseAuth.instance.currentUser;
     try {
       // final coba = newInfo.map((key, value) {
@@ -110,9 +196,13 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       //     role: 'customer',
       //     fullName: 'bejo');
       log('currentUser $_currentUser');
-      firestore.collection("users").add(_currentUser!.toJson()).then(
-          (DocumentReference doc) =>
-              log('DocumentSnapshot added with ID: ${doc.id}'));
+      await firestore
+          .collection("users")
+          .doc(_currentUser!.id)
+          .update(_currentUser!.toJson())
+          .then((value) => log("DocumentSnapshot successfully updated!"),
+              onError: (e) => log("Error updating document $e"));
+
       sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
