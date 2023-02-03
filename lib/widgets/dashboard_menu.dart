@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 
@@ -8,8 +6,8 @@ class DashboardMenu extends StatelessWidget {
 
   static const List<Map<String, dynamic>> menuList = [
     {"name": "Spots", "route": "/spots", "icon": Icons.explore_outlined},
-    {"name": "Riwayat", "route": "/history", "icon": Icons.list_alt_outlined},
-    {"name": "E-wallet", "route": "/ewallet", "icon": Icons.wallet},
+    {"name": "Reservasi", "route": "/reservations", "icon": Icons.menu_book},
+    {"name": "Wallet", "route": "/wallet", "icon": Icons.wallet},
     {"name": "Kendaraan", "route": "/vehiclelist", "icon": Icons.motorcycle},
     // {"name": "Pro", "route": "/spots", "icon": Icons.explore_outlined},
   ];

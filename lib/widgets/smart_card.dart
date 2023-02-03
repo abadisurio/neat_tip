@@ -8,7 +8,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
-import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/debit_card.dart';
 
 class SmartCard extends StatefulWidget {
@@ -164,13 +163,13 @@ class _SmartCardState extends State<SmartCard> {
               scale: _isScanning ? 1.5 : 2.1,
               curve: Curves.easeOutCirc,
               duration: const Duration(milliseconds: 500),
-              child: CameraCapturer(
-                  resolution: ResolutionPreset.low,
-                  controller: (controller) {
-                    setState(() {
-                      cameraController = controller;
-                    });
-                  }),
+              // child: CameraCapturer(
+              //     resolution: ResolutionPreset.low,
+              //     controller: (controller) {
+              //       setState(() {
+              //         cameraController = controller;
+              //       });
+              //     }),
             ),
             AnimatedOpacity(
               curve: Curves.easeOutCirc,

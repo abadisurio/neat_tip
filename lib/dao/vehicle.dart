@@ -5,10 +5,10 @@ import 'package:neat_tip/models/vehicle.dart';
 
 @dao
 abstract class VehicleDao {
-  @Query('SELECT * FROM Person')
+  @Query('SELECT * FROM Vehicle')
   Future<List<Vehicle>> findAllVehicle();
 
-  @Query('SELECT * FROM Person WHERE id = :id')
+  @Query('SELECT * FROM Vehicle WHERE id = :id')
   Stream<Vehicle?> findVehicleById(int id);
 
   @insert

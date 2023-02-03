@@ -15,7 +15,8 @@ class PermissionWindow extends StatefulWidget {
 }
 
 final List<Map<String, dynamic>> serviceList = [
-  {'name': 'Kameraaa', 'type': Permission.camera}
+  {'name': 'Kameraaa', 'icon': Icons.camera_alt, 'type': Permission.camera},
+  {'name': 'Lokasi', 'icon': Icons.location_on, 'type': Permission.location},
 ];
 
 class _PermissionWindowState extends State<PermissionWindow> {
@@ -43,12 +44,6 @@ class _PermissionWindowState extends State<PermissionWindow> {
         });
       }
     }
-
-    log('widget.onAllowedAll ${widget.onAllowedAll}');
-    if (widget.onAllowedAll != null && isAllAllowed) {
-      widget.onAllowedAll!();
-    }
-
     setState(() {
       isChecking = false;
     });
@@ -63,7 +58,12 @@ class _PermissionWindowState extends State<PermissionWindow> {
   }
 
   returnToApp() {
-    Navigator.pop(context, isAllAllowed);
+    log('widget.onAllowedAll ${widget.onAllowedAll}');
+    if (widget.onAllowedAll != null && isAllAllowed) {
+      widget.onAllowedAll!();
+    } else {
+      Navigator.pop(context, isAllAllowed);
+    }
   }
 
   @override
@@ -101,7 +101,7 @@ class _PermissionWindowState extends State<PermissionWindow> {
                 final service = serviceList[index - 1];
                 final isGranted = permissionStatus[service['type']]!.isGranted;
                 return ListTile(
-                  leading: const Icon(Icons.camera_alt),
+                  leading: Icon(service['icon']),
                   title: Text(service['name']),
                   subtitle:
                       Text(isGranted ? "sudah diizinkan" : "tidak diizinkan"),

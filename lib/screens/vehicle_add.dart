@@ -140,219 +140,224 @@ class VehicleAddState extends State<VehicleAdd> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Kendaraan'),
-      ),
-      body: SafeArea(
-          child: NotificationListener(
-        onNotification: (t) {
-          if (t is ScrollEndNotification) {
-            log('_listViewController ${_listViewController.position.pixels}');
-            setState(() {
-              if (_listViewController.position.pixels > screenWidth) {
-                isCameraFocus = false;
-              } else {
-                isCameraFocus = true;
-              }
-            });
-          }
-          return true;
-        },
-        child: ListView(
-          controller: _listViewController,
-          children: [
-            Stack(
-              fit: StackFit.loose,
-              children: [
-                if (isScreenActive)
-                  Container(
-                    margin: const EdgeInsets.only(left: contentGap),
-                    decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+    return WillPopScope(
+      onWillPop: () {
+        return Future.value(true);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Tambah Kendaraan'),
+        ),
+        body: SafeArea(
+            child: NotificationListener(
+          onNotification: (t) {
+            if (t is ScrollEndNotification) {
+              log('_listViewController ${_listViewController.position.pixels}');
+              setState(() {
+                if (_listViewController.position.pixels > screenWidth) {
+                  isCameraFocus = false;
+                } else {
+                  isCameraFocus = true;
+                }
+              });
+            }
+            return true;
+          },
+          child: ListView(
+            controller: _listViewController,
+            children: [
+              Stack(
+                fit: StackFit.loose,
+                children: [
+                  if (isScreenActive)
+                    Container(
+                      margin: const EdgeInsets.only(left: contentGap),
+                      decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade50)),
+                      width: boxSize,
+                      height: boxSize,
+                      child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade50)),
-                    width: boxSize,
-                    height: boxSize,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Transform.scale(
-                        scale: 1.5,
-                        child: Center(
-                          child: CameraCapturer(
-                            resolution: ResolutionPreset.medium,
-                            controller: (controller) {
-                              controller.setFlashMode(FlashMode.off);
-                              setState(() {
-                                cameraController = controller;
-                              });
-                              // }
-                            },
+                        child: Transform.scale(
+                          scale: 1.5,
+                          child: Center(
+                            child: CameraCapturer(
+                              resolution: ResolutionPreset.medium,
+                              controller: (controller) {
+                                controller.setFlashMode(FlashMode.off);
+                                setState(() {
+                                  cameraController = controller;
+                                });
+                                // }
+                              },
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                SizedBox(
-                    height: boxSize,
-                    width: screenWidth,
-                    child: ScrollablePositionedList.builder(
-                      padding: EdgeInsets.only(
-                          left: contentGap / 2,
-                          right: screenWidth - boxSize - contentGap * 1.5),
-                      reverse: true,
-                      itemScrollController: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _imgFilePhotos.length + 1,
-                      itemBuilder: ((context, index) {
-                        if (index == _imgFilePhotos.length) {
-                          return ClipPath(
-                            clipper: ButtonClipper(),
-                            child: Container(
+                  SizedBox(
+                      height: boxSize,
+                      width: screenWidth,
+                      child: ScrollablePositionedList.builder(
+                        padding: EdgeInsets.only(
+                            left: contentGap / 2,
+                            right: screenWidth - boxSize - contentGap * 1.5),
+                        reverse: true,
+                        itemScrollController: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _imgFilePhotos.length + 1,
+                        itemBuilder: ((context, index) {
+                          if (index == _imgFilePhotos.length) {
+                            return ClipPath(
+                              clipper: ButtonClipper(),
+                              child: Container(
+                                color: Colors.grey.shade50,
+                                width: boxSize + 16,
+                              ),
+                            );
+                          }
+                          return Container(
+                            padding: const EdgeInsets.only(left: contentGap),
+                            decoration: BoxDecoration(
                               color: Colors.grey.shade50,
-                              width: boxSize + 16,
                             ),
-                          );
-                        }
-                        return Container(
-                          padding: const EdgeInsets.only(left: contentGap),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                          ),
-                          width: boxSize + contentGap,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Image.file(
-                                  _imgFilePhotos[index],
-                                  fit: BoxFit.cover,
-                                ),
-                                Text('$index'),
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.grey.shade800,
-                                        elevation: 0,
-                                        shape: const CircleBorder()),
-                                    onPressed: () {
-                                      removePhoto(index);
-                                    },
-                                    child: Icon(
-                                      Icons.cancel_outlined,
-                                      color: Colors.grey.shade200,
+                            width: boxSize + contentGap,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.file(
+                                    _imgFilePhotos[index],
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Text('$index'),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey.shade800,
+                                          elevation: 0,
+                                          shape: const CircleBorder()),
+                                      onPressed: () {
+                                        removePhoto(index);
+                                      },
+                                      child: Icon(
+                                        Icons.cancel_outlined,
+                                        color: Colors.grey.shade200,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          // width: 110,
-                        );
-                      }),
-                    )),
-              ],
-            ),
-
-            // Text('${_scrollListener.itemPositions.value.first.}'),
-            Container(
-              padding: const EdgeInsets.fromLTRB(contentGap, 8.0, 0, 0),
-              alignment: Alignment.centerLeft,
-              child: Row(
-                children: [
-                  if (cameraController != null && isCameraFocus)
-                    ElevatedButton(
-                        onPressed: () async {
-                          if (!isCapturing) {
-                            takePicture();
-                          }
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isCapturing ? Icons.adjust : Icons.circle,
-                              color: Colors.grey.shade200,
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text(isCapturing ? 'Tahan' : 'Ambil Gambar'),
-                          ],
-                        )
-                        // child: Text('${item['name']}')
-                        ),
-                  ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(shape: const CircleBorder()),
-                    onPressed: () async {
-                      if (isFlashOn) {
-                        cameraController?.setFlashMode(FlashMode.off);
-                      } else {
-                        cameraController?.setFlashMode(FlashMode.always);
-                      }
-                      setState(() {
-                        isFlashOn = !isFlashOn;
-                      });
-                    },
-                    child: Icon(
-                      isFlashOn ? Icons.flash_on : Icons.flash_off,
-                      color: Colors.grey.shade200,
-                    ),
-                  ),
+                            // width: 110,
+                          );
+                        }),
+                      )),
                 ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+              // Text('${_scrollListener.itemPositions.value.first.}'),
+              Container(
+                padding: const EdgeInsets.fromLTRB(contentGap, 8.0, 0, 0),
+                alignment: Alignment.centerLeft,
+                child: Row(
                   children: [
-                    const Text('(*) Wajib Diisi'),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    ...vehicleFields.map((e) {
-                      final controller = vehicleFieldControllers.putIfAbsent(
-                          e['fieldname'], () => TextEditingController());
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: TextFormField(
-                          keyboardType: e['type'],
-                          controller: controller,
-                          decoration: InputDecoration(
-                              border: const OutlineInputBorder(),
-                              hintText: 'Masukkan ${e['fieldname']}',
-                              labelText: e['fieldname']),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Tidak boleh kosong. Masukkan ${e['fieldname']} Anda!';
+                    if (cameraController != null && isCameraFocus)
+                      ElevatedButton(
+                          onPressed: () async {
+                            if (!isCapturing) {
+                              takePicture();
                             }
-                            if (!e['validator'](value)) {
-                              return 'Format ${e['fieldname']} tidak sesuai';
-                            }
-                            return null;
                           },
-                        ),
-                      );
-                    }),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: submitForm,
-                        child: const Text('Submit'),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isCapturing ? Icons.adjust : Icons.circle,
+                                color: Colors.grey.shade200,
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text(isCapturing ? 'Tahan' : 'Ambil Gambar'),
+                            ],
+                          )
+                          // child: Text('${item['name']}')
+                          ),
+                    ElevatedButton(
+                      style:
+                          ElevatedButton.styleFrom(shape: const CircleBorder()),
+                      onPressed: () async {
+                        if (isFlashOn) {
+                          cameraController?.setFlashMode(FlashMode.off);
+                        } else {
+                          cameraController?.setFlashMode(FlashMode.always);
+                        }
+                        setState(() {
+                          isFlashOn = !isFlashOn;
+                        });
+                      },
+                      child: Icon(
+                        isFlashOn ? Icons.flash_on : Icons.flash_off,
+                        color: Colors.grey.shade200,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      )),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('(*) Wajib Diisi'),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      ...vehicleFields.map((e) {
+                        final controller = vehicleFieldControllers.putIfAbsent(
+                            e['fieldname'], () => TextEditingController());
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: TextFormField(
+                            keyboardType: e['type'],
+                            controller: controller,
+                            decoration: InputDecoration(
+                                border: const OutlineInputBorder(),
+                                hintText: 'Masukkan ${e['fieldname']}',
+                                labelText: e['fieldname']),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Tidak boleh kosong. Masukkan ${e['fieldname']} Anda!';
+                              }
+                              if (!e['validator'](value)) {
+                                return 'Format ${e['fieldname']} tidak sesuai';
+                              }
+                              return null;
+                            },
+                          ),
+                        );
+                      }),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: submitForm,
+                          child: const Text('Submit'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )),
+      ),
     );
   }
 }

@@ -1,7 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:neat_tip/utils/firebase.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/widgets/google_sign_in_button.dart';
 import 'package:validators/validators.dart';
 
@@ -40,6 +43,7 @@ List<Map<String, dynamic>> signUpFields = [
 
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
+  late NeatTipUserCubit neatTipUserCubit;
   bool isSingingUp = false;
   bool isSuccess = false;
   Map<String, TextEditingController> authFieldControllers = {};
@@ -62,19 +66,44 @@ class _AuthScreenState extends State<AuthScreen> {
         const SnackBar(content: Text('Processing Data')),
       );
 
+      final email = authFieldControllers['Email']!.text;
+      final password = authFieldControllers['Password']!.text;
+
       try {
         if (isSingingUp) {
-          await AppFirebase.signUpWithEmailPassword(
-              authFieldControllers['Email']!.text,
-              authFieldControllers['Password']!.text);
+          await neatTipUserCubit.signUpEmailPassword(email, password);
+          await neatTipUserCubit
+              .updateDisplayName(authFieldControllers['Nama']!.text);
         } else {
-          await AppFirebase.signInWithEmailPassword(
-              authFieldControllers['Email']!.text,
-              authFieldControllers['Password']!.text);
+          await neatTipUserCubit.signInEmailPassword(email, password);
         }
         onSuccess();
       } catch (e) {
-        print(e);
+        log('eeee $e');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Perhatian!'),
+            content: const Text('Pengguna tidak ditemukan'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    // isSingingUp = true;
+                    authType[0] = false;
+                    authType[1] = true;
+                  });
+                },
+                child: const Text('Buat Sekarang'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
 
       // print(_formKey.currentState!.);
@@ -82,7 +111,14 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    neatTipUserCubit = BlocProvider.of<NeatTipUserCubit>(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    isSingingUp = authType[1];
     return Scaffold(
       appBar: AppBar(),
       body: WillPopScope(
@@ -105,7 +141,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         for (int i = 0; i < authType.length; i++) {
                           authType[i] = i == index;
                         }
-                        isSingingUp = authType[1];
                       });
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),

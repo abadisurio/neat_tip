@@ -1,13 +1,17 @@
-class Transaction {
+import 'package:floor/floor.dart';
+
+@entity
+class Transactions {
+  @primaryKey
   late String id;
   late String customerUserId;
-  String? service;
   late String timeRequested;
   String? timeFinished;
   int? value;
+  String? service;
   String? status;
 
-  Transaction(
+  Transactions(
       {required this.id,
       required this.customerUserId,
       this.service,
@@ -16,7 +20,7 @@ class Transaction {
       this.value,
       this.status});
 
-  Transaction.fromJson(Map<String, dynamic> json) {
+  Transactions.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     customerUserId = json['customerUserId'];
     service = json['service'];

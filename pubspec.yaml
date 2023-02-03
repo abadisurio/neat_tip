@@ -51,6 +51,11 @@ dependencies:
   floor: ^1.4.1
   introduction_screen: ^3.1.4
   sqflite: ^2.2.3
+  google_maps_flutter: ^2.2.3
+  location: ^4.4.0
+  intl: ^0.17.0
+  shared_preferences: ^2.0.17
+  cloud_firestore: ^4.3.1
 
 
 dev_dependencies:

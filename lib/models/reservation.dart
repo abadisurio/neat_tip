@@ -1,4 +1,8 @@
+import 'package:floor/floor.dart';
+
+@entity
 class Reservation {
+  @primaryKey
   late String id;
   late String spotId;
   late String hostUserId;
