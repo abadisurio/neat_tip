@@ -23,7 +23,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> pullDataFromDB() async {
     final dataDB = await _db.vehicleDao.findAllVehicle();
     _dbList = dataDB;
-    emit([...state, ...dataDB]);
+    emit(dataDB);
     // log('tarikMang $state');
   }
 

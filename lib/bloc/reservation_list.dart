@@ -23,7 +23,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
   Future<void> pullDataFromDB() async {
     final dataDB = await _db.reservationsDao.findAllReservation();
     _dbList = dataDB;
-    emit([...state, ...dataDB]);
+    emit(dataDB);
     // log('tarikMang $state');
   }
 

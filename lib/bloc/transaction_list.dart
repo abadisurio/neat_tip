@@ -23,7 +23,7 @@ class TransactionsListCubit extends Cubit<List<Transactions>> {
   Future<void> pullDataFromDB() async {
     final dataDB = await _db.transactionsDao.findAllTransactions();
     _dbList = dataDB;
-    emit([...state, ...dataDB]);
+    emit(dataDB);
     // log('tarikMang $state');
   }
 
