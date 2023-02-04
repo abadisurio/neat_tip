@@ -12,7 +12,6 @@ import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/neattip_user.dart';
-import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
@@ -123,46 +122,52 @@ class _MyAppState extends State<MyApp> {
                 BlocProvider<NeatTipUserCubit>(
                     create: (BuildContext context) => neatTipUserCubit),
               ],
-              child: MaterialApp(
-                title: 'Neat Tip',
-                navigatorObservers: [routeObserver],
-                theme: getThemeData(),
-                onGenerateRoute: routeGenerator,
-                home: () {
-                  // FlutterNativeSplash.remove();
-                  // return LoadingWindow();
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    //  FlutterNativeSplash.remove();
-                    return const LoadingWindow();
-                  } else {
-                    FlutterNativeSplash.remove();
-                    if (user == null) {
-                      return const Introduction();
-                    } else if (!isNeedPermission) {
-                      return Builder(builder: (context) {
-                        return PermissionWindow(
-                          onAllowedAll: () {
-                            Navigator.pushNamedAndRemoveUntil(context, () {
-                              switch (user!.role) {
-                                case 'host_owner':
-                                  return '/homehost';
-                                default:
-                                  return '/homeroot';
-                              }
-                            }(), (route) => false);
-                          },
-                        );
-                      });
+              child: Builder(builder: (context2) {
+                return MaterialApp(
+                  themeMode: (context2.watch<AppStateCubit>().state.darkMode)
+                      ? ThemeMode.dark
+                      : ThemeMode.light,
+                  title: 'Neat Tip',
+                  navigatorObservers: [routeObserver],
+                  darkTheme: ThemeData.dark(),
+                  theme: getThemeData(),
+                  onGenerateRoute: routeGenerator,
+                  home: () {
+                    // FlutterNativeSplash.remove();
+                    // return LoadingWindow();
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      //  FlutterNativeSplash.remove();
+                      return const LoadingWindow();
+                    } else {
+                      FlutterNativeSplash.remove();
+                      if (user == null) {
+                        return const Introduction();
+                      } else if (!isNeedPermission) {
+                        return Builder(builder: (context) {
+                          return PermissionWindow(
+                            onAllowedAll: () {
+                              Navigator.pushNamedAndRemoveUntil(context, () {
+                                switch (user!.role) {
+                                  case 'host_owner':
+                                    return '/homehost';
+                                  default:
+                                    return '/homeroot';
+                                }
+                              }(), (route) => false);
+                            },
+                          );
+                        });
+                      }
+                      switch (user!.role) {
+                        case 'host_owner':
+                          return const HomeHost();
+                        default:
+                          return const HomeRoot();
+                      }
                     }
-                    switch (user!.role) {
-                      case 'host_owner':
-                        return const HomeHost();
-                      default:
-                        return const HomeRoot();
-                    }
-                  }
-                }(),
-              ));
+                  }(),
+                );
+              }));
         });
   }
 }

@@ -33,7 +33,6 @@ class Manage extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<NeatTipUserCubit, NeatTipUser?>(
           builder: (context, neatTipUser) {
-        // return BlocProvider.of<AppStateCubit>(context).updateConfig();
         return ListView(
           children: [
             Padding(
@@ -72,24 +71,21 @@ class Manage extends StatelessWidget {
             ),
             ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: appStateCubit.state.configs.length,
+              itemCount: appStateCubit.state.visibleMembers.entries.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                final configItem = appStateCubit.state.configs[index];
+                final configItem =
+                    appStateCubit.state.visibleMembers.entries.toList()[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    child: Icon(IconData(configItem['icon'],
-                        fontFamily: 'MaterialIcons')),
-                  ),
                   title: Text(
-                    configItem['name'] as String,
+                    configItem.value['name'],
                     style: style,
                   ),
                   trailing: Switch(
-                    value: configItem['value'] as bool,
+                    value: configItem.value['value'] ?? false,
                     onChanged: (bool value) {
-                      log('$index $value');
-                      appStateCubit.updateConfig(index, value);
+                      log('${configItem.key} $value');
+                      appStateCubit.updateConfig(configItem.key, value);
                       // This is called when the user toggles the switch.
                       // setState(() {
                       //   light = value;
