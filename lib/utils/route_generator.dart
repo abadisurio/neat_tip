@@ -8,7 +8,7 @@ import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/permission_window.dart';
-import 'package:neat_tip/screens/profile.dart';
+import 'package:neat_tip/screens/manage.dart';
 import 'package:neat_tip/screens/transaction_list.dart';
 import 'package:neat_tip/screens/vehicle_add.dart';
 import 'package:neat_tip/screens/vehicle_list.dart';
@@ -44,7 +44,7 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           builder: (_) => const VehicleAdd(), settings: settings);
     case '/profile':
       return CupertinoPageRoute(
-          builder: (_) => const Profile(), settings: settings);
+          builder: (_) => const Manage(), settings: settings);
     case '/profileedit':
       return CupertinoPageRoute(
           builder: (_) => const ProfileEdit(), settings: settings);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/home.dart';
-import 'package:neat_tip/screens/profile.dart';
+import 'package:neat_tip/screens/manage.dart';
 
 class HomeRoot extends StatefulWidget {
   const HomeRoot({Key? key}) : super(key: key);
@@ -10,20 +10,20 @@ class HomeRoot extends StatefulWidget {
 }
 
 class _HomeRootState extends State<HomeRoot> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 4;
   static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Home(),
     Text(
-      'Index 1: Business',
+      'Sosial',
       style: optionStyle,
     ),
     SizedBox(),
     Text(
-      'Index 2: School',
+      'Notifikasi',
       style: optionStyle,
     ),
-    Profile(),
+    Manage(),
   ];
 
   void _onItemTapped(int index) {
@@ -43,6 +43,15 @@ class _HomeRootState extends State<HomeRoot> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text([
+          'Neat Tip',
+          'Sosial',
+          'Pindai',
+          'Notifikasi',
+          'Pengaturan'
+        ][_selectedIndex]),
+      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

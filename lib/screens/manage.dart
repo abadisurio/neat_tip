@@ -21,8 +21,8 @@ const appConfigs = [
   },
 ];
 
-class Profile extends StatelessWidget {
-  const Profile({super.key});
+class Manage extends StatelessWidget {
+  const Manage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +36,13 @@ class Profile extends StatelessWidget {
         // return BlocProvider.of<AppStateCubit>(context).updateConfig();
         return ListView(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Akun Saya',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
             ListTile(
               leading: CircleAvatar(
                 // child: Text(state!.displayName
@@ -49,18 +56,22 @@ class Profile extends StatelessWidget {
                 'Abadi Suryo',
                 style: Theme.of(context).textTheme.bodyText1,
               ),
-              subtitle: const Text('Akun personal'),
+              subtitle: const Text('Personal'),
               trailing: TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/profileedit');
                   },
                   child: const Text('Ubah')),
             ),
-            const Divider(
-              indent: 12,
-              endIndent: 12,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Pengaturan',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
             ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: appStateCubit.state.configs.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
