@@ -77,14 +77,19 @@ class Manage extends StatelessWidget {
             ListTile(
               leading: CircleAvatar(
                 // child: Text(state!.displayName
-                child: Text('Abadi Suryo'
+                child: Text((context
+                            .read<NeatTipUserCubit>()
+                            .currentUser
+                            ?.displayName ??
+                        'Neat Tip User')
                     .split(' ')
                     .map((e) => e.substring(0, 1))
                     .join('')
                     .toUpperCase()),
               ),
               title: Text(
-                'Abadi Suryo',
+                context.read<NeatTipUserCubit>().currentUser?.displayName ??
+                    'Neat Tip User',
                 style: Theme.of(context).textTheme.bodyText1,
               ),
               subtitle: const Text('Personal'),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,12 +7,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppState {
   // late List<dynamic> configs;
+  late DateTime updatedAt;
   late bool darkMode;
   late bool reduceMotion;
 
-  AppState({required this.darkMode, required this.reduceMotion});
+  AppState(
+      {required this.darkMode,
+      required this.reduceMotion,
+      required this.updatedAt});
 
   Map<String, dynamic> get members => ({
+        'updatedAt': DateTime.now(),
         'darkMode': darkMode,
         'reduceMotion': reduceMotion,
       });
@@ -35,7 +41,8 @@ class AppState {
   }
 }
 
-final defaultAppState = AppState(darkMode: false, reduceMotion: false);
+final defaultAppState =
+    AppState(darkMode: false, reduceMotion: false, updatedAt: DateTime.now());
 
 class AppStateCubit extends Cubit<AppState> {
   AppStateCubit() : super(defaultAppState);
@@ -46,7 +53,7 @@ class AppStateCubit extends Cubit<AppState> {
     sharedPreferences = await SharedPreferences.getInstance();
     // sharedPreferences.remove('appState');
     final appState = sharedPreferences.getString('appState');
-    // log('appState $appState');
+    // log('appState ${appState}');
     if (appState == null) {
       emit(defaultAppState);
     } else {

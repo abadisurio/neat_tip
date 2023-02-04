@@ -16,7 +16,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   NeatTipUser? _currentUser;
 
   get firebaseCurrentUser => FirebaseAuth.instance.currentUser;
-  get currentUser => _currentUser;
+  NeatTipUser? get currentUser => _currentUser;
 
   Future<void> initialize() async {
     sharedPreferences = await SharedPreferences.getInstance();
@@ -98,9 +98,11 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   Future<void> addUserToFirestore() async {
     try {
       log('currentUser $_currentUser');
-      DocumentReference doc =
-          await firestore.collection("users").add(_currentUser!.toJson());
-      log('DocumentSnapshot added with ID: ${doc.id}');
+      await firestore
+          .collection("users")
+          .doc(_currentUser!.id)
+          .set(_currentUser!.toJson());
+      // log('DocumentSnapshot added with ID');
       sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
@@ -138,9 +140,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .map((key, value) => MapEntry(Symbol(key), value));
       log('oldInfo $oldInfo');
       _currentUser = Function.apply(NeatTipUser.new, [], {
-        #createdAt:
-            firebaseUser?.metadata.creationTime!.toIso8601String() ?? '',
-        #updatedAt: DateTime.now().toUtc().toIso8601String(),
+        #createdAt: firebaseUser?.metadata.creationTime! ?? DateTime.now(),
+        #updatedAt: DateTime.now(),
         #id: firebaseUser?.uid ?? '',
         #role: 'customer',
         #displayName: 'Neat Tip User',
@@ -180,9 +181,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .map((key, value) => MapEntry(Symbol(key), value));
       log('oldInfo $oldInfo');
       _currentUser = Function.apply(NeatTipUser.new, [], {
-        #createdAt:
-            firebaseUser?.metadata.creationTime!.toIso8601String() ?? '',
-        #updatedAt: DateTime.now().toUtc().toIso8601String(),
+        #createdAt: firebaseUser?.metadata.creationTime! ?? DateTime.now(),
+        #updatedAt: DateTime.now(),
         #id: firebaseUser?.uid ?? '',
         #role: 'customer',
         #displayName: 'Neat Tip User',
@@ -222,9 +222,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .map((key, value) => MapEntry(Symbol(key), value));
       log('oldInfo $oldInfo');
       _currentUser = Function.apply(NeatTipUser.new, [], {
-        #createdAt:
-            firebaseUser?.metadata.creationTime!.toIso8601String() ?? '',
-        #updatedAt: DateTime.now().toUtc().toIso8601String(),
+        #createdAt: firebaseUser?.metadata.creationTime! ?? DateTime.now(),
+        #updatedAt: DateTime.now(),
         #id: firebaseUser?.uid ?? '',
         #role: 'customer',
         #displayName: 'Neat Tip User',
