@@ -42,12 +42,15 @@ List<Map<String, dynamic>> signUpFields = [
   },
 ];
 
+const List<String> roleList = <String>['Pemilik Penitipan', 'Pengguna'];
+
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   late NeatTipUserCubit neatTipUserCubit;
   bool _passwordVisible = false;
   bool isSingingUp = false;
   bool isSuccess = false;
+  String? selectedRole;
   Map<String, TextEditingController> authFieldControllers = {};
 
   final List<bool> authType = <bool>[true, false];
@@ -76,6 +79,7 @@ class _AuthScreenState extends State<AuthScreen> {
           await neatTipUserCubit.signUpEmailPassword(email, password);
           await neatTipUserCubit
               .updateDisplayName(authFieldControllers['Nama']!.text);
+          await neatTipUserCubit.updateLocalInfo({#role: selectedRole});
           await neatTipUserCubit.addUserToFirestore();
         } else {
           await neatTipUserCubit.signInEmailPassword(email, password);
@@ -235,7 +239,44 @@ class _AuthScreenState extends State<AuthScreen> {
                                   },
                                 ),
                               );
-                            }).toList()
+                            }).toList(),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: DropdownButtonFormField<String>(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Tidak boleh kosong. Pilih peran Anda!';
+                                  }
+                                  return null;
+                                },
+                                decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Saya adalah'),
+                                value: selectedRole,
+                                icon: const Icon(Icons.arrow_drop_down),
+                                elevation: 16,
+                                style:
+                                    const TextStyle(color: Colors.deepPurple),
+                                // underline: Container(
+                                //   height: 2,
+                                //   color: Colors.deepPurpleAccent,
+                                // ),
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedRole = value!;
+                                  });
+                                },
+                                items: roleList.map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                            )
                           ])),
                 ElevatedButton(
                   onPressed: submitAuth,

@@ -104,7 +104,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
-      log('eee $e');
+      // log('eee $e');
       throw Exception(e);
     }
   }
@@ -211,7 +211,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     }
   }
 
-  void addInfo(Map<Symbol, dynamic> newInfo) {
+  void addInfo(Map<Symbol, dynamic> newInfo) async {
     firebaseUser = FirebaseAuth.instance.currentUser;
     try {
       // final coba = newInfo.map((key, value) {
@@ -238,9 +238,10 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       //     role: 'customer',
       //     fullName: 'bejo');
       log('currentUser $_currentUser');
-      firestore.collection("users").add(_currentUser!.toJson()).then(
-          (DocumentReference doc) =>
-              log('DocumentSnapshot added with ID: ${doc.id}'));
+      await firestore
+          .collection("users")
+          .doc(_currentUser!.id)
+          .set(_currentUser!.toJson());
       sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {

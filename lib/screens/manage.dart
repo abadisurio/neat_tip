@@ -24,6 +24,38 @@ const appConfigs = [
 class Manage extends StatelessWidget {
   const Manage({super.key});
 
+  _askToSignOut(context) async {
+    await showDialog(
+        context: context,
+        builder: ((context) {
+          return AlertDialog(
+            title: const Text('Keluar dari akun'),
+            content: const Text('Anda yakin?'),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Batal'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Keluar'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/signout');
+                },
+              ),
+            ],
+          );
+        }));
+  }
+
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.bodyText1;
@@ -94,6 +126,13 @@ class Manage extends StatelessWidget {
                   ),
                 );
               },
+            ),
+            ListTile(
+              onTap: () => _askToSignOut(context),
+              title: Text(
+                'Keluarkan Akun',
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
             ),
           ],
         );

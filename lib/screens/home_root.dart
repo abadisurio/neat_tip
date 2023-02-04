@@ -10,7 +10,7 @@ class HomeRoot extends StatefulWidget {
 }
 
 class _HomeRootState extends State<HomeRoot> {
-  int _selectedIndex = 4;
+  int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Home(),

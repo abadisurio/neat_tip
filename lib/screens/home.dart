@@ -6,7 +6,6 @@ import 'package:neat_tip/bloc/transaction_list.dart';
 import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
 import 'package:neat_tip/widgets/peek_and_pop_able.dart';
-import 'package:neat_tip/widgets/smart_card.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -41,7 +40,6 @@ class _HomeState extends State<Home> {
     // Navigator.of(context).
     // log('$routeNow');
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -52,15 +50,14 @@ class _HomeState extends State<Home> {
               width: MediaQuery.of(context).size.width,
               child: Stack(
                 alignment: Alignment.topCenter,
-                children: [
-                  const Align(
+                children: const [
+                  Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(8, 0, 8, 30),
                       child: DashboardMenu(),
                     ),
                   ),
-                  if (false) const SmartCard()
                 ],
               ),
             ),
