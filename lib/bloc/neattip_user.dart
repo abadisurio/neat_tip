@@ -161,8 +161,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       //     .then((value) => log("DocumentSnapshot successfully updated!"),
       //         onError: (e) => log("Error updating document $e"));
 
-      // sharedPreferences.setString(
-      //     'currentUser', json.encode(_currentUser?.toJson()));
+      sharedPreferences.setString(
+          'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
       log('eee $e');
       throw Exception(e);

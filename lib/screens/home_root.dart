@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/home.dart';
+import 'package:neat_tip/screens/profile.dart';
 
 class HomeRoot extends StatefulWidget {
   const HomeRoot({Key? key}) : super(key: key);
@@ -22,10 +23,7 @@ class _HomeRootState extends State<HomeRoot> {
       'Index 2: School',
       style: optionStyle,
     ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
+    Profile(),
   ];
 
   void _onItemTapped(int index) {

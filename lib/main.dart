@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:neat_tip/bloc/app_state.dart';
 import 'package:neat_tip/bloc/camera.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
@@ -40,6 +41,7 @@ class _MyAppState extends State<MyApp> {
   late List<CameraDescription> cameras;
   late NeatTipDatabase database;
   late VehicleListCubit vehicleListCubit;
+  late AppStateCubit appStateCubit;
   late TransactionsListCubit transactionsListCubit;
   late ReservationsListCubit reservationsListCubit;
   late NeatTipUserCubit neatTipUserCubit;
@@ -51,6 +53,7 @@ class _MyAppState extends State<MyApp> {
     await initializeDateFormatting('id_ID', null);
     await AppFirebase.initializeFirebase();
     await neatTipUserCubit.initialize();
+    await appStateCubit.initialize();
     // await neatTipUserCubit.signOut();
 
     isNeedPermission = await checkPermission();
@@ -90,6 +93,7 @@ class _MyAppState extends State<MyApp> {
     vehicleListCubit = VehicleListCubit();
     neatTipUserCubit = NeatTipUserCubit();
     transactionsListCubit = TransactionsListCubit();
+    appStateCubit = AppStateCubit();
     reservationsListCubit = ReservationsListCubit();
     cameraCubit = CameraCubit();
     routeObserverCubit = RouteObserverCubit();
@@ -104,6 +108,8 @@ class _MyAppState extends State<MyApp> {
         builder: (context, snapshot) {
           return MultiBlocProvider(
               providers: [
+                BlocProvider<AppStateCubit>(
+                    create: (BuildContext context) => appStateCubit),
                 BlocProvider<CameraCubit>(
                     create: (BuildContext context) => cameraCubit),
                 BlocProvider<RouteObserverCubit>(

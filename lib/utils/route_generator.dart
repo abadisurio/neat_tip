@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/home_root.dart';
+import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/wallet.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
@@ -44,6 +45,9 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/profile':
       return CupertinoPageRoute(
           builder: (_) => const Profile(), settings: settings);
+    case '/profileedit':
+      return CupertinoPageRoute(
+          builder: (_) => const ProfileEdit(), settings: settings);
     case '/spots':
       return CupertinoPageRoute(
           builder: (_) => const ExploreSpot(), settings: settings);
