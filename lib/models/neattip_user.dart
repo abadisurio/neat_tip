@@ -1,6 +1,6 @@
 class NeatTipUser {
-  late DateTime createdAt;
-  late DateTime updatedAt;
+  late String createdAt;
+  late String updatedAt;
   late String id;
   late String role;
   late String displayName;

@@ -12,28 +12,29 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   NeatTipUserCubit() : super(null);
   late SharedPreferences sharedPreferences;
   late FirebaseFirestore firestore;
-  late User? firebaseUser;
+  late User? _firebaseUser;
   NeatTipUser? _currentUser;
 
-  get firebaseCurrentUser => FirebaseAuth.instance.currentUser;
+  User? get firebaseCurrentUser => FirebaseAuth.instance.currentUser;
   NeatTipUser? get currentUser => _currentUser;
 
   Future<void> initialize() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    firebaseUser = FirebaseAuth.instance.currentUser;
+    _firebaseUser = FirebaseAuth.instance.currentUser;
 
     firestore = FirebaseFirestore.instance;
     final currentUser = sharedPreferences.getString('currentUser');
 
     try {
-      firebaseUser
+      _firebaseUser
           ?.reload()
           .onError((error, stackTrace) => throw error.toString());
       log('currentUser $currentUser');
-      if (currentUser == null && firebaseUser != null) {
+      if (currentUser == null && _firebaseUser != null) {
         updateLocalInfo({});
       }
-      final userFromFirestore = await fetchUserFromFirestore(firebaseUser!.uid);
+      final userFromFirestore =
+          await fetchUserFromFirestore(_firebaseUser!.uid);
       log('${userFromFirestore?.displayName}');
       if (currentUser != null) {
         _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
@@ -42,7 +43,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     } catch (e) {
       log('$e');
     }
-    // log('firebaseUser ${await  }');
+    // log('_firebaseUser ${await  }');
     // return NeatTipUser.fromJson(json.decode(currentUser));
   }
 
@@ -72,27 +73,30 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   }
 
   Future<void> updateDisplayName(String newInfo) async {
-    await firebaseUser?.updateDisplayName(newInfo);
+    await _firebaseUser?.updateDisplayName(newInfo);
     updateLocalInfo({#displayName: newInfo});
+    updateUserToFirestore();
   }
 
   Future<void> updateEmail(String newInfo) async {
-    await firebaseUser?.updateEmail(newInfo);
-    updateLocalInfo({#email: newInfo});
+    await _firebaseUser?.updateEmail(newInfo);
+    // updateLocalInfo({#email: newInfo});
+    // updateUserToFirestore();
   }
 
   Future<void> updatePhotoURL(String newInfo) async {
-    await firebaseUser?.updatePhotoURL(newInfo);
-    updateLocalInfo({#photoURL: newInfo});
+    await _firebaseUser?.updatePhotoURL(newInfo);
+    // updateLocalInfo({#photoURL: newInfo});
+    // updateUserToFirestore();
   }
 
   Future<void> updatePassword(String newInfo) async {
-    await firebaseUser?.updatePassword(newInfo);
+    await _firebaseUser?.updatePassword(newInfo);
     // updateInfo({#email: newInfo});
   }
 
   // void updatePhoneNumber(PhoneAuthCredential newInfo) async {
-  //   firebaseUser?.updatePhoneNumber(newInfo);
+  //   _firebaseUser?.updatePhoneNumber(newInfo);
   // }
 
   Future<void> addUserToFirestore() async {
@@ -130,76 +134,40 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   }
 
   Future<void> updateLocalInfo(Map<Symbol, dynamic> newInfo) async {
-    firebaseUser = FirebaseAuth.instance.currentUser;
+    _firebaseUser = FirebaseAuth.instance.currentUser;
     try {
-      // final coba = newInfo.map((key, value) {
-      //   return MapEntry(Symbol(key), value);
-      // });
       final oldInfo = _currentUser
           ?.toJson()
           .map((key, value) => MapEntry(Symbol(key), value));
       log('oldInfo $oldInfo');
       _currentUser = Function.apply(NeatTipUser.new, [], {
-        #createdAt: firebaseUser?.metadata.creationTime! ?? DateTime.now(),
-        #updatedAt: DateTime.now(),
-        #id: firebaseUser?.uid ?? '',
-        #role: 'customer',
+        #createdAt: _firebaseUser?.metadata.creationTime!.toIso8601String() ??
+            DateTime.now().toIso8601String(),
+        #updatedAt: DateTime.now().toIso8601String(),
+        #id: _firebaseUser?.uid ?? '',
+        #role: 'Pengguna',
         #displayName: 'Neat Tip User',
         ...(oldInfo ?? {}),
         ...newInfo,
       });
-      // currentUser = NeatTipUser(
-      //     createdAt: firebaseUser?.metadata.creationTime.toString() ?? '',
-      //     updatedAt: DateTime.now().toIso8601String(),
-      //     id: firebaseUser?.uid ?? '',
-      //     role: 'customer',
-      //     fullName: 'bejo');
-      // log('currentUser $_currentUser');
-      // await firestore
-      //     .collection("users")
-      //     .doc(_currentUser!.id)
-      //     .update(_currentUser!.toJson())
-      //     .then((value) => log("DocumentSnapshot successfully updated!"),
-      //         onError: (e) => log("Error updating document $e"));
-
       sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
+      emit(_currentUser);
     } catch (e) {
       log('eee $e');
       throw Exception(e);
     }
   }
 
-  Future<void> updateUserToFirebase(Map<Symbol, dynamic> newInfo) async {
-    firebaseUser = FirebaseAuth.instance.currentUser;
+  Future<void> updateUserToFirestore() async {
+    _firebaseUser = FirebaseAuth.instance.currentUser;
     try {
-      // final coba = newInfo.map((key, value) {
-      //   return MapEntry(Symbol(key), value);
-      // });
-      final oldInfo = _currentUser
-          ?.toJson()
-          .map((key, value) => MapEntry(Symbol(key), value));
-      log('oldInfo $oldInfo');
-      _currentUser = Function.apply(NeatTipUser.new, [], {
-        #createdAt: firebaseUser?.metadata.creationTime! ?? DateTime.now(),
-        #updatedAt: DateTime.now(),
-        #id: firebaseUser?.uid ?? '',
-        #role: 'customer',
-        #displayName: 'Neat Tip User',
-        ...(oldInfo ?? {}),
-        ...newInfo,
-      });
-      // currentUser = NeatTipUser(
-      //     createdAt: firebaseUser?.metadata.creationTime.toString() ?? '',
-      //     updatedAt: DateTime.now().toIso8601String(),
-      //     id: firebaseUser?.uid ?? '',
-      //     role: 'customer',
-      //     fullName: 'bejo');
       log('currentUser $_currentUser');
       await firestore
           .collection("users")
           .doc(_currentUser!.id)
-          .update(_currentUser!.toJson())
+          .set(_currentUser!.toJson(), SetOptions(merge: true))
+          // .update(_currentUser!.toJson())
           .then((value) => log("DocumentSnapshot successfully updated!"),
               onError: (e) => log("Error updating document $e"));
 
@@ -212,7 +180,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   }
 
   void addInfo(Map<Symbol, dynamic> newInfo) async {
-    firebaseUser = FirebaseAuth.instance.currentUser;
+    _firebaseUser = FirebaseAuth.instance.currentUser;
     try {
       // final coba = newInfo.map((key, value) {
       //   return MapEntry(Symbol(key), value);
@@ -222,18 +190,19 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .map((key, value) => MapEntry(Symbol(key), value));
       log('oldInfo $oldInfo');
       _currentUser = Function.apply(NeatTipUser.new, [], {
-        #createdAt: firebaseUser?.metadata.creationTime! ?? DateTime.now(),
-        #updatedAt: DateTime.now(),
-        #id: firebaseUser?.uid ?? '',
+        #createdAt: _firebaseUser?.metadata.creationTime!.toIso8601String() ??
+            DateTime.now().toIso8601String(),
+        #updatedAt: DateTime.now().toIso8601String(),
+        #id: _firebaseUser?.uid ?? '',
         #role: 'customer',
         #displayName: 'Neat Tip User',
         ...(oldInfo ?? {}),
         ...newInfo,
       });
       // currentUser = NeatTipUser(
-      //     createdAt: firebaseUser?.metadata.creationTime.toString() ?? '',
-      //     updatedAt: DateTime.now().toIso8601String(),
-      //     id: firebaseUser?.uid ?? '',
+      //     createdAt: _firebaseUser?.metadata.creationTime..toIso8601String()toString() ?? '',
+      //     updatedAt:  DateTime.now().toIso8601String().toIso8601String(),
+      //     id: _firebaseUser?.uid ?? '',
       //     role: 'customer',
       //     fullName: 'bejo');
       log('currentUser $_currentUser');

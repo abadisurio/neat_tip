@@ -65,6 +65,13 @@ class Manage extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<NeatTipUserCubit, NeatTipUser?>(
           builder: (context, neatTipUser) {
+        final nameInitial =
+            (context.watch<NeatTipUserCubit>().state?.displayName ??
+                    'Neat Tip User')
+                .split(' ')
+                .map((e) => (e.isNotEmpty ? e.substring(0, 1) : ''))
+                .join('')
+                .toUpperCase();
         return ListView(
           children: [
             Padding(
@@ -76,23 +83,19 @@ class Manage extends StatelessWidget {
             ),
             ListTile(
               leading: CircleAvatar(
-                // child: Text(state!.displayName
-                child: Text((context
-                            .read<NeatTipUserCubit>()
-                            .currentUser
-                            ?.displayName ??
-                        'Neat Tip User')
-                    .split(' ')
-                    .map((e) => e.substring(0, 1))
-                    .join('')
-                    .toUpperCase()),
-              ),
+                  // child: Text(state!.displayName
+                  child: Text(
+                (nameInitial.length > 3
+                    ? nameInitial.substring(0, 3)
+                    : nameInitial),
+              )),
               title: Text(
-                context.read<NeatTipUserCubit>().currentUser?.displayName ??
+                context.watch<NeatTipUserCubit>().state?.displayName ??
                     'Neat Tip User',
                 style: Theme.of(context).textTheme.bodyText1,
               ),
-              subtitle: const Text('Personal'),
+              subtitle: Text(
+                  context.watch<NeatTipUserCubit>().state?.role ?? 'Pengguna'),
               trailing: TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/profileedit');

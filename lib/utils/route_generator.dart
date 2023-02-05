@@ -6,6 +6,7 @@ import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
+import 'package:neat_tip/screens/state_loading.dart';
 import 'package:neat_tip/screens/wallet.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
@@ -63,6 +64,17 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/reservations':
       return CupertinoPageRoute(
           builder: (_) => const ReservationList(), settings: settings);
+    case '/loading':
+      return PageRouteBuilder(
+          transitionsBuilder: (ctx, anim1, anim2, child) {
+            return BackdropFilter(
+                filter: ImageFilter.blur(
+                    sigmaX: 7 * anim1.value, sigmaY: 7 * anim1.value),
+                child: Opacity(opacity: anim1.value, child: child));
+          },
+          opaque: false,
+          pageBuilder: (context, anim1, anim2) => const StateLoading(),
+          settings: settings);
     case '/signout':
       return PageRouteBuilder(
           transitionsBuilder: (ctx, anim1, anim2, child) {
