@@ -93,30 +93,27 @@ class _HomeState extends State<Home> {
                           //set border radius more than 50% of height and width to make circle
                         ),
                         elevation: 0,
-                        child: PeekAndPopable(
-                          child: ListTile(
-                            // dense: true,
-                            leading: const CircleAvatar(
-                              child: Icon(
-                                Icons.motorcycle,
-                              ),
+                        child: ListTile(
+                          // dense: true,
+                          leading: const CircleAvatar(
+                            child: Icon(
+                              Icons.motorcycle,
                             ),
-                            title: const Text('Kurnia Motor'),
-                            subtitle: const Text('Dititipkan • Hari ini'),
-                            trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Rp6000',
-                                    style:
-                                        Theme.of(context).textTheme.bodyText1,
-                                  ),
-                                  Text(
-                                    'Ditahan',
-                                    style: Theme.of(context).textTheme.caption,
-                                  )
-                                ]),
                           ),
+                          title: const Text('Kurnia Motor'),
+                          subtitle: const Text('Dititipkan • Hari ini'),
+                          trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Rp6000',
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                ),
+                                Text(
+                                  'Ditahan',
+                                  style: Theme.of(context).textTheme.caption,
+                                )
+                              ]),
                         ));
                   }));
             })

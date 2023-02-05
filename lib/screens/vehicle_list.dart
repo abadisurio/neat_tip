@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,10 +12,18 @@ class VehicleList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    removeItem(index) async {
+      await Navigator.maybePop(context);
+      Future.delayed(peekDuration, () {
+        context.read<VehicleListCubit>().removeByIndex(index);
+      });
+    }
+
     final navigator = Navigator.of(context);
 
     return BlocBuilder<VehicleListCubit, List<Vehicle>>(
         builder: (context, vehicleList) {
+      log('rerender $vehicleList');
       return Scaffold(
           appBar: AppBar(
             title: const Text('Kendaraan Anda'),
@@ -59,17 +68,18 @@ class VehicleList extends StatelessWidget {
               return ListView.builder(
                 itemCount: vehicleList.length,
                 itemBuilder: (context, index) {
-                  // final firstPath =
-                  //     vehicleList[index].imgSrcPhotos.split(',').first;
-                  // final File cover = File(firstPath);
                   return PeekAndPopable(
+                      // removeByIndex
+                      actions: [
+                        {
+                          "name": "Hapus",
+                          "icon": 0xe1bb,
+                          "color": 0xFFFF0000,
+                          "onTap": () => removeItem(index)
+                        }
+                      ],
                       peekPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 300),
-
-                      // childToPeek: Container(
-                      //   height: 300,
-                      //   color: Colors.red,
-                      // ),
                       childToPeek: Image.network(
                         "https://helios-i.mashable.com/imagery/articles/036SM7saRgnSGmvT3XNLYXQ/hero-image.fill.size_1200x900.v1623372406.jpg",
                         height: double.infinity,
@@ -83,11 +93,7 @@ class VehicleList extends StatelessWidget {
                           vehicle: vehicleList[index],
                         ),
                       ));
-                  // return VehicleItem(
-                  //   vehicle: vehicleList[index],
-                  // );
                 },
-                // children: [],
               );
             }
           }()));

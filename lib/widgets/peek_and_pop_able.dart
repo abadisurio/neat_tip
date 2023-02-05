@@ -5,16 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:neat_tip/widgets/draggable_card.dart';
 
-const duration = Duration(milliseconds: 350);
+const peekDuration = Duration(milliseconds: 350);
 const curve = Curves.easeInOutExpo;
 final border = BorderRadius.circular(16);
 
 class PeekAndPopable extends StatefulWidget {
   final EdgeInsets? peekPadding;
+  final Function? onDidPop;
   final Widget child;
+  final List<Map<String, dynamic>> actions;
   final Widget? childToPeek;
   const PeekAndPopable(
-      {super.key, required this.child, this.childToPeek, this.peekPadding});
+      {super.key,
+      required this.child,
+      this.childToPeek,
+      this.peekPadding,
+      required this.actions,
+      this.onDidPop});
 
   @override
   State<PeekAndPopable> createState() => _PeekAndPopableState();
@@ -98,6 +105,8 @@ class _PeekAndPopableState extends State<PeekAndPopable>
     await Navigator.push(
         context,
         PageRouteBuilder(
+            reverseTransitionDuration: peekDuration,
+            transitionDuration: peekDuration,
             transitionsBuilder: (ctx, anim1, anim2, child) {
               return BackdropFilter(
                   filter: ImageFilter.blur(
@@ -109,8 +118,8 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             barrierDismissible: true,
             barrierLabel: '',
             barrierColor: Colors.black38,
-            transitionDuration: duration,
             pageBuilder: (context, anim1, anim2) => PeekPage(
+                  actions: widget.actions,
                   peekPadding: widget.peekPadding,
                   childToPeek: widget.childToPeek,
                   transitionAnimation: anim1,
@@ -118,11 +127,15 @@ class _PeekAndPopableState extends State<PeekAndPopable>
                   child: widget.child,
                 )));
     if (mounted) {
+      // log('mounted ${mounted}');
       Future.delayed(const Duration(milliseconds: 250), () {
         setState(() {
           isOpened = false;
         });
       });
+    }
+    if (widget.onDidPop != null) {
+      widget.onDidPop!();
     }
   }
 
@@ -168,13 +181,15 @@ class PeekPage extends StatefulWidget {
   final Widget child;
   final Rect childPosition;
   final EdgeInsets? peekPadding;
+  final List<Map<String, dynamic>> actions;
   const PeekPage(
       {super.key,
       required this.transitionAnimation,
       required this.childPosition,
       this.childToPeek,
       required this.child,
-      this.peekPadding});
+      this.peekPadding,
+      required this.actions});
 
   @override
   State<PeekPage> createState() => _PeekPageState();
@@ -182,20 +197,18 @@ class PeekPage extends StatefulWidget {
 
 class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
   late AnimationController controller;
+  late List<Map<String, dynamic>> menuItem;
   double offsetY = 0;
   bool isOpened = false;
   bool isOpened2 = false;
   double cardScale = 1;
-  Map<String, dynamic> menuItem = {
-    'Hapus': {'icon': Icons.delete, 'color': Colors.red, 'action': () {}},
-    'Edit': {'icon': Icons.edit, 'color': null, 'action': () {}},
-  };
 
   @override
   void initState() {
-    controller = AnimationController(vsync: this, duration: duration);
+    menuItem = widget.actions;
+    controller = AnimationController(vsync: this, duration: peekDuration);
     controller.value = 0;
-    Future.delayed(duration, () {
+    Future.delayed(peekDuration, () {
       setState(() {
         isOpened = true;
         isOpened2 = true;
@@ -224,14 +237,14 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
           isOpened = false;
           // cardScale = 1;
         });
-        Navigator.pop(context);
-        return Future.value(false);
+        // Navigator.pop(context);
+        return Future.value(true);
       },
       child: AnimatedBuilder(
         animation: innerController,
         builder: (BuildContext context, Widget? child) {
           // log('innerController ${innerController.value}');
-          log('isCollapsed ${offsetY > 0.5 || !isOpened}');
+          // log('isCollapsed ${offsetY > 0.5 || !isOpened}');
           // log('cardScale ${1 + ((1 - innerController.value) * 0.05)}');
           // log('isOpened2 ${widget.peekPadding!.top + widget.peekPadding!.bottom}');
           // log('isOpened3 ${size.height * 0.4}');
@@ -251,10 +264,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                 cardScale = 1;
               });
               if (p0.velocity.pixelsPerSecond.dy > 1) {
-                setState(() {
-                  isOpened = false;
-                });
-                Navigator.pop(context);
+                Navigator.maybePop(context);
               } else {
                 setState(() {
                   offsetY = 0;
@@ -304,7 +314,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                         curve: isOpened ? Curves.easeOutCubic : curve,
                         duration: cardScale < 1 || !isOpened2
                             ? const Duration(milliseconds: 0)
-                            : duration,
+                            : peekDuration,
                         scale: cardScale +
                             (isOpened2
                                 ? 0
@@ -353,21 +363,21 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                       height: innerController.value * 16,
                     ),
                     AnimatedContainer(
+                      // curve: isOpened ? Curves.easeOutCubic : curve,
                       curve: isOpened ? Curves.easeOutCubic : curve,
-                      duration:
-                          isOpened ? duration : const Duration(milliseconds: 0),
-                      height: offsetY > 0.3 * menuItem.length
+                      duration: isOpened
+                          ? peekDuration
+                          : const Duration(milliseconds: 0),
+                      height: offsetY > 0.1 * menuItem.length
                           ? 0
-                          : innerController.value *
-                              menuItem.entries.length *
-                              50,
+                          : innerController.value * menuItem.length * 50,
                       width: double.infinity,
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: AnimatedOpacity(
                           curve: isOpened ? Curves.easeOutCubic : curve,
                           duration: isOpened
-                              ? duration
+                              ? peekDuration
                               : const Duration(milliseconds: 0),
                           opacity: offsetY > 0.3 * menuItem.length
                               ? 0
@@ -380,33 +390,33 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                               child: ListView.builder(
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                itemCount: menuItem.entries.length,
+                                itemCount: menuItem.length,
                                 padding: const EdgeInsets.all(0.0),
                                 itemBuilder: (context, index) {
                                   return TextButton(
                                       style: ButtonStyle(
                                         foregroundColor:
-                                            MaterialStateProperty.all(menuItem
-                                                    .entries
-                                                    .elementAt(index)
-                                                    .value['color'] ??
-                                                Colors.blue),
+                                            MaterialStateProperty.all(Color(
+                                                menuItem.elementAt(
+                                                        index)['color'] ??
+                                                    0xFF0000FF)),
                                         shape: MaterialStateProperty.all(
                                           const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.zero),
                                         ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        menuItem.elementAt(index)['onTap']();
+                                      },
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(menuItem.entries
-                                              .elementAt(index)
-                                              .key),
-                                          Icon(menuItem.entries
-                                              .elementAt(index)
-                                              .value['icon'])
+                                          Text(menuItem
+                                              .elementAt(index)['name']),
+                                          Icon(IconData(
+                                              menuItem.elementAt(index)['icon'],
+                                              fontFamily: 'MaterialIcons'))
                                         ],
                                       ));
                                 },

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/vehicle.dart';
@@ -36,7 +38,10 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   }
 
   void removeByIndex(int index) {
+    log('sss $index');
+    log('ssblum $state');
     state.removeAt(index);
+    log('ssudah $state');
     emit([...state]);
   }
 
