@@ -108,11 +108,12 @@ class VehicleAddState extends State<VehicleAdd> {
   }
 
   submitForm() async {
+    final vehicleListCubit = context.read<VehicleListCubit>();
     log('heh ');
     String imgSrcString = '';
     // _imgFilePhotos.map((e) {
     // });
-    log('id ${BlocProvider.of<VehicleListCubit>(context).length.toString()}');
+    // log('id ${BlocProvider.of<VehicleListCubit>(context).length.toString()}');
     for (var element in _imgFilePhotos) {
       log('hehe ');
       log('$element');
@@ -120,6 +121,7 @@ class VehicleAddState extends State<VehicleAdd> {
     }
     // if (imgSrcString == '') return;
     if (_formKey.currentState!.validate()) {
+      FocusManager.instance.primaryFocus?.unfocus();
       final newVehicle = Vehicle(
           ownerName: vehicleFieldControllers['Nama Pemilik *']!.text,
           createdAt: DateTime.now().toString(),
@@ -130,11 +132,15 @@ class VehicleAddState extends State<VehicleAdd> {
           wheel: int.parse(vehicleFieldControllers['Jumlah Roda']!.text),
           brand: vehicleFieldControllers['Merek *']!.text,
           model: vehicleFieldControllers['Model *']!.text);
-      BlocProvider.of<VehicleListCubit>(context).addVehicle(newVehicle);
-      log('message ${BlocProvider.of<VehicleListCubit>(context).state}');
-      BlocProvider.of<VehicleListCubit>(context).pushDataToDB();
+      // log('message ${vehicleListCubit.state}');
       log('success');
-      Navigator.pop(context, true);
+      await Navigator.pushNamed(context, '/loading', arguments: () async {
+        vehicleListCubit.addVehicle(newVehicle);
+        await vehicleListCubit.pushDataToDB();
+      });
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 

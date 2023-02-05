@@ -25,7 +25,7 @@ class _ProfileEditState extends State<ProfileEdit> {
     profileFields = [
       {
         "fieldname": "Nama Lengkap",
-        "value": neatTipUserCubit.state?.displayName,
+        "value": neatTipUserCubit.currentUser?.displayName,
         "type": TextInputType.text,
         "validator": (str) => true
       },

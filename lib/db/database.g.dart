@@ -185,7 +185,7 @@ class _$VehicleDao extends VehicleDao {
 
   @override
   Future<void> insertVehicle(Vehicle vehicle) async {
-    await _vehicleInsertionAdapter.insert(vehicle, OnConflictStrategy.abort);
+    await _vehicleInsertionAdapter.insert(vehicle, OnConflictStrategy.ignore);
   }
 }
 
