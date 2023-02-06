@@ -414,9 +414,8 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                         children: [
                                           Text(menuItem
                                               .elementAt(index)['name']),
-                                          Icon(IconData(
-                                              menuItem.elementAt(index)['icon'],
-                                              fontFamily: 'MaterialIcons'))
+                                          Icon(
+                                              menuItem.elementAt(index)['icon'])
                                         ],
                                       ));
                                 },

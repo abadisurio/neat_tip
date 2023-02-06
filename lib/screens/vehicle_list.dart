@@ -73,7 +73,7 @@ class VehicleList extends StatelessWidget {
                       actions: [
                         {
                           "name": "Hapus",
-                          "icon": 0xe1bb,
+                          "icon": Icons.delete,
                           "color": 0xFFFF0000,
                           "onTap": () => removeItem(index)
                         }
