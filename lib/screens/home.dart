@@ -57,28 +57,36 @@ class Home extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: ((context, index) {
-                    return ListTile(
-                      onTap: () {},
-                      // dense: true,
-                      leading: const CircleAvatar(
-                        child: Icon(
-                          Icons.motorcycle,
-                        ),
+                    return Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      clipBehavior: Clip.hardEdge,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      title: const Text('Kurnia Motor'),
-                      subtitle: const Text('Dititipkan • Hari ini'),
-                      trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Rp6000',
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                            Text(
-                              'Ditahan',
-                              style: Theme.of(context).textTheme.caption,
-                            )
-                          ]),
+                      child: ListTile(
+                        onTap: () {},
+                        // dense: true,
+                        leading: const CircleAvatar(
+                          child: Icon(
+                            Icons.motorcycle,
+                          ),
+                        ),
+                        title: const Text('Kurnia Motor'),
+                        subtitle: const Text('Dititipkan • Hari ini'),
+                        trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Rp6000',
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ),
+                              Text(
+                                'Ditahan',
+                                style: Theme.of(context).textTheme.caption,
+                              )
+                            ]),
+                      ),
                     );
                   }));
             })

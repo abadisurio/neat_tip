@@ -386,7 +386,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                               decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .canvasColor
-                                      .withOpacity(0.7),
+                                      .withOpacity(0.8),
                                   borderRadius: border),
                               child: ClipRRect(
                                 borderRadius: border,

@@ -24,7 +24,7 @@ class _HomeRootState extends State<HomeRoot> {
     ),
     SizedBox(),
     Text(
-      'Notifikasi',
+      'Kotak Masuk',
       style: optionStyle,
     ),
     Manage(),
@@ -63,7 +63,7 @@ class _HomeRootState extends State<HomeRoot> {
           'Neat Tip',
           'Sosial',
           'Pindai',
-          'Notifikasi',
+          'Kotak Masuk',
           'Pengaturan'
         ][_selectedIndex]),
         actions: [
@@ -116,7 +116,7 @@ class _HomeRootState extends State<HomeRoot> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.notifications_outlined),
-              label: 'Notif',
+              label: 'Inbox',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.grid_view_outlined),
