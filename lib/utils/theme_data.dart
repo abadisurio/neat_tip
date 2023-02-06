@@ -20,7 +20,7 @@ getThemeData() {
         backgroundColor: Colors.grey.shade800,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
       ),
     ),

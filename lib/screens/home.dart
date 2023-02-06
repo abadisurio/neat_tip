@@ -4,63 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/transaction_list.dart';
 import 'package:neat_tip/models/transactions.dart';
+import 'package:neat_tip/widgets/carousel.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
-import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  void initState() {
-    super.initState();
-    // isScreenActive = true;
-  }
-
-  @override
-  void deactivate() {
-    // log('deact');
-    super.deactivate();
-  }
-
-  seeMoreTransaction() {
-    log('message');
-    Navigator.pushNamed(context, '/transactions');
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // bool isScreenActive = true;
-    // log('isScreenActive $isScreenActive');
-    // final routeNow = ModalRoute.of(context)?.settings.name;
-    // Navigator.of(context).
-    // log('$routeNow');
+    seeMoreTransaction() {
+      log('message');
+      Navigator.pushNamed(context, '/transactions');
+    }
+
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           children: [
-            SizedBox(
-              // color: Colors.red,
-              height: MediaQuery.of(context).size.width,
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: const [
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(8, 0, 8, 30),
-                      child: DashboardMenu(),
-                    ),
-                  ),
-                ],
-              ),
+            const Carousel(),
+            const SizedBox(
+              height: 16,
             ),
+            const DashboardMenu(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

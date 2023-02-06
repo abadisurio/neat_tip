@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 
 class DashboardMenu extends StatelessWidget {
   const DashboardMenu({super.key});
@@ -20,7 +19,7 @@ class DashboardMenu extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: Theme.of(context).highlightColor,
       ),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -32,7 +31,7 @@ class DashboardMenu extends StatelessWidget {
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 18),
-                        backgroundColor: Colors.grey.shade800,
+                        backgroundColor: Theme.of(context).primaryColor,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -52,9 +51,7 @@ class DashboardMenu extends StatelessWidget {
                   ),
                   Text(
                     item['name'],
-                    style: TextStyle(
-                        color: Colors.grey.shade800,
-                        fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ],
               ),
