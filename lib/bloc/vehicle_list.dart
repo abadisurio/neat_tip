@@ -18,6 +18,10 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> addDataToDB(Vehicle vehicle) async {
     await _db.vehicleDao.insertVehicle(vehicle);
   }
+
+  Future<void> removeDataFromDB(Vehicle vehicle) async {
+    await _db.vehicleDao.removeVehicle(vehicle);
+  }
   // Future<void> pushDataToDB() async {
   //   for (var vehicle in state) {
   //     await _db.vehicleDao.insertVehicle(vehicle);
@@ -54,8 +58,9 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     emit([...state]);
   }
 
-  void removeById(String id) {
-    final newList = state.where((element) => element.id != id).toList();
+  Future<void> removeVehicle(Vehicle vehicle) async {
+    final newList = state.where((element) => element != vehicle).toList();
+    await removeDataFromDB(vehicle);
     emit([...newList]);
   }
 

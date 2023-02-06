@@ -12,14 +12,17 @@ class VehicleList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    removeItem(index) async {
+    final navigator = Navigator.of(context);
+    removeItem(Vehicle vehicle) async {
       await Navigator.maybePop(context);
-      Future.delayed(peekDuration, () {
-        context.read<VehicleListCubit>().removeByIndex(index);
+      Future.delayed(peekDuration, () async {
+        await Navigator.pushNamed(context, '/loading', arguments: () async {
+          await context.read<VehicleListCubit>().removeVehicle(vehicle);
+          // await vehicleListCubit.add();
+          log('hereeeeee');
+        });
       });
     }
-
-    final navigator = Navigator.of(context);
 
     return BlocBuilder<VehicleListCubit, List<Vehicle>>(
         builder: (context, vehicleList) {
@@ -75,7 +78,7 @@ class VehicleList extends StatelessWidget {
                           "name": "Hapus",
                           "icon": Icons.delete,
                           "color": Colors.red,
-                          "onTap": () => removeItem(index)
+                          "onTap": () => removeItem(vehicleList[index])
                         },
                         // {
                         //   "name": "Ubah",

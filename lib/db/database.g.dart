@@ -140,6 +140,22 @@ class _$VehicleDao extends VehicleDao {
                   'imgSrcPhotos': item.imgSrcPhotos,
                   'wheel': item.wheel
                 },
+            changeListener),
+        _vehicleDeletionAdapter = DeletionAdapter(
+            database,
+            'Vehicle',
+            ['id'],
+            (Vehicle item) => <String, Object?>{
+                  'id': item.id,
+                  'createdAt': item.createdAt,
+                  'ownerId': item.ownerId,
+                  'plate': item.plate,
+                  'brand': item.brand,
+                  'model': item.model,
+                  'ownerName': item.ownerName,
+                  'imgSrcPhotos': item.imgSrcPhotos,
+                  'wheel': item.wheel
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -149,6 +165,8 @@ class _$VehicleDao extends VehicleDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<Vehicle> _vehicleInsertionAdapter;
+
+  final DeletionAdapter<Vehicle> _vehicleDeletionAdapter;
 
   @override
   Future<List<Vehicle>> findAllVehicle() async {
@@ -185,7 +203,12 @@ class _$VehicleDao extends VehicleDao {
 
   @override
   Future<void> insertVehicle(Vehicle vehicle) async {
-    await _vehicleInsertionAdapter.insert(vehicle, OnConflictStrategy.ignore);
+    await _vehicleInsertionAdapter.insert(vehicle, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> removeVehicle(Vehicle vehicle) async {
+    await _vehicleDeletionAdapter.delete(vehicle);
   }
 }
 
