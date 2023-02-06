@@ -13,4 +13,8 @@ abstract class VehicleDao {
 
   @insert
   Future<void> insertVehicle(Vehicle vehicle);
+
+  // @Query('DELETE FROM Vehicle')
+  // @insert
+  // Future<void> dropAndPushVehicleList(List<Vehicle> vehicle);
 }

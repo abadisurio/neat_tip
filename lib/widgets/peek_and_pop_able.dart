@@ -327,12 +327,11 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                 opacity: innerController.value,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(16),
+                                    color: Theme.of(context).canvasColor,
+                                    borderRadius: border,
                                   ),
                                   child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: childToPeek),
+                                      borderRadius: border, child: childToPeek),
                                 ),
                               ),
                             Opacity(
@@ -345,8 +344,8 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                 decoration: BoxDecoration(
                                   color: childToPeek != null
                                       ? null
-                                      : Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(8),
+                                      : Theme.of(context).canvasColor,
+                                  borderRadius: border,
                                 ),
                                 child: Column(
                                   children: [
@@ -368,9 +367,9 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                       duration: isOpened
                           ? peekDuration
                           : const Duration(milliseconds: 0),
-                      height: offsetY > 0.1 * menuItem.length
+                      height: offsetY > 0.3 * menuItem.length
                           ? 0
-                          : innerController.value * menuItem.length * 50,
+                          : innerController.value * menuItem.length * 45,
                       width: double.infinity,
                       child: FittedBox(
                         fit: BoxFit.contain,
@@ -385,40 +384,78 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                           child: Container(
                               width: 250,
                               decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: Theme.of(context)
+                                      .canvasColor
+                                      .withOpacity(0.7),
                                   borderRadius: border),
-                              child: ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: menuItem.length,
-                                padding: const EdgeInsets.all(0.0),
-                                itemBuilder: (context, index) {
-                                  return TextButton(
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            MaterialStateProperty.all(Color(
-                                                menuItem.elementAt(
-                                                        index)['color'] ??
-                                                    0xFF0000FF)),
-                                        shape: MaterialStateProperty.all(
-                                          const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.zero),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        menuItem.elementAt(index)['onTap']();
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(menuItem
-                                              .elementAt(index)['name']),
-                                          Icon(
-                                              menuItem.elementAt(index)['icon'])
-                                        ],
-                                      ));
-                                },
+                              child: ClipRRect(
+                                borderRadius: border,
+                                child: ListView.separated(
+                                  separatorBuilder: (context, index) => Divider(
+                                    color: Theme.of(context).hintColor,
+                                    height: 0,
+                                  ),
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: menuItem.length,
+                                  padding: const EdgeInsets.all(0.0),
+                                  itemBuilder: (context, index) {
+                                    final element = menuItem.elementAt(index);
+                                    return Material(
+                                      type: MaterialType.transparency,
+                                      child: InkWell(
+                                          onTap: () {
+                                            element['onTap']();
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  element['name'],
+                                                  style: TextStyle(
+                                                      color: element['color']),
+                                                ),
+                                                Icon(
+                                                  element['icon'],
+                                                  color: element['color'],
+                                                )
+                                              ],
+                                            ),
+                                          )),
+                                    );
+                                    // return TextButton(
+                                    //     style: ButtonStyle(
+                                    //       padding: MaterialStateProperty.all(
+                                    //           EdgeInsets.zero),
+                                    //       // minimumSize: MaterialStateProperty.all(
+                                    //       //     Size(50, 30)),
+                                    //       foregroundColor:
+                                    //           MaterialStateProperty.all(menuItem
+                                    //               .elementAt(index)['color']),
+                                    //       shape: MaterialStateProperty.all(
+                                    //         const RoundedRectangleBorder(
+                                    //             borderRadius: BorderRadius.zero),
+                                    //       ),
+                                    //     ),
+                                    //     onPressed: () {
+                                    //       menuItem.elementAt(index)['onTap']();
+                                    //     },
+                                    //     child: Row(
+                                    //       mainAxisAlignment:
+                                    //           MainAxisAlignment.spaceBetween,
+                                    //       children: [
+                                    //         Text(menuItem
+                                    //             .elementAt(index)['name']),
+                                    //         Icon(
+                                    //             menuItem.elementAt(index)['icon'])
+                                    //       ],
+                                    //     ));
+                                  },
+                                ),
                               )),
                         ),
                       ),

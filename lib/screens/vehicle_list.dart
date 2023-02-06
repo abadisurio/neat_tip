@@ -23,7 +23,7 @@ class VehicleList extends StatelessWidget {
 
     return BlocBuilder<VehicleListCubit, List<Vehicle>>(
         builder: (context, vehicleList) {
-      log('rerender $vehicleList');
+      log('rerender ${vehicleList.length}');
       return Scaffold(
           appBar: AppBar(
             title: const Text('Kendaraan Anda'),
@@ -74,19 +74,18 @@ class VehicleList extends StatelessWidget {
                         {
                           "name": "Hapus",
                           "icon": Icons.delete,
-                          "color": 0xFFFF0000,
+                          "color": Colors.red,
                           "onTap": () => removeItem(index)
-                        }
+                        },
+                        // {
+                        //   "name": "Ubah",
+                        //   "icon": Icons.edit,
+                        //   "color": Colors.white,
+                        //   "onTap": () {}
+                        // },
                       ],
                       peekPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 300),
-                      childToPeek: Image.network(
-                        "https://helios-i.mashable.com/imagery/articles/036SM7saRgnSGmvT3XNLYXQ/hero-image.fill.size_1200x900.v1623372406.jpg",
-                        height: double.infinity,
-                        width: double.infinity,
-                        // width: 150,
-                        fit: BoxFit.cover,
-                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: VehicleItem(

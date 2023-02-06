@@ -15,12 +15,21 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _db = db;
   }
 
-  Future<void> pushDataToDB() async {
-    final newData = state.sublist(_dbList.length);
-    for (var vehicle in newData) {
-      await _db.vehicleDao.insertVehicle(vehicle);
-    }
+  Future<void> addDataToDB(Vehicle vehicle) async {
+    await _db.vehicleDao.insertVehicle(vehicle);
   }
+  // Future<void> pushDataToDB() async {
+  //   for (var vehicle in state) {
+  //     await _db.vehicleDao.insertVehicle(vehicle);
+  //   }
+  // }
+
+  // Future<void> dropAndPushDataToDB() async {
+  //   // _db.vehicleDao.d
+  //   for (var vehicle in state) {
+  //     await _db.vehicleDao.insertVehicle(vehicle);
+  //   }
+  // }
 
   Future<void> pullDataFromDB() async {
     final dataDB = await _db.vehicleDao.findAllVehicle();
@@ -61,7 +70,9 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     emit([...state]);
   }
 
-  void addVehicle(Vehicle vehicle) {
+  Future<void> addVehicle(Vehicle vehicle) async {
+    _dbList = [..._dbList, vehicle];
+    await addDataToDB(vehicle);
     emit([...state, vehicle]);
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 const showDuration = Duration(seconds: 5);
@@ -57,7 +55,7 @@ class _SnackBarContentState extends State<SnackBarContent>
     )..addListener(() {
         setState(() {});
       });
-    ;
+
     controller.forward().whenComplete(() => controller.stop());
     // controller.stop();
     super.initState();
