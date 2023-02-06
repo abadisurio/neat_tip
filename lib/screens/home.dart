@@ -27,60 +27,59 @@ class Home extends StatelessWidget {
               height: 16,
             ),
             const DashboardMenu(),
+            const SizedBox(
+              height: 8,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Terbaru'),
+                const Text(' Terbaru'),
                 TextButton(
+                    style: const ButtonStyle(
+                        visualDensity:
+                            VisualDensity(vertical: -3, horizontal: -1)),
                     onPressed: seeMoreTransaction,
                     child: const Text('Lihat Semua')),
               ],
             ),
             const Divider(
               // height: 1,
+              // height: 0,
               thickness: 2,
             ),
             BlocBuilder<TransactionsListCubit, List<Transactions>>(
                 builder: (context, transactionsList) {
-              if (transactionsList.isEmpty) {
-                return const Center(child: Text('Belum ada transaksi!'));
-              }
+              // if (transactionsList.isEmpty) {
+              //   return const Center(child: Text('Belum ada transaksi!'));
+              // }
               return ListView.builder(
                   itemCount: 5,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: ((context, index) {
-                    return Card(
-                        clipBehavior: Clip.hardEdge,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 0, vertical: 4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          //set border radius more than 50% of height and width to make circle
+                    return ListTile(
+                      onTap: () {},
+                      // dense: true,
+                      leading: const CircleAvatar(
+                        child: Icon(
+                          Icons.motorcycle,
                         ),
-                        elevation: 0,
-                        child: ListTile(
-                          // dense: true,
-                          leading: const CircleAvatar(
-                            child: Icon(
-                              Icons.motorcycle,
+                      ),
+                      title: const Text('Kurnia Motor'),
+                      subtitle: const Text('Dititipkan • Hari ini'),
+                      trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Rp6000',
+                              style: Theme.of(context).textTheme.bodyText1,
                             ),
-                          ),
-                          title: const Text('Kurnia Motor'),
-                          subtitle: const Text('Dititipkan • Hari ini'),
-                          trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Rp6000',
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                                Text(
-                                  'Ditahan',
-                                  style: Theme.of(context).textTheme.caption,
-                                )
-                              ]),
-                        ));
+                            Text(
+                              'Ditahan',
+                              style: Theme.of(context).textTheme.caption,
+                            )
+                          ]),
+                    );
                   }));
             })
           ],

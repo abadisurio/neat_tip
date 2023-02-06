@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/app_state.dart';
@@ -83,12 +84,22 @@ class Manage extends StatelessWidget {
             ),
             ListTile(
               leading: CircleAvatar(
+                  radius: 32,
+                  child: FirebaseAuth.instance.currentUser?.photoURL != null
+                      ? ClipOval(
+                          child: Image.network(
+                            FirebaseAuth.instance.currentUser?.photoURL ?? '',
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Text(
+                          (nameInitial.length > 3
+                              ? nameInitial.substring(0, 3)
+                              : nameInitial),
+                        )
                   // child: Text(currentUser!.displayName
-                  child: Text(
-                (nameInitial.length > 3
-                    ? nameInitial.substring(0, 3)
-                    : nameInitial),
-              )),
+                  //     child:
+                  ),
               title: Text(
                 context.watch<NeatTipUserCubit>().currentUser?.displayName ??
                     'Neat Tip User',

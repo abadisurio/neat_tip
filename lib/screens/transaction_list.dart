@@ -24,13 +24,7 @@ class TransactionList extends StatelessWidget {
               return ListView.builder(
                   itemCount: reservationList.length,
                   itemBuilder: ((context, index) {
-                    if (reservationList.isEmpty) {
-                      return const Center(
-                        child: Text('Kamu belum melakukan transaksi'),
-                      );
-                    } else {
-                      return const ListTile();
-                    }
+                    return const ListTile();
                   }));
             }
           }());

@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/manage.dart';
@@ -51,6 +54,24 @@ class _HomeRootState extends State<HomeRoot> {
           'Notifikasi',
           'Pengaturan'
         ][_selectedIndex]),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ClipOval(
+              clipBehavior: Clip.hardEdge,
+              child: GestureDetector(
+                onTap: () {
+                  log('tapp');
+                },
+                child: Image.network(
+                  FirebaseAuth.instance.currentUser?.photoURL ??
+                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

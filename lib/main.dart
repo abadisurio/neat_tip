@@ -20,6 +20,7 @@ import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/utils/route_generator.dart';
 import 'package:neat_tip/utils/theme_data.dart';
+import 'package:neat_tip/utils/theme_data_dark.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -130,9 +131,10 @@ class _MyAppState extends State<MyApp> {
                       : ThemeMode.light,
                   title: 'Neat Tip',
                   navigatorObservers: [routeObserver],
+                  debugShowCheckedModeBanner: false,
                   // darkTheme: ThemeData.dark(),
                   theme: (context2.watch<AppStateCubit>().state.darkMode)
-                      ? ThemeData.dark()
+                      ? getThemeDataDark()
                       : getThemeData(),
                   onGenerateRoute: routeGenerator,
                   home: () {
