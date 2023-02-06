@@ -146,7 +146,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
         #updatedAt: DateTime.now().toIso8601String(),
         #id: _firebaseUser?.uid ?? '',
         #role: 'Pengguna',
-        #displayName: 'Neat Tip User',
+        #displayName: _firebaseUser?.displayName ?? 'Neat Tip User',
         ...(oldInfo ?? {}),
         ...newInfo,
       });
