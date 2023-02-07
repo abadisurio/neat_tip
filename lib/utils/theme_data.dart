@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 getThemeData() {
   return ThemeData(
     appBarTheme: AppBarTheme(
+      systemOverlayStyle:
+          SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
       elevation: 0,
       titleTextStyle: TextStyle(
           color: Colors.grey.shade800,

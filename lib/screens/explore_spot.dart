@@ -62,6 +62,8 @@ class _ExploreSpotState extends State<ExploreSpot> {
 
   @override
   void initState() {
+//     Google .provideAPIKey("Your key")
+// GMSServices.provideAPIKey("Your key")
     location.onLocationChanged.listen((LocationData cLoc) {
       // cLoc contains the lat and long of the
       // current user's position in real time,
@@ -75,6 +77,7 @@ class _ExploreSpotState extends State<ExploreSpot> {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
+
         // padding: EdgeInsets.only(
         //   bottom: MediaQuery.of(context).size.height - 700,
         // ),

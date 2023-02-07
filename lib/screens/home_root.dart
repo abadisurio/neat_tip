@@ -94,40 +94,43 @@ class _HomeRootState extends State<HomeRoot> {
       //   child: const Icon(Icons.fit_screen_outlined),
       // ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.transparent,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        shape: const CircularNotchedRectangle(),
-        child: BottomNavigationBar(
-          enableFeedback: false,
-          type: BottomNavigationBarType.fixed,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.public_outlined),
-              label: 'Sosial',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.remove),
-              label: 'Pindai',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_outlined),
-              label: 'Inbox',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.grid_view_outlined),
-              label: 'Atur',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedFontSize: 12,
-          unselectedItemColor: Colors.grey[700],
-          selectedItemColor: Colors.blue[500],
-          onTap: _onItemTapped,
+      bottomNavigationBar: SafeArea(
+        child: BottomAppBar(
+          elevation: 0,
+          color: Colors.transparent,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: const CircularNotchedRectangle(),
+          child: BottomNavigationBar(
+            enableFeedback: false,
+            type: BottomNavigationBarType.fixed,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.public_outlined),
+                label: 'Sosial',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.remove),
+                label: 'Pindai',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.notifications_outlined),
+                label: 'Inbox',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.grid_view_outlined),
+                label: 'Atur',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedFontSize: 12,
+            unselectedItemColor: Colors.grey[700],
+            selectedItemColor: Colors.blue[500],
+            onTap: _onItemTapped,
+          ),
         ),
       ),
     );
