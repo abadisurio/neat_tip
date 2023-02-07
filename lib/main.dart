@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,8 +54,8 @@ class _MyAppState extends State<MyApp> {
     // log('panggil');
     await initializeDateFormatting('id_ID', null);
     await AppFirebase.initializeFirebase();
-    await neatTipUserCubit.initialize();
     await appStateCubit.initialize();
+    await neatTipUserCubit.initialize();
     // await neatTipUserCubit.signOut();
 
     isNeedPermission = await checkPermission();
@@ -124,7 +126,8 @@ class _MyAppState extends State<MyApp> {
                     create: (BuildContext context) => neatTipUserCubit),
               ],
               child: Builder(builder: (context2) {
-                // log('sini1 ${appStateCubit.state.darkMode}');
+                log('connection ${snapshot.connectionState == ConnectionState.done}');
+                log('darkmode ${context2.watch<AppStateCubit>().state.darkMode}');
                 return MaterialApp(
                   themeMode: (context2.watch<AppStateCubit>().state.darkMode)
                       ? ThemeMode.dark
