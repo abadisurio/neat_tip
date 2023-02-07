@@ -37,6 +37,13 @@
             {
               "client_id": "988007689143-jecscqvskm5kagfr9uobu4uh34mk99ad.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "988007689143-hlp1vp1bv7stlre1i08s32ceph156e8r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.neattip"
+              }
             }
           ]
         }
