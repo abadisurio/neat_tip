@@ -5,7 +5,7 @@ getThemeData() {
   return ThemeData(
     appBarTheme: AppBarTheme(
       systemOverlayStyle:
-          SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
+          const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
       elevation: 0,
       titleTextStyle: TextStyle(
           color: Colors.grey.shade800,

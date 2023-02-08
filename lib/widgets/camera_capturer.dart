@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class _CameraCapturerState extends State<CameraCapturer>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     cameraList = BlocProvider.of<CameraCubit>(context).cameraList;
+    log('kamera nyalaa');
     _initCameraController(cameraList);
     // setState(() {
     //   _isScanning = widget.isScanning;
@@ -67,7 +70,10 @@ class _CameraCapturerState extends State<CameraCapturer>
   @override
   Widget build(BuildContext context) {
     // log('hehe ${widget.isScanning}');
-    return Center(child: CameraPreview(_cameraController!));
+    return Center(
+        child: _cameraController != null
+            ? CameraPreview(_cameraController!)
+            : const CircularProgressIndicator());
   }
 
   void _startCamera() {
@@ -108,6 +114,8 @@ class _CameraCapturerState extends State<CameraCapturer>
       widget.resolution,
       enableAudio: false,
     );
+
+    log('_cameraController $_cameraController');
 
     await _cameraController!.initialize().then((_) {
       widget.controller(_cameraController!);

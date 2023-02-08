@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
@@ -18,10 +19,7 @@ class _HomeRootState extends State<HomeRoot> {
   static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Home(),
-    Text(
-      'Sosial',
-      style: optionStyle,
-    ),
+    ExploreSpot(),
     SizedBox(),
     Text(
       'Kotak Masuk',
@@ -61,7 +59,7 @@ class _HomeRootState extends State<HomeRoot> {
       appBar: AppBar(
         title: Text([
           'Neat Tip',
-          'Sosial',
+          'Spots',
           'Pindai',
           'Kotak Masuk',
           'Pengaturan'
@@ -109,8 +107,8 @@ class _HomeRootState extends State<HomeRoot> {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.public_outlined),
-                label: 'Sosial',
+                icon: Icon(Icons.map),
+                label: 'Spots',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.remove),

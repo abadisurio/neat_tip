@@ -111,7 +111,6 @@ class VehicleItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final firstPath = vehicle.imgSrcPhotos.split(',').first;
     final File cover = File(firstPath);
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -134,7 +133,7 @@ class VehicleItem extends StatelessWidget {
                         height: 100,
                         width: 100,
                       ),
-                      if (firstPath == '')
+                      if (cover.existsSync())
                         Image.network(
                             "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg"),
                       // Image.asset(

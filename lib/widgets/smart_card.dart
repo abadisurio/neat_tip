@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:camera/camera.dart';
@@ -85,6 +86,7 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
     setState(() {
       _isScanning = false;
     });
+    textRecognizer.close();
     if (cameraController!.value.isStreamingImages) {
       await cameraController?.stopImageStream();
     }
@@ -103,26 +105,37 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
     InputImage inputImage = getInputImage(image);
 
     _isDetecting = true;
+    // log('message ${inputImage.bytes}');
 
-    final RecognizedText recognisedText =
-        await textRecognizer.processImage(inputImage);
+    try {
+      final RecognizedText recognisedText = await textRecognizer
+          .processImage(inputImage)
+          .onError((error, stackTrace) {
+        log('error $error');
+        return RecognizedText(text: 'text', blocks: []);
+      });
 
-    log('plateNumbers $plateNumbers');
-    if (recognisedText.blocks.isNotEmpty) {
-      for (TextBlock block in recognisedText.blocks) {
-        log('block.text ${block.text}');
-        if (regexPlate.hasMatch(block.text)) {
-          for (var number in plateNumbers) {
-            log('number $number');
-            if (number.replaceAll(' ', '') == block.text.replaceAll(' ', '')) {
-              _itemDetected(number);
-              // _isDetecting = false;
+      log('plateNumbers $plateNumbers');
+      if (recognisedText.blocks.isNotEmpty) {
+        for (TextBlock block in recognisedText.blocks) {
+          log('block.text ${block.text}');
+          if (regexPlate.hasMatch(block.text)) {
+            for (var number in plateNumbers) {
+              log('number $number');
+              if (number.replaceAll(' ', '') ==
+                  block.text.replaceAll(' ', '')) {
+                _itemDetected(number);
+                // _isDetecting = false;
+              }
             }
           }
         }
       }
+      textRecognizer.close();
+      _isDetecting = false;
+    } catch (e) {
+      log('error $e');
     }
-    _isDetecting = false;
   }
 
   InputImage getInputImage(CameraImage cameraImage) {
@@ -282,10 +295,12 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
                         setState(() {
                           _isScanning = !_isScanning;
                         });
-                        if (_isScanning) {
-                          startScanning();
-                        } else {
-                          stopScanning();
+                        if (Platform.isAndroid) {
+                          if (_isScanning) {
+                            startScanning();
+                          } else {
+                            stopScanning();
+                          }
                         }
                       },
                       child: Icon(_isScanning
