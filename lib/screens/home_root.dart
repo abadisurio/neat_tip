@@ -90,10 +90,13 @@ class _HomeRootState extends State<HomeRoot> {
                 onTap: () {
                   log('tapp');
                 },
-                child: Image.network(
-                  FirebaseAuth.instance.currentUser?.photoURL ??
-                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                  fit: BoxFit.cover,
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Image.network(
+                    FirebaseAuth.instance.currentUser?.photoURL ??
+                        'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
