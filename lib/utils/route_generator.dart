@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
+import 'package:neat_tip/screens/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
@@ -33,13 +34,13 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           builder: (_) => const AuthScreen(), settings: settings);
     case '/home':
       return CupertinoPageRoute(
-          builder: (_) => const Home(), settings: settings);
+          builder: (_) => const HomeCustomer(), settings: settings);
     case '/homeroot':
       return CupertinoPageRoute(
           builder: (_) => const HomeRoot(), settings: settings);
     case '/homehost':
       return CupertinoPageRoute(
-          builder: (_) => const Home(), settings: settings);
+          builder: (_) => const HomeHost(), settings: settings);
     case '/vehiclelist':
       return CupertinoPageRoute(
           builder: (_) => const VehicleList(), settings: settings);
