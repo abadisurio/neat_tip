@@ -45,25 +45,28 @@ class _HomeRootState extends State<HomeRoot> {
   }
 
   void _onScanTapped() {
-    ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-      icon: const Icon(Icons.motorcycle),
-      content: ListTile(
-        onTap: () {},
-        // dense: true,
-        leading: const Icon(Icons.motorcycle),
-        title: const Text('Kurnia Motor'),
-        subtitle: const Text('Dititipkan • Hari ini'),
-        // trailing:
-      ),
-    ).create() // SnackBar(
-        );
+    if (userRole != 'Pengguna') {
+      Navigator.pushNamed(context, '/scan_vehicle');
+    }
+    // ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+    //   icon: const Icon(Icons.motorcycle),
+    //   content: ListTile(
+    //     onTap: () {},
+    //     // dense: true,
+    //     leading: const Icon(Icons.motorcycle),
+    //     title: const Text('Kurnia Motor'),
+    //     subtitle: const Text('Dititipkan • Hari ini'),
+    //     // trailing:
+    //   ),
+    // ).create() // SnackBar(
+    //     );
   }
 
   @override
   void initState() {
-    log('userRole ${context.read<NeatTipUserCubit>().state?.role}');
+    // log('userRole ${context.read<NeatTipUserCubit>().state?.role}');
     userRole = context.read<NeatTipUserCubit>().state?.role ?? 'Pengguna';
-    log('userRole $userRole');
+    // log('userRole $userRole');
     if (userRole != 'Pengguna') {
       _widgetOptions[0] = const HomeHost();
       _widgetOptions[1] = const VehicleList();

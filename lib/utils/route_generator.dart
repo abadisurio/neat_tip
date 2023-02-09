@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
+import 'package:neat_tip/screens/host/scan_vehicle.dart';
 import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
@@ -47,6 +48,9 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/vehicleadd':
       return CupertinoPageRoute(
           builder: (_) => const VehicleAdd(), settings: settings);
+    case '/scan_vehicle':
+      return CupertinoPageRoute(
+          builder: (_) => const ScanVehicle(), settings: settings);
     case '/profile':
       return CupertinoPageRoute(
           builder: (_) => const Manage(), settings: settings);

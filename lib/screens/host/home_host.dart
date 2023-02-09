@@ -34,15 +34,15 @@ class _HomeHostState extends State<HomeHost> with TickerProviderStateMixin {
         initialIndex: 1,
         length: 2,
         child: Scaffold(
-          bottomNavigationBar: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                tabController.animateTo(0);
-              },
-              child: const Text('Pindai motor'),
-            ),
-          ),
+          // bottomNavigationBar: Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       tabController.animateTo(0);
+          //     },
+          //     child: const Text('Pindai motor'),
+          //   ),
+          // ),
           body: TabBarView(
             controller: tabController,
             children: [
