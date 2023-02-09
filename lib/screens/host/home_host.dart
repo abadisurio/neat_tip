@@ -81,58 +81,12 @@ class _HomeHostState extends State<HomeHost> with TickerProviderStateMixin {
                 return ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CircleAvatar(
-                            foregroundImage: NetworkImage(
-                                FirebaseAuth.instance.currentUser?.photoURL ??
-                                    ''),
-                          ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Neat Tip',
-                            style: thinStyle,
-                          ),
-                          Text(
-                            'Kurnia Motor',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displaySmall!
-                                .copyWith(color: Colors.black),
-                          ),
-                        ],
-                      ),
-                      const Divider(
-                        thickness: 1,
-                      ),
-                      const SizedBox(
-                        height: 40,
-                      ),
-                      Wrap(
-                          alignment: WrapAlignment.spaceBetween,
-                          spacing: 2.0, // gap between adjacent chips
-                          runSpacing: 2.0, // gap between lines
-                          children: [
-                            ...List.generate(
-                                (156 * storedVehicle / capacity).ceil(),
-                                ((index) {
-                              return const Icon(Icons.play_arrow);
-                            })),
-                            ...List.generate(
-                                (156 * (1 - storedVehicle / capacity)).floor(),
-                                ((index) {
-                              return const Icon(Icons.play_arrow_outlined);
-                            })),
-                          ]),
-                      const SizedBox(
-                        height: 40,
+                      Text(
+                        'Kurnia Motor',
+                        style: Theme.of(context)
+                            .textTheme
+                            .displaySmall!
+                            .copyWith(color: Colors.black),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,6 +132,28 @@ class _HomeHostState extends State<HomeHost> with TickerProviderStateMixin {
                           // ),
                         ],
                       ),
+                      const Divider(
+                        thickness: 1,
+                      ),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          spacing: 2.0, // gap between adjacent chips
+                          runSpacing: 2.0, // gap between lines
+                          children: [
+                            ...List.generate(
+                                (156 * storedVehicle / capacity).ceil(),
+                                ((index) {
+                              return const Icon(Icons.play_arrow);
+                            })),
+                            ...List.generate(
+                                (156 * (1 - storedVehicle / capacity)).floor(),
+                                ((index) {
+                              return const Icon(Icons.play_arrow_outlined);
+                            })),
+                          ]),
                       const SizedBox(
                         height: 40,
                       ),

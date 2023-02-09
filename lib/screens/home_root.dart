@@ -21,6 +21,7 @@ class HomeRoot extends StatefulWidget {
 class _HomeRootState extends State<HomeRoot> {
   int _selectedIndex = 0;
   String userRole = 'Pengguna';
+  static const thinStyle = TextStyle(fontSize: 24, fontWeight: FontWeight.w300);
   static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
   final List<Widget> _widgetOptions = <Widget>[
     const HomeCustomer(),
@@ -74,13 +75,16 @@ class _HomeRootState extends State<HomeRoot> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text([
-          'Neat Tip',
-          userRole != 'Pengguna' ? 'Titipan' : 'Spots',
-          'Pindai',
-          'Kotak Masuk',
-          'Pengaturan'
-        ][_selectedIndex]),
+        title: Text(
+          [
+            'Neat Tip',
+            userRole != 'Pengguna' ? 'Titipan' : 'Spots',
+            'Pindai',
+            'Kotak Masuk',
+            'Pengaturan'
+          ][_selectedIndex],
+          style: thinStyle,
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(12.0),
