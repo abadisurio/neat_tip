@@ -2,9 +2,12 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home_customer.dart';
 import 'package:neat_tip/screens/manage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/screens/vehicle_list.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
 
 class HomeRoot extends StatefulWidget {
@@ -16,16 +19,17 @@ class HomeRoot extends StatefulWidget {
 
 class _HomeRootState extends State<HomeRoot> {
   int _selectedIndex = 0;
+  String userRole = 'Pengguna';
   static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeCustomer(),
-    ExploreSpot(),
-    SizedBox(),
-    Text(
+  final List<Widget> _widgetOptions = <Widget>[
+    const HomeCustomer(),
+    const ExploreSpot(),
+    const SizedBox(),
+    const Text(
       'Kotak Masuk',
       style: optionStyle,
     ),
-    Manage(),
+    const Manage(),
   ];
 
   void _onItemTapped(int index) {
@@ -54,12 +58,21 @@ class _HomeRootState extends State<HomeRoot> {
   }
 
   @override
+  void initState() {
+    userRole = context.read<NeatTipUserCubit>().state?.role ?? 'Pengguna';
+    if (userRole != 'Pengguna') {
+      _widgetOptions[1] = const VehicleList();
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text([
           'Neat Tip',
-          'Spots',
+          userRole != 'Pengguna' ? 'Titipan' : 'Spots',
           'Pindai',
           'Kotak Masuk',
           'Pengaturan'
