@@ -2,21 +2,21 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
-import 'package:neat_tip/screens/home_host.dart';
+import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
 import 'package:neat_tip/screens/state_loading.dart';
 import 'package:neat_tip/screens/wallet.dart';
-import 'package:neat_tip/screens/explore_spot.dart';
-import 'package:neat_tip/screens/home_customer.dart';
+import 'package:neat_tip/screens/customer/explore_spot.dart';
+import 'package:neat_tip/screens/customer/home_customer.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:neat_tip/screens/transaction_list.dart';
-import 'package:neat_tip/screens/vehicle_add.dart';
-import 'package:neat_tip/screens/vehicle_list.dart';
+import 'package:neat_tip/screens/customer/vehicle_add.dart';
+import 'package:neat_tip/screens/customer/vehicle_list.dart';
 
 Route<dynamic>? routeGenerator(RouteSettings settings) {
   switch (settings.name) {

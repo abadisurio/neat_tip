@@ -3,12 +3,12 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
-import 'package:neat_tip/screens/explore_spot.dart';
-import 'package:neat_tip/screens/home_customer.dart';
-import 'package:neat_tip/screens/home_host.dart';
+import 'package:neat_tip/screens/customer/explore_spot.dart';
+import 'package:neat_tip/screens/customer/home_customer.dart';
+import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neat_tip/screens/vehicle_list.dart';
+import 'package:neat_tip/screens/customer/vehicle_list.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
 
 class HomeRoot extends StatefulWidget {
