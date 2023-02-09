@@ -43,6 +43,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     } catch (e) {
       log('$e');
     }
+    emit(_currentUser);
     // log('_firebaseUser ${await  }');
     // return NeatTipUser.fromJson(json.decode(currentUser));
   }

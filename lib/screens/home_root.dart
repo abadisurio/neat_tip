@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
 import 'package:neat_tip/screens/home_customer.dart';
+import 'package:neat_tip/screens/home_host.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/screens/vehicle_list.dart';
@@ -59,8 +60,11 @@ class _HomeRootState extends State<HomeRoot> {
 
   @override
   void initState() {
+    log('userRole ${context.read<NeatTipUserCubit>().state?.role}');
     userRole = context.read<NeatTipUserCubit>().state?.role ?? 'Pengguna';
+    log('userRole $userRole');
     if (userRole != 'Pengguna') {
+      _widgetOptions[0] = const HomeHost();
       _widgetOptions[1] = const VehicleList();
     }
     super.initState();
@@ -114,24 +118,25 @@ class _HomeRootState extends State<HomeRoot> {
           child: BottomNavigationBar(
             enableFeedback: false,
             type: BottomNavigationBarType.fixed,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.map),
-                label: 'Spots',
+                icon: Icon(
+                    (userRole != 'Pengguna') ? Icons.motorcycle : Icons.map),
+                label: (userRole != 'Pengguna') ? 'Titipan' : 'Spots',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.remove),
                 label: 'Pindai',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.notifications_outlined),
                 label: 'Inbox',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.grid_view_outlined),
                 label: 'Atur',
               ),
