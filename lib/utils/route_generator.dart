@@ -9,7 +9,7 @@ import 'package:neat_tip/screens/sign_out.dart';
 import 'package:neat_tip/screens/state_loading.dart';
 import 'package:neat_tip/screens/wallet.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
-import 'package:neat_tip/screens/home.dart';
+import 'package:neat_tip/screens/home_customer.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/screens/manage.dart';

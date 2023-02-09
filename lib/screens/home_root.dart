@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/explore_spot.dart';
-import 'package:neat_tip/screens/home.dart';
+import 'package:neat_tip/screens/home_customer.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
 
@@ -18,7 +18,7 @@ class _HomeRootState extends State<HomeRoot> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    Home(),
+    HomeCustomer(),
     ExploreSpot(),
     SizedBox(),
     Text(

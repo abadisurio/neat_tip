@@ -7,8 +7,8 @@ import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/widgets/carousel.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class HomeCustomer extends StatelessWidget {
+  const HomeCustomer({super.key});
 
   @override
   Widget build(BuildContext context) {
