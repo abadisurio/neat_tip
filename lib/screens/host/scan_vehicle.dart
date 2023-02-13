@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
+import 'package:neat_tip/utils/constants.dart';
+import 'package:neat_tip/utils/get_input_image.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
 
 class ScanVehicle extends StatefulWidget {
@@ -19,7 +22,10 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
   bool _isScanning = true;
   bool isScreenActive = false;
   bool isBatchScanning = false;
-  String _detectedPlate = '';
+  String _lastDetectedPlate = "";
+  bool _isDetecting = false;
+  List<String> _listDetectedPlate = [];
+  final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   @override
   void didChangeDependencies() {
@@ -61,48 +67,82 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
     });
   }
 
+  confirmScan() {
+    Navigator.pushNamed(context, '/confirm_scan_vehicle',
+        arguments: {"scannedVehicleList": _listDetectedPlate});
+  }
+
   startScanning() {
-    // setState(() {
-    //   _isScanning = true;
-    // });
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      stopScanning();
-      setState(() {
-        _detectedPlate = "B 1234 ABC";
-      });
+    setState(() {
+      _isScanning = true;
     });
-    // cameraController?.startImageStream((image) {
-    //   if (_detectedPlate != "") {
-    //     setState(() {
-    //       _detectedPlate = "";
-    //     });
-    //     return;
-    //   }
-    //   if (!_isScanning) return;
-    //   // if (!_isDetecting) _processCameraImage(image);
-    // });
+    cameraController?.startImageStream((image) {
+      // log('hehe');
+      if (_lastDetectedPlate != "") {
+        setState(() {
+          _lastDetectedPlate = "";
+        });
+        return;
+      }
+      if (!_isScanning) return;
+      if (!_isDetecting) _processCameraImage(image);
+    });
   }
 
   stopScanning() async {
+    log('_lastDetectedPlate $_lastDetectedPlate');
     setState(() {
-      _detectedPlate = "B 1234 ABC";
       _isScanning = false;
     });
-    // textRecognizer.close();
-    // if (cameraController!.value.isStreamingImages) {
-    //   await cameraController?.stopImageStream();
-    // }
+    textRecognizer.close();
+    if (cameraController!.value.isStreamingImages) {
+      await cameraController?.stopImageStream();
+    }
+  }
+
+  void _itemDetected(String plateNumber) async {
+    setState(() {
+      _lastDetectedPlate = plateNumber;
+      _listDetectedPlate.add(plateNumber);
+    });
+    if (!isBatchScanning) {
+      stopScanning();
+    }
+  }
+
+  void _processCameraImage(CameraImage image) async {
+    _isDetecting = true;
+
+    InputImage inputImage = getInputImage(image);
+    try {
+      final RecognizedText recognisedText = await textRecognizer
+          .processImage(inputImage)
+          .onError((error, stackTrace) {
+        log('error $error');
+        return RecognizedText(text: 'text', blocks: []);
+      });
+      if (recognisedText.blocks.isNotEmpty) {
+        for (TextBlock block in recognisedText.blocks) {
+          log('block.text ${block.text}');
+          if (regexPlate.hasMatch(block.text)) {
+            _itemDetected(block.text);
+          }
+        }
+      }
+      textRecognizer.close();
+      _isDetecting = false;
+    } catch (e) {
+      log('error $e');
+    }
   }
 
   @override
   void initState() {
     Future.delayed(const Duration(milliseconds: 350), () {
       setState(() {
-        _isScanning = true;
         isScreenActive = true;
       });
     });
-    startScanning();
     super.initState();
   }
 
@@ -120,206 +160,206 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16.0),
+            child: Container(
+              color: Colors.grey.shade900,
+              // curve: Curves.easeOutCirc,
+              // duration: const Duration(milliseconds: 500),
+              width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.width,
               child: Stack(
+                fit: StackFit.loose,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: AnimatedContainer(
-                      color: Colors.grey.shade900,
+                  if (isScreenActive)
+                    AnimatedOpacity(
+                      opacity: _isScanning ? 1 : 0,
                       curve: Curves.easeOutCirc,
                       duration: const Duration(milliseconds: 500),
-                      width: MediaQuery.of(context).size.width,
-                      height:
-                          _isScanning ? MediaQuery.of(context).size.width : 200,
-                      child: Stack(
-                        fit: StackFit.loose,
-                        children: [
-                          AnimatedOpacity(
-                            opacity: _isScanning ? 1 : 0,
-                            curve: Curves.easeOutCirc,
-                            duration: const Duration(milliseconds: 500),
-                            child: Transform.scale(
-                              scale: 1.4,
-                              child: CameraCapturer(
-                                resolution: ResolutionPreset.low,
-                                controller: (controller) {
-                                  setState(() {
-                                    cameraController = controller;
-                                  });
-                                },
-                              ),
+                      child: Transform.scale(
+                        scale: 1.4,
+                        child: CameraCapturer(
+                          resolution: ResolutionPreset.low,
+                          controller: (controller) {
+                            setState(() {
+                              cameraController = controller;
+                            });
+                            startScanning();
+                          },
+                        ),
+                      ),
+                    ),
+                  AnimatedOpacity(
+                    curve: Curves.easeOutCirc,
+                    opacity: _isScanning ? 1 : 0,
+                    duration: const Duration(milliseconds: 500),
+                    child: const Align(
+                        alignment: Alignment.topCenter,
+                        child: Text(
+                          '\nPindai plat motor Pelanggan',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(color: Colors.black, blurRadius: 3)
+                              ]),
+                        )),
+                  ),
+                  AnimatedOpacity(
+                    curve: Curves.easeOutCirc,
+                    opacity: (_isScanning) ? 0 : 1,
+                    duration: const Duration(milliseconds: 500),
+                    child: Container(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '\n${_listDetectedPlate.length > 1 ? 'Beberapa ' : ''}Kendaraan Terdeteksi\n',
+                              style: const TextStyle(color: Colors.white),
                             ),
-                          ),
-                          AnimatedOpacity(
-                            curve: Curves.easeOutCirc,
-                            opacity: _isScanning ? 1 : 0,
-                            duration: const Duration(milliseconds: 500),
-                            child: const Align(
-                                alignment: Alignment.topCenter,
-                                child: Text(
-                                  '\nPindai plat motor Pelanggan',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      shadows: [
-                                        Shadow(
-                                            color: Colors.black, blurRadius: 3)
-                                      ]),
-                                )),
-                          ),
-                          AnimatedOpacity(
-                            curve: Curves.easeOutCirc,
-                            opacity: (_isScanning) ? 0 : 1,
-                            duration: const Duration(milliseconds: 500),
-                            child: Container(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '\n${isBatchScanning ? 'Beberapa ' : ''}Kendaraan Terdeteksi\n',
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(8)),
-                                          padding: const EdgeInsets.all(8),
-                                          child: Text(_detectedPlate,
-                                              style: TextStyle(
-                                                  fontSize: 40,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey.shade900)),
-                                        ),
-                                        if (isBatchScanning)
-                                          Container(
-                                            margin:
-                                                const EdgeInsets.only(left: 16),
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                                boxShadow: !isBatchScanning
-                                                    ? null
-                                                    : [
-                                                        const BoxShadow(
-                                                            spreadRadius: -2,
-                                                            color: Colors.white,
-                                                            offset:
-                                                                Offset(-8, -8)),
-                                                        BoxShadow(
-                                                            spreadRadius: -2,
-                                                            color: Colors
-                                                                .grey.shade900,
-                                                            offset:
-                                                                const Offset(
-                                                                    -5, -5)),
-                                                      ],
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            child: Text(
-                                              '+4',
-                                              style: TextStyle(
-                                                  color: Colors.grey.shade900,
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          )
-                                      ],
-                                    ),
-                                    const Divider(),
-                                    if (!_isScanning && _detectedPlate != "")
-                                      ElevatedButton(
-                                          onPressed: startScanning,
-                                          child: const Text('Tambah Lagi'))
-                                  ],
-                                )),
+                            if (_listDetectedPlate.isNotEmpty)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)),
+                                    padding: const EdgeInsets.all(8),
+                                    child: Text(_listDetectedPlate.last,
+                                        style: TextStyle(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey.shade900)),
+                                  ),
+                                  if (_listDetectedPlate.length > 1)
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 16),
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                          boxShadow: _listDetectedPlate.length <
+                                                  2
+                                              ? null
+                                              : [
+                                                  const BoxShadow(
+                                                      spreadRadius: -2,
+                                                      color: Colors.white,
+                                                      offset: Offset(-8, -8)),
+                                                  BoxShadow(
+                                                      spreadRadius: -2,
+                                                      color:
+                                                          Colors.grey.shade900,
+                                                      offset:
+                                                          const Offset(-5, -5)),
+                                                ],
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: Text(
+                                        '+${_listDetectedPlate.length - 1}',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade900,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                ],
+                              ),
+                            const Divider(
+                              thickness: 0,
+                            ),
+                            if (!_isScanning)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: startScanning,
+                                      child: const Text('Tambah Lagi')),
+                                  ElevatedButton(
+                                      onPressed: confirmScan,
+                                      child: const Text('Proses Kendaraan')),
+                                ],
+                              )
+                          ],
+                        )),
+                  ),
+                  if (_isScanning)
+                    SizedBox.expand(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).canvasColor,
+                                borderRadius: BorderRadius.circular(8)),
+                            padding: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
+                            child: Column(children: [
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text(' Pindai Sekaligus'),
+                                  ),
+                                  if (isBatchScanning)
+                                    ElevatedButton(
+                                        onPressed: stopScanning,
+                                        child: const Text('Selesai')),
+                                  Switch(
+                                    // This bool value toggles the switch.
+                                    value: isBatchScanning,
+                                    // overlayColor: overlayColor,
+                                    // trackColor: trackColor,
+                                    thumbColor:
+                                        const MaterialStatePropertyAll<Color>(
+                                            Colors.black),
+                                    onChanged: (bool value) {
+                                      // This is called when the user toggles the switch.
+                                      setState(() {
+                                        isBatchScanning = !isBatchScanning;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ]),
                           ),
                         ],
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
           ),
-          if (_isScanning)
-            Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor,
-                  borderRadius: BorderRadius.circular(8)),
-              padding: const EdgeInsets.all(8),
-              margin: const EdgeInsets.all(8),
-              child: Column(children: [
-                ListTile(
-                  title: const Text('Pindai Sekaligus'),
-                  trailing: Switch(
-                    // This bool value toggles the switch.
-                    value: isBatchScanning,
-                    // overlayColor: overlayColor,
-                    // trackColor: trackColor,
-                    thumbColor:
-                        const MaterialStatePropertyAll<Color>(Colors.black),
-                    onChanged: (bool value) {
-                      // This is called when the user toggles the switch.
-                      setState(() {
-                        isBatchScanning = !isBatchScanning;
-                      });
-                    },
-                  ),
-                ),
-                if (isBatchScanning)
-                  ElevatedButton(
-                      onPressed: stopScanning, child: const Text('Selesai'))
-              ]),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Kendaraan Terdeteksi',
+              style: Theme.of(context).textTheme.headline6,
             ),
+          ),
           ListView.builder(
-              itemCount: 0,
+              itemCount: _listDetectedPlate.length,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: ((context, index) {
                 return Card(
-                  elevation: 0,
-                  color: Colors.transparent,
-                  clipBehavior: Clip.hardEdge,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: ListTile(
-                    onTap: () {},
-                    // dense: true,
-                    leading: const CircleAvatar(
-                      child: Icon(
-                        Icons.motorcycle,
+                    elevation: 0,
+                    color: Colors.white,
+                    clipBehavior: Clip.hardEdge,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        _listDetectedPlate[index],
+                        style: TextStyle(
+                            color: Colors.grey.shade900,
+                            fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    title: const Text('Kurnia Motor'),
-                    subtitle: const Text('Dititipkan • Hari ini'),
-                    trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Rp6000',
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                          Text(
-                            'Ditahan',
-                            style: Theme.of(context).textTheme.caption,
-                          )
-                        ]),
-                  ),
-                );
+                    ));
               }))
         ],
       ),

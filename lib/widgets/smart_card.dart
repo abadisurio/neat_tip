@@ -10,6 +10,8 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/utils/constants.dart';
+import 'package:neat_tip/utils/get_input_image.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/debit_card.dart';
 
@@ -24,8 +26,6 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
   bool isScreenActive = false;
   late List<Vehicle> vehicleList;
   late List<String> plateNumbers;
-  final RegExp regexPlate =
-      RegExp(r'^([A-Za-z0-9]{1,4})(\s|-)*([0-9]{1,5})(\s|-)*([A-Za-z]{0,3})$');
   String _detectedPlate = "";
   bool _isScanning = false;
   bool _isDetecting = false;
@@ -115,7 +115,7 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
         return RecognizedText(text: 'text', blocks: []);
       });
 
-      log('plateNumbers $plateNumbers');
+      // log('plateNumbers $plateNumbers');
       if (recognisedText.blocks.isNotEmpty) {
         for (TextBlock block in recognisedText.blocks) {
           log('block.text ${block.text}');
@@ -136,40 +136,6 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
     } catch (e) {
       log('error $e');
     }
-  }
-
-  InputImage getInputImage(CameraImage cameraImage) {
-    final WriteBuffer allBytes = WriteBuffer();
-    for (Plane plane in cameraImage.planes) {
-      allBytes.putUint8List(plane.bytes);
-    }
-    final bytes = allBytes.done().buffer.asUint8List();
-
-    final Size imageSize =
-        Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
-
-    const InputImageRotation imageRotation = InputImageRotation.rotation0deg;
-
-    const InputImageFormat inputImageFormat = InputImageFormat.nv21;
-
-    final planeData = cameraImage.planes.map(
-      (Plane plane) {
-        return InputImagePlaneMetadata(
-          bytesPerRow: plane.bytesPerRow,
-          height: plane.height,
-          width: plane.width,
-        );
-      },
-    ).toList();
-
-    final inputImageData = InputImageData(
-      size: imageSize,
-      imageRotation: imageRotation,
-      inputImageFormat: inputImageFormat,
-      planeData: planeData,
-    );
-
-    return InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
   }
 
   @override
