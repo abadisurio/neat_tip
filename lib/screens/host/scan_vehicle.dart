@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,10 @@ class ScanVehicle extends StatefulWidget {
 
 class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
   CameraController? cameraController;
-  bool _isScanning = false;
+  bool _isScanning = true;
   bool isScreenActive = false;
-  bool batchScanning = false;
+  bool isBatchScanning = false;
+  String _detectedPlate = '';
 
   @override
   void didChangeDependencies() {
@@ -60,28 +62,32 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
   }
 
   startScanning() {
-    setState(() {
-      _isScanning = true;
+    // setState(() {
+    //   _isScanning = true;
+    // });
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      stopScanning();
+      setState(() {
+        _detectedPlate = "B 1234 ABC";
+      });
     });
     // cameraController?.startImageStream((image) {
-    //   // log('gambar baru');
-    //   // log('_detectedPlate $_detectedPlate');
-    //   // // log('_isDetecting $_isDetecting');
-    //   // if (_detectedPlate != "") {
-    //   //   setState(() {
-    //   //     _detectedPlate = "";
-    //   //   });
-    //   //   return;
-    //   // }
-    //   // if (!_isScanning) return;
+    //   if (_detectedPlate != "") {
+    //     setState(() {
+    //       _detectedPlate = "";
+    //     });
+    //     return;
+    //   }
+    //   if (!_isScanning) return;
     //   // if (!_isDetecting) _processCameraImage(image);
     // });
   }
 
   stopScanning() async {
-    // setState(() {
-    //   _isScanning = false;
-    // });
+    setState(() {
+      _detectedPlate = "B 1234 ABC";
+      _isScanning = false;
+    });
     // textRecognizer.close();
     // if (cameraController!.value.isStreamingImages) {
     //   await cameraController?.stopImageStream();
@@ -92,9 +98,11 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
   void initState() {
     Future.delayed(const Duration(milliseconds: 350), () {
       setState(() {
+        _isScanning = true;
         isScreenActive = true;
       });
     });
+    startScanning();
     super.initState();
   }
 
@@ -106,50 +114,178 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    // if (cameraController != null) {
+    //   startScanning();
+    // }
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
         children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.width,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Transform.scale(
-                    scale: 1.4,
-                    // child: Container(color: Colors.grey),
-                    child: Container(
-                      color: Colors.black,
-                      child: !isScreenActive
-                          ? null
-                          : CameraCapturer(
-                              resolution: ResolutionPreset.low,
-                              controller: onControllerMounted,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.width,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: AnimatedContainer(
+                      color: Colors.grey.shade900,
+                      curve: Curves.easeOutCirc,
+                      duration: const Duration(milliseconds: 500),
+                      width: MediaQuery.of(context).size.width,
+                      height:
+                          _isScanning ? MediaQuery.of(context).size.width : 200,
+                      child: Stack(
+                        fit: StackFit.loose,
+                        children: [
+                          AnimatedOpacity(
+                            opacity: _isScanning ? 1 : 0,
+                            curve: Curves.easeOutCirc,
+                            duration: const Duration(milliseconds: 500),
+                            child: Transform.scale(
+                              scale: 1.4,
+                              child: CameraCapturer(
+                                resolution: ResolutionPreset.low,
+                                controller: (controller) {
+                                  setState(() {
+                                    cameraController = controller;
+                                  });
+                                },
+                              ),
                             ),
-                    )),
+                          ),
+                          AnimatedOpacity(
+                            curve: Curves.easeOutCirc,
+                            opacity: _isScanning ? 1 : 0,
+                            duration: const Duration(milliseconds: 500),
+                            child: const Align(
+                                alignment: Alignment.topCenter,
+                                child: Text(
+                                  '\nPindai plat motor Pelanggan',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      shadows: [
+                                        Shadow(
+                                            color: Colors.black, blurRadius: 3)
+                                      ]),
+                                )),
+                          ),
+                          AnimatedOpacity(
+                            curve: Curves.easeOutCirc,
+                            opacity: (_isScanning) ? 0 : 1,
+                            duration: const Duration(milliseconds: 500),
+                            child: Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '\n${isBatchScanning ? 'Beberapa ' : ''}Kendaraan Terdeteksi\n',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          padding: const EdgeInsets.all(8),
+                                          child: Text(_detectedPlate,
+                                              style: TextStyle(
+                                                  fontSize: 40,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey.shade900)),
+                                        ),
+                                        if (isBatchScanning)
+                                          Container(
+                                            margin:
+                                                const EdgeInsets.only(left: 16),
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                                boxShadow: !isBatchScanning
+                                                    ? null
+                                                    : [
+                                                        const BoxShadow(
+                                                            spreadRadius: -2,
+                                                            color: Colors.white,
+                                                            offset:
+                                                                Offset(-8, -8)),
+                                                        BoxShadow(
+                                                            spreadRadius: -2,
+                                                            color: Colors
+                                                                .grey.shade900,
+                                                            offset:
+                                                                const Offset(
+                                                                    -5, -5)),
+                                                      ],
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            child: Text(
+                                              '+4',
+                                              style: TextStyle(
+                                                  color: Colors.grey.shade900,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          )
+                                      ],
+                                    ),
+                                    const Divider(),
+                                    if (!_isScanning && _detectedPlate != "")
+                                      ElevatedButton(
+                                          onPressed: startScanning,
+                                          child: const Text('Tambah Lagi'))
+                                  ],
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          ListTile(
-            title: const Text('Pindai Sekaligus'),
-            trailing: Switch(
-              // This bool value toggles the switch.
-              value: batchScanning,
-              // overlayColor: overlayColor,
-              // trackColor: trackColor,
-              thumbColor: const MaterialStatePropertyAll<Color>(Colors.black),
-              onChanged: (bool value) {
-                // This is called when the user toggles the switch.
-                setState(() {
-                  batchScanning = !batchScanning;
-                });
-              },
+          if (_isScanning)
+            Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).highlightColor,
+                  borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(8),
+              child: Column(children: [
+                ListTile(
+                  title: const Text('Pindai Sekaligus'),
+                  trailing: Switch(
+                    // This bool value toggles the switch.
+                    value: isBatchScanning,
+                    // overlayColor: overlayColor,
+                    // trackColor: trackColor,
+                    thumbColor:
+                        const MaterialStatePropertyAll<Color>(Colors.black),
+                    onChanged: (bool value) {
+                      // This is called when the user toggles the switch.
+                      setState(() {
+                        isBatchScanning = !isBatchScanning;
+                      });
+                    },
+                  ),
+                ),
+                if (isBatchScanning)
+                  ElevatedButton(
+                      onPressed: stopScanning, child: const Text('Selesai'))
+              ]),
             ),
-          ),
           ListView.builder(
-              itemCount: 5,
+              itemCount: 0,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: ((context, index) {

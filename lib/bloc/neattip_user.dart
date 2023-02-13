@@ -29,16 +29,14 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       _firebaseUser
           ?.reload()
           .onError((error, stackTrace) => throw error.toString());
-      log('currentUser $currentUser');
-      if (currentUser == null && _firebaseUser != null) {
-        updateLocalInfo({});
-      }
-      final userFromFirestore =
-          await fetchUserFromFirestore(_firebaseUser!.uid);
-      log('${userFromFirestore?.displayName}');
+      // log('currentUser $currentUser');
+
+      // if (currentUser == null && _firebaseUser != null) {
+      // }
       if (currentUser != null) {
         _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
         // if(userFromFirestore)
+        updateLocalInfo({});
       }
     } catch (e) {
       log('$e');
@@ -65,7 +63,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       if (user == null) {
         throw Exception('User not found!');
       }
-      // updateInfo({});
+      updateLocalInfo({});
       log('user $user');
     } catch (e) {
       log('sinii $e');
@@ -136,21 +134,26 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
   Future<void> updateLocalInfo(Map<Symbol, dynamic> newInfo) async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
+    // log('_firebaseUser ${_firebaseUser}');
+    final userFromFirestore = await fetchUserFromFirestore(_firebaseUser!.uid);
+    // log('userFromFirestore ${userFromFirestore?.toJson()}');
     try {
       final oldInfo = _currentUser
           ?.toJson()
           .map((key, value) => MapEntry(Symbol(key), value));
-      log('oldInfo $oldInfo');
+      // log('oldInfo $oldInfo');
+
       _currentUser = Function.apply(NeatTipUser.new, [], {
+        ...(oldInfo ?? {}),
         #createdAt: _firebaseUser?.metadata.creationTime!.toIso8601String() ??
             DateTime.now().toIso8601String(),
         #updatedAt: DateTime.now().toIso8601String(),
         #id: _firebaseUser?.uid ?? '',
-        #role: 'Pengguna',
-        #displayName: _firebaseUser?.displayName ?? 'Neat Tip User',
-        ...(oldInfo ?? {}),
+        #role: userFromFirestore?.role ?? 'Pengguna',
+        #displayName: userFromFirestore?.displayName ?? 'Neat Tip User',
         ...newInfo,
       });
+      log('_currentUser ${_currentUser?.toJson()}');
       sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
       emit(_currentUser);

@@ -1,5 +1,4 @@
 import 'package:camera/camera.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
