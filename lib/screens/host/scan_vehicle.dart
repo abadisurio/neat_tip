@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +22,7 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
   bool isBatchScanning = false;
   String _lastDetectedPlate = "";
   bool _isDetecting = false;
-  List<String> _listDetectedPlate = [];
+  final List<String> _listDetectedPlate = [];
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   @override

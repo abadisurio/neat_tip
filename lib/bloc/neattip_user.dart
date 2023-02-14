@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   NeatTipUserCubit() : super(null);
-  late SharedPreferences sharedPreferences;
-  late FirebaseFirestore firestore;
+  late SharedPreferences _sharedPreferences;
+  late FirebaseFirestore _firestore;
   late User? _firebaseUser;
   NeatTipUser? _currentUser;
 
@@ -19,11 +19,10 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   NeatTipUser? get currentUser => _currentUser;
 
   Future<void> initialize() async {
-    sharedPreferences = await SharedPreferences.getInstance();
     _firebaseUser = FirebaseAuth.instance.currentUser;
-
-    firestore = FirebaseFirestore.instance;
-    final currentUser = sharedPreferences.getString('currentUser');
+    _firestore = FirebaseFirestore.instance;
+    _sharedPreferences = await SharedPreferences.getInstance();
+    final currentUser = _sharedPreferences.getString('currentUser');
 
     try {
       _firebaseUser
@@ -33,7 +32,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
       if (currentUser == null && _firebaseUser != null) {
         updateLocalInfo({});
-      } else if (currentUser != null) {
+      }
+      if (currentUser != null) {
         _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
         // if(userFromFirestore)
         updateLocalInfo({});
@@ -101,12 +101,12 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   Future<void> addUserToFirestore() async {
     try {
       log('currentUser $_currentUser');
-      await firestore
+      await _firestore
           .collection("users")
           .doc(_currentUser!.id)
           .set(_currentUser!.toJson());
       // log('DocumentSnapshot added with ID');
-      sharedPreferences.setString(
+      _sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
       // log('eee $e');
@@ -116,7 +116,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
   Future<NeatTipUser?> fetchUserFromFirestore(String id) async {
     try {
-      final fetch = await firestore.collection("users").doc(id).get();
+      final fetch = await _firestore.collection("users").doc(id).get();
       final data = fetch.data();
       if (data == null) {
         // log('sinii $data');
@@ -154,7 +154,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
         ...newInfo,
       });
       log('_currentUser ${_currentUser?.toJson()}');
-      sharedPreferences.setString(
+      _sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
       emit(_currentUser);
     } catch (e) {
@@ -167,7 +167,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     _firebaseUser = FirebaseAuth.instance.currentUser;
     try {
       log('currentUser $_currentUser');
-      await firestore
+      await _firestore
           .collection("users")
           .doc(_currentUser!.id)
           .set(_currentUser!.toJson(), SetOptions(merge: true))
@@ -175,7 +175,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .then((value) => log("DocumentSnapshot successfully updated!"),
               onError: (e) => log("Error updating document $e"));
 
-      sharedPreferences.setString(
+      _sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
       log('eee $e');
@@ -210,11 +210,11 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       //     role: 'customer',
       //     fullName: 'bejo');
       log('currentUser $_currentUser');
-      await firestore
+      await _firestore
           .collection("users")
           .doc(_currentUser!.id)
           .set(_currentUser!.toJson());
-      sharedPreferences.setString(
+      _sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
     } catch (e) {
       log('eee $e');
@@ -228,7 +228,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
   Future signOut() async {
     await FirebaseAuth.instance.signOut();
-    sharedPreferences.remove('currentUser');
+    _sharedPreferences.remove('currentUser');
     _currentUser = null;
   }
 

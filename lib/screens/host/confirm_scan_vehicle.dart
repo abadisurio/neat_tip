@@ -22,9 +22,8 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _getArgument());
+    super.initState();
   }
 
   @override

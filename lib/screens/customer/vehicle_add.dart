@@ -2,14 +2,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class VehicleAdd extends StatefulWidget {
@@ -120,8 +118,8 @@ class VehicleAddState extends State<VehicleAdd> {
       if (imgSrcNames != '') {
         imgSrcNames += ',';
       }
-      log('hehe ');
-      log('${element.path}');
+      // log('hehe ');
+      // log('${element.path}');
       imgSrcNames += element.name;
     }
     // if (imgSrcNames == '') return;
