@@ -37,12 +37,12 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> addDataToFirestore(Vehicle vehicle) async {
     Directory tempDir = await getTemporaryDirectory();
     try {
-      log('vehicle $vehicle');
+      // log('vehicle $vehicle');
       String uploadedPhotoUrls = '';
       for (var photoName in vehicle.imgSrcPhotos.split(',')) {
-        log('photoName $photoName');
+        // log('photoName $photoName');
         final filePhoto = File('${tempDir.path}/$photoName');
-        log('filePhoto $filePhoto');
+        // log('filePhoto $filePhoto');
         final storageRef = firebaseStorage
             .ref("vehicles/${vehicle.ownerId}/${vehicle.id}/$photoName");
         await storageRef.putFile(filePhoto);
@@ -52,7 +52,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
         }
         uploadedPhotoUrls += photoUrl;
       }
-      log('uploadedPhotoUrls $uploadedPhotoUrls');
+      // log('uploadedPhotoUrls $uploadedPhotoUrls');
       final oldInfo =
           vehicle.toJson().map((key, value) => MapEntry(Symbol(key), value));
       final vehicleData = Function.apply(
@@ -61,7 +61,25 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
           .collection("vehicles")
           .add(vehicleData.toJson())
           .then((value) {
-        log('DocumentSnapshot added with ID ${value.id}');
+        // log('DocumentSnapshot added with ID ${value.id}');
+      });
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<void> removeDataFromFirestore(Vehicle vehicle) async {
+    try {
+      await firestore
+          .collection("vehicles")
+          .where("ownerId", isEqualTo: vehicle.ownerId)
+          .where("id", isEqualTo: vehicle.id)
+          .get()
+          .then((snapshot) {
+        for (var element in snapshot.docs) {
+          element.reference.delete();
+        }
       });
     } catch (e) {
       // log('eee $e');
@@ -107,6 +125,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> removeVehicle(Vehicle vehicle) async {
     final newList = state.where((element) => element != vehicle).toList();
     await removeDataFromDB(vehicle);
+    removeDataFromFirestore(vehicle);
     emit([...newList]);
   }
 
