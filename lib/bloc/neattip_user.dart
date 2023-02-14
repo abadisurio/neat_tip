@@ -31,9 +31,9 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .onError((error, stackTrace) => throw error.toString());
       // log('currentUser $currentUser');
 
-      // if (currentUser == null && _firebaseUser != null) {
-      // }
-      if (currentUser != null) {
+      if (currentUser == null && _firebaseUser != null) {
+        updateLocalInfo({});
+      } else if (currentUser != null) {
         _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
         // if(userFromFirestore)
         updateLocalInfo({});
@@ -229,6 +229,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   Future signOut() async {
     await FirebaseAuth.instance.signOut();
     sharedPreferences.remove('currentUser');
+    _currentUser = null;
   }
 
   // Future<void> updateData() {}
