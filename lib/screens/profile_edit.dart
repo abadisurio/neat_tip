@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
@@ -18,6 +17,7 @@ class _ProfileEditState extends State<ProfileEdit> {
 
   Map<String, TextEditingController> profileFieldControllers = {};
   bool _passwordVisible = false;
+  bool _isProfileEdited = false;
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _ProfileEditState extends State<ProfileEdit> {
     profileFields = [
       {
         "fieldname": "Nama Lengkap",
-        "value": neatTipUserCubit.currentUser?.displayName,
+        "value": neatTipUserCubit.state?.displayName,
         "type": TextInputType.text,
         "validator": (str) => true
       },
@@ -37,6 +37,17 @@ class _ProfileEditState extends State<ProfileEdit> {
       },
     ];
     super.initState();
+  }
+
+  void checkEdit(String value) {
+    final isEdited = profileFieldControllers['Email']!.text !=
+            neatTipUserCubit.firebaseCurrentUser?.email ||
+        profileFieldControllers['Nama Lengkap']!.text !=
+            neatTipUserCubit.state?.displayName;
+    // log('isEdited $isEdited');
+    setState(() {
+      _isProfileEdited = isEdited;
+    });
   }
 
   void submitProfile() async {
@@ -53,16 +64,17 @@ class _ProfileEditState extends State<ProfileEdit> {
       // final password = profileFieldControllers['Password']!.text;
       FocusManager.instance.primaryFocus?.unfocus();
       try {
-        log('hehehe ${neatTipUserCubit.firebaseCurrentUser?.displayName}');
-        if (email != neatTipUserCubit.firebaseCurrentUser?.email ||
-            displayName != neatTipUserCubit.firebaseCurrentUser?.displayName) {
-          await Navigator.pushNamed(context, '/loading', arguments: () async {
+        // log('hehehe ${neatTipUserCubit.state?.displayName}');
+        await Navigator.pushNamed(context, '/loading', arguments: () async {
+          if (email != neatTipUserCubit.firebaseCurrentUser?.email) {
             await neatTipUserCubit.updateEmail(email);
-            await neatTipUserCubit.updateDisplayName(displayName);
-          });
-          if (mounted) {
-            Navigator.pop(context);
           }
+          if (displayName != neatTipUserCubit.state?.displayName) {
+            await neatTipUserCubit.updateDisplayName(displayName);
+          }
+        });
+        if (mounted) {
+          Navigator.pop(context);
         }
         // if (isSingingUp) {
         //   await neatTipUserCubit.signUpEmailPassword(email, password);
@@ -115,7 +127,8 @@ class _ProfileEditState extends State<ProfileEdit> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
-                onPressed: submitProfile, child: const Text('Simpan')),
+                onPressed: _isProfileEdited ? submitProfile : null,
+                child: const Text('Simpan')),
           )
         ],
       ),
@@ -133,6 +146,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: TextFormField(
+                    onChanged: checkEdit,
                     obscureText: (e['obscure'] ?? false) && !_passwordVisible,
                     keyboardType: e['type'],
                     controller: controller,

@@ -67,7 +67,7 @@ class Manage extends StatelessWidget {
       body: BlocBuilder<NeatTipUserCubit, NeatTipUser?>(
           builder: (context, neatTipUser) {
         final nameInitial =
-            (context.watch<NeatTipUserCubit>().currentUser?.displayName ??
+            (context.watch<NeatTipUserCubit>().state?.displayName ??
                     'Neat Tip User')
                 .split(' ')
                 .map((e) => (e.isNotEmpty ? e.substring(0, 1) : ''))
@@ -101,13 +101,12 @@ class Manage extends StatelessWidget {
                   //     child:
                   ),
               title: Text(
-                context.watch<NeatTipUserCubit>().currentUser?.displayName ??
+                context.watch<NeatTipUserCubit>().state?.displayName ??
                     'Neat Tip User',
                 style: Theme.of(context).textTheme.bodyText1,
               ),
               subtitle: Text(
-                  context.watch<NeatTipUserCubit>().currentUser?.role ??
-                      'Pengguna'),
+                  context.watch<NeatTipUserCubit>().state?.role ?? 'Pengguna'),
               trailing: TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/profileedit');

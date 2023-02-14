@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
     // await neatTipUserCubit.signOut();
 
     isNeedPermission = await checkPermission();
-    user = neatTipUserCubit.currentUser;
+    user = neatTipUserCubit.state;
     database =
         await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
 

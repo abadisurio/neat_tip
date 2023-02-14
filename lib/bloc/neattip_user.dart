@@ -16,7 +16,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   NeatTipUser? _currentUser;
 
   User? get firebaseCurrentUser => FirebaseAuth.instance.currentUser;
-  NeatTipUser? get currentUser => _currentUser;
+  // NeatTipUser? get currentUser => _currentUser;
 
   Future<void> initialize() async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
@@ -30,10 +30,10 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
           .onError((error, stackTrace) => throw error.toString());
       // log('currentUser $currentUser');
 
-      if (currentUser == null && _firebaseUser != null) {
-        updateLocalInfo({});
-      }
-      if (currentUser != null) {
+      // if (_firebaseUser != null) {
+      //   updateLocalInfo({});
+      // }
+      if (currentUser != null && _firebaseUser != null) {
         _currentUser = NeatTipUser.fromJson(json.decode(currentUser));
         // if(userFromFirestore)
         updateLocalInfo({});
@@ -72,13 +72,13 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   }
 
   Future<void> updateDisplayName(String newInfo) async {
-    await _firebaseUser?.updateDisplayName(newInfo);
-    updateLocalInfo({#displayName: newInfo});
+    await updateLocalInfo({#displayName: newInfo});
+    _firebaseUser?.updateDisplayName(newInfo);
     updateUserToFirestore();
   }
 
   Future<void> updateEmail(String newInfo) async {
-    await _firebaseUser?.updateEmail(newInfo);
+    _firebaseUser?.updateEmail(newInfo);
     // updateLocalInfo({#email: newInfo});
     // updateUserToFirestore();
   }
@@ -135,13 +135,14 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   Future<void> updateLocalInfo(Map<Symbol, dynamic> newInfo) async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
     // log('_firebaseUser ${_firebaseUser}');
-    final userFromFirestore = await fetchUserFromFirestore(_firebaseUser!.uid);
+    final NeatTipUser? userFromFirestore =
+        await fetchUserFromFirestore(_firebaseUser!.uid);
     // log('userFromFirestore ${userFromFirestore?.toJson()}');
     try {
       final oldInfo = _currentUser
           ?.toJson()
           .map((key, value) => MapEntry(Symbol(key), value));
-      // log('oldInfo $oldInfo');
+      // log('newInfo $newInfo');
 
       _currentUser = Function.apply(NeatTipUser.new, [], {
         ...(oldInfo ?? {}),
@@ -153,8 +154,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
         #displayName: userFromFirestore?.displayName ?? 'Neat Tip User',
         ...newInfo,
       });
-      log('_currentUser ${_currentUser?.toJson()}');
-      _sharedPreferences.setString(
+      // log('_currentUser ${_currentUser?.toJson()}');
+      await _sharedPreferences.setString(
           'currentUser', json.encode(_currentUser?.toJson()));
       emit(_currentUser);
     } catch (e) {
@@ -166,7 +167,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   Future<void> updateUserToFirestore() async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
     try {
-      log('currentUser $_currentUser');
+      log('_currentUser sini ${_currentUser?.toJson()}');
       await _firestore
           .collection("users")
           .doc(_currentUser!.id)
