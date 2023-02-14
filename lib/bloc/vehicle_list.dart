@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/utils/firestore_delete_document.dart';
 import 'package:path_provider/path_provider.dart';
 
 class VehicleListCubit extends Cubit<List<Vehicle>> {
@@ -35,14 +36,15 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   }
 
   Future<void> addDataToFirestore(Vehicle vehicle) async {
-    Directory tempDir = await getTemporaryDirectory();
+    Directory tempDir = await getApplicationDocumentsDirectory();
     try {
       // log('vehicle $vehicle');
       String uploadedPhotoUrls = '';
       for (var photoName in vehicle.imgSrcPhotos.split(',')) {
-        // log('photoName $photoName');
-        final filePhoto = File('${tempDir.path}/$photoName');
-        // log('filePhoto $filePhoto');
+        log('photoName $photoName');
+        final filePhoto = File(
+            '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName');
+        log('filePhoto $filePhoto');
         final storageRef = firebaseStorage
             .ref("vehicles/${vehicle.ownerId}/${vehicle.id}/$photoName");
         await storageRef.putFile(filePhoto);
@@ -70,6 +72,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   }
 
   Future<void> removeDataFromFirestore(Vehicle vehicle) async {
+    log('vehicle ${vehicle.id}');
     try {
       await firestore
           .collection("vehicles")
@@ -81,6 +84,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
           element.reference.delete();
         }
       });
+      deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
     } catch (e) {
       // log('eee $e');
       throw Exception(e);

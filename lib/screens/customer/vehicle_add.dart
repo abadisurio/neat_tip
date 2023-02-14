@@ -113,6 +113,7 @@ class VehicleAddState extends State<VehicleAdd> {
     log('heh ');
     String imgSrcNames = '';
     // _imgFilePhotos.map((e) {
+    //   log('photo $e');
     // });
     // log('id ${BlocProvider.of<VehicleListCubit>(context).length.toString()}');
     for (var element in _imgFilePhotos) {
@@ -120,7 +121,7 @@ class VehicleAddState extends State<VehicleAdd> {
         imgSrcNames += ',';
       }
       log('hehe ');
-      log('$element');
+      log('${element.path}');
       imgSrcNames += element.name;
     }
     // if (imgSrcNames == '') return;
@@ -163,7 +164,7 @@ class VehicleAddState extends State<VehicleAdd> {
             child: NotificationListener(
           onNotification: (t) {
             if (t is ScrollEndNotification) {
-              log('_listViewController ${_listViewController.position.pixels}');
+              // log('_listViewController ${_listViewController.position.pixels}');
               setState(() {
                 if (_listViewController.position.pixels > screenWidth) {
                   isCameraFocus = false;

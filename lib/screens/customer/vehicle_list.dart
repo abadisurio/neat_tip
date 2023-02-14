@@ -133,10 +133,11 @@ class VehicleItem extends StatelessWidget {
                         width: 100,
                       ),
                       FutureBuilder(future: () async {
-                        final appDir = await getTemporaryDirectory();
+                        final appDir = await getApplicationDocumentsDirectory();
                         final firstName = vehicle.imgSrcPhotos.split(',').first;
-                        // log('${appDir.path}/$firstName');
-                        return File('${appDir.path}/$firstName');
+                        log('${appDir.path}/$firstName');
+                        return File(
+                            '${appDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$firstName');
                       }(), builder: ((context, snapshot) {
                         //  if (cover.existsSync())
                         if (snapshot.data != null) {
