@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/widgets/peek_and_pop_able.dart';
+import 'package:path_provider/path_provider.dart';
 
 class VehicleList extends StatelessWidget {
   const VehicleList({super.key});
@@ -109,8 +110,6 @@ class VehicleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firstPath = vehicle.imgSrcPhotos.split(',').first;
-    final File cover = File(firstPath);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -133,21 +132,25 @@ class VehicleItem extends StatelessWidget {
                         height: 100,
                         width: 100,
                       ),
-                      if (cover.existsSync())
-                        Image.network(
-                            "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg"),
-                      // Image.asset(
-                      //   'assets/vario.png',
-                      //   height: 150,
-                      //   width: 150,
-                      // ),
-                      if (firstPath != '')
-                        Image.file(
-                          cover,
-                          height: 150,
-                          width: 150,
-                          fit: BoxFit.cover,
-                        )
+                      FutureBuilder(future: () async {
+                        final appDir = await getTemporaryDirectory();
+                        final firstName = vehicle.imgSrcPhotos.split(',').first;
+                        // log('${appDir.path}/$firstName');
+                        return File('${appDir.path}/$firstName');
+                      }(), builder: ((context, snapshot) {
+                        //  if (cover.existsSync())
+                        if (snapshot.data != null) {
+                          return Image.file(
+                            snapshot.data!,
+                            height: 150,
+                            width: 150,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          return Image.network(
+                              "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg");
+                        }
+                      })),
                     ],
                   ),
                 ),

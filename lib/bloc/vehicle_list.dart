@@ -1,17 +1,28 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:path_provider/path_provider.dart';
 
 class VehicleListCubit extends Cubit<List<Vehicle>> {
   List<Vehicle> _dbList = [];
   late NeatTipDatabase _db;
+  late FirebaseFirestore firestore;
+  late FirebaseStorage firebaseStorage;
+  // late String userId;
   VehicleListCubit() : super([]);
   get collection => state;
   get length => state.length;
 
   void initializeDB(NeatTipDatabase db) {
+    firestore = FirebaseFirestore.instance;
+    firebaseStorage = FirebaseStorage.instance;
+    // userId = FirebaseAuth.instance.currentUser!.uid;
     _db = db;
   }
 
@@ -21,6 +32,41 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
 
   Future<void> removeDataFromDB(Vehicle vehicle) async {
     await _db.vehicleDao.removeVehicle(vehicle);
+  }
+
+  Future<void> addDataToFirestore(Vehicle vehicle) async {
+    Directory tempDir = await getTemporaryDirectory();
+    try {
+      log('vehicle $vehicle');
+      String uploadedPhotoUrls = '';
+      for (var photoName in vehicle.imgSrcPhotos.split(',')) {
+        log('photoName $photoName');
+        final filePhoto = File('${tempDir.path}/$photoName');
+        log('filePhoto $filePhoto');
+        final storageRef = firebaseStorage
+            .ref("vehicles/${vehicle.ownerId}/${vehicle.id}/$photoName");
+        await storageRef.putFile(filePhoto);
+        final photoUrl = await storageRef.getDownloadURL();
+        if (uploadedPhotoUrls != '') {
+          uploadedPhotoUrls += ',';
+        }
+        uploadedPhotoUrls += photoUrl;
+      }
+      log('uploadedPhotoUrls $uploadedPhotoUrls');
+      final oldInfo =
+          vehicle.toJson().map((key, value) => MapEntry(Symbol(key), value));
+      final vehicleData = Function.apply(
+          Vehicle.new, [], {...oldInfo, #imgSrcPhotos: uploadedPhotoUrls});
+      await firestore
+          .collection("vehicles")
+          .add(vehicleData.toJson())
+          .then((value) {
+        log('DocumentSnapshot added with ID ${value.id}');
+      });
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
   }
   // Future<void> pushDataToDB() async {
   //   for (var vehicle in state) {
@@ -78,6 +124,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> addVehicle(Vehicle vehicle) async {
     _dbList = [..._dbList, vehicle];
     await addDataToDB(vehicle);
+    addDataToFirestore(vehicle);
     emit([...state, vehicle]);
   }
 }

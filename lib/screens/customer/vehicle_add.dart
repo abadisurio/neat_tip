@@ -5,9 +5,11 @@ import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class VehicleAdd extends StatefulWidget {
@@ -65,8 +67,8 @@ class VehicleAddState extends State<VehicleAdd> {
   static const double boxSize = 300;
   static const double contentGap = 16;
   CameraController? cameraController;
-  List<String> imgSrcPhotos = [];
-  final List<File> _imgFilePhotos = [];
+  // List<String> imgSrcPhotos = [];
+  final List<XFile> _imgFilePhotos = [];
   bool isScreenActive = true;
   bool isCapturing = false;
   bool isFlashOn = false;
@@ -79,10 +81,9 @@ class VehicleAddState extends State<VehicleAdd> {
     });
     if (cameraController != null) {
       final photo = await cameraController!.takePicture();
-      log('photo $photo');
       setState(() {
-        imgSrcPhotos.add(photo.path);
-        _imgFilePhotos.add(File(photo.path));
+        // imgSrcPhotos.add(photo.name);
+        _imgFilePhotos.add(photo);
       });
       addPhotoField();
     }
@@ -110,24 +111,27 @@ class VehicleAddState extends State<VehicleAdd> {
   submitForm() async {
     final vehicleListCubit = context.read<VehicleListCubit>();
     log('heh ');
-    String imgSrcString = '';
+    String imgSrcNames = '';
     // _imgFilePhotos.map((e) {
     // });
     // log('id ${BlocProvider.of<VehicleListCubit>(context).length.toString()}');
     for (var element in _imgFilePhotos) {
+      if (imgSrcNames != '') {
+        imgSrcNames += ',';
+      }
       log('hehe ');
       log('$element');
-      imgSrcString += '${element.path},';
+      imgSrcNames += element.name;
     }
-    // if (imgSrcString == '') return;
+    // if (imgSrcNames == '') return;
     if (_formKey.currentState!.validate()) {
       FocusManager.instance.primaryFocus?.unfocus();
       final newVehicle = Vehicle(
           ownerName: vehicleFieldControllers['Nama Pemilik *']!.text,
           createdAt: DateTime.now().toString(),
           id: (BlocProvider.of<VehicleListCubit>(context).length).toString(),
-          ownerId: FirebaseAuth.instance.currentUser!.uid,
-          imgSrcPhotos: imgSrcString,
+          ownerId: context.read<NeatTipUserCubit>().state!.id,
+          imgSrcPhotos: imgSrcNames,
           plate: vehicleFieldControllers['Plat Nomor *']!.text,
           wheel: int.parse(vehicleFieldControllers['Jumlah Roda']!.text),
           brand: vehicleFieldControllers['Merek *']!.text,
@@ -237,7 +241,7 @@ class VehicleAddState extends State<VehicleAdd> {
                                 fit: StackFit.expand,
                                 children: [
                                   Image.file(
-                                    _imgFilePhotos[index],
+                                    File(_imgFilePhotos[index].path),
                                     fit: BoxFit.cover,
                                   ),
                                   Text('$index'),

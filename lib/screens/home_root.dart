@@ -47,19 +47,20 @@ class _HomeRootState extends State<HomeRoot> {
   void _onScanTapped() {
     if (userRole != 'Pengguna') {
       Navigator.pushNamed(context, '/scan_vehicle');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+        icon: const Icon(Icons.motorcycle),
+        content: ListTile(
+          onTap: () {},
+          // dense: true,
+          leading: const Icon(Icons.motorcycle),
+          title: const Text('Kurnia Motor'),
+          subtitle: const Text('Dititipkan • Hari ini'),
+          // trailing:
+        ),
+      ).create() // SnackBar(
+          );
     }
-    // ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-    //   icon: const Icon(Icons.motorcycle),
-    //   content: ListTile(
-    //     onTap: () {},
-    //     // dense: true,
-    //     leading: const Icon(Icons.motorcycle),
-    //     title: const Text('Kurnia Motor'),
-    //     subtitle: const Text('Dititipkan • Hari ini'),
-    //     // trailing:
-    //   ),
-    // ).create() // SnackBar(
-    //     );
   }
 
   @override
