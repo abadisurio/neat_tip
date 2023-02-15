@@ -104,7 +104,7 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
     InputImage inputImage = getInputImage(image);
 
     _isDetecting = true;
-    // log('message ${inputImage.bytes}');
+    // log('message ${inputImage.type}');
 
     try {
       final RecognizedText recognisedText = await textRecognizer
@@ -114,7 +114,7 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
         return RecognizedText(text: 'text', blocks: []);
       });
 
-      // log('plateNumbers $plateNumbers');
+      log('recognisedText ${recognisedText.blocks}');
       if (recognisedText.blocks.isNotEmpty) {
         for (TextBlock block in recognisedText.blocks) {
           log('block.text ${block.text}');
@@ -130,7 +130,7 @@ class _SmartCardState extends State<SmartCard> with RouteAware {
           }
         }
       }
-      textRecognizer.close();
+
       _isDetecting = false;
     } catch (e) {
       log('error $e');

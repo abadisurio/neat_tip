@@ -22,7 +22,6 @@ class _CameraCapturerState extends State<CameraCapturer>
   // bool _isPermissionGranted = false;
   List<CameraDescription> cameras = [];
   late List<CameraDescription> cameraList;
-  final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   // Add this controller to be able to control de camera
   CameraController? _cameraController;

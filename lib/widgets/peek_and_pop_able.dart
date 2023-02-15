@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -66,11 +67,13 @@ class _PeekAndPopableState extends State<PeekAndPopable>
 
     log('globalPaintBounds ${context.globalPaintBounds}');
     onHold = Timer(const Duration(milliseconds: 500), () {
-      Future.delayed(
-        const Duration(milliseconds: 100),
-        () => HapticFeedback.lightImpact(),
-      );
-      HapticFeedback.lightImpact();
+      if (Platform.isAndroid) {
+        Future.delayed(
+          const Duration(milliseconds: 100),
+          () => HapticFeedback.lightImpact(),
+        );
+      }
+      HapticFeedback.mediumImpact();
       onLongPress();
     });
     // Future.delayed(const Duration(milliseconds: 300), () {});
