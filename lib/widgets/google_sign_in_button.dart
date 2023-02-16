@@ -2,6 +2,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/utils/firebase.dart';
 
 class GoogleSignInButton extends StatefulWidget {
@@ -17,6 +19,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
 
   @override
   Widget build(BuildContext context) {
+    final NeatTipUserCubit neatTipUserCubit = context.read<NeatTipUserCubit>();
     // final navigator = Navigator.of(context);
     return _isSigningIn
         ? const Center(
@@ -29,15 +32,19 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               backgroundColor: Colors.white,
             ),
             onPressed: () async {
-              setState(() {
-                _isSigningIn = true;
-              });
               try {
-                final User? user = await AppFirebase.signInWithGoogle();
+                setState(() {
+                  _isSigningIn = true;
+                });
+                await Navigator.pushNamed(context, '/state_loading',
+                    arguments: () async {
+                  await neatTipUserCubit.signInGoogle();
+                });
+                // final User? user = await AppFirebase.signInWithGoogle();
                 setState(() {
                   _isSigningIn = false;
                 });
-                print(user);
+                // print(user);
                 if (widget.onSuccess != null) {
                   widget.onSuccess!();
                 }

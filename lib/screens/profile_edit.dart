@@ -65,7 +65,8 @@ class _ProfileEditState extends State<ProfileEdit> {
       FocusManager.instance.primaryFocus?.unfocus();
       try {
         // log('hehehe ${neatTipUserCubit.state?.displayName}');
-        await Navigator.pushNamed(context, '/loading', arguments: () async {
+        await Navigator.pushNamed(context, '/state_loading',
+            arguments: () async {
           if (email != neatTipUserCubit.firebaseCurrentUser?.email) {
             await neatTipUserCubit.updateEmail(email);
           }

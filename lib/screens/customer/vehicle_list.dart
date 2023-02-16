@@ -17,7 +17,8 @@ class VehicleList extends StatelessWidget {
     removeItem(Vehicle vehicle) async {
       await Navigator.maybePop(context);
       Future.delayed(peekDuration, () async {
-        await Navigator.pushNamed(context, '/loading', arguments: () async {
+        await Navigator.pushNamed(context, '/state_loading',
+            arguments: () async {
           await context.read<VehicleListCubit>().removeVehicle(vehicle);
           // await vehicleListCubit.add();
           log('hereeeeee');

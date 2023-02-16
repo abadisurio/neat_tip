@@ -71,6 +71,20 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     }
   }
 
+  Future signInGoogle() async {
+    try {
+      final User? user = await AppFirebase.signInWithGoogle();
+      if (user == null) {
+        throw Exception('User not found!');
+      }
+      updateLocalInfo({});
+      log('user $user');
+    } catch (e) {
+      log('sinii $e');
+      rethrow;
+    }
+  }
+
   Future<void> updateDisplayName(String newInfo) async {
     await updateLocalInfo({#displayName: newInfo});
     _firebaseUser?.updateDisplayName(newInfo);

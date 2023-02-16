@@ -73,7 +73,7 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/reservations':
       return CupertinoPageRoute(
           builder: (_) => const ReservationList(), settings: settings);
-    case '/loading':
+    case '/state_loading':
       return PageRouteBuilder(
           transitionsBuilder: (ctx, anim1, anim2, child) {
             return BackdropFilter(
