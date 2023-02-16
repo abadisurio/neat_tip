@@ -63,8 +63,8 @@ class _MyAppState extends State<MyApp> {
     database =
         await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
 
-    vehicleListCubit.initializeDB(database);
-    vehicleListCubit.pullDataFromDB();
+    vehicleListCubit.initialize(localDB: database);
+    // vehicleListCubit.pullDataFromDB();
 
     transactionsListCubit.initializeDB(database);
     transactionsListCubit.pullDataFromDB();
@@ -166,12 +166,7 @@ class _MyAppState extends State<MyApp> {
                           );
                         });
                       }
-                      switch (user!.role) {
-                        case 'host_owner':
-                          return const HomeHost();
-                        default:
-                          return const HomeRoot();
-                      }
+                      return const HomeRoot();
                     }
                   }(),
                 );

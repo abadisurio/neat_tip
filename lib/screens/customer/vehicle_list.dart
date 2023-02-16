@@ -153,9 +153,9 @@ class VehicleItem extends StatelessWidget {
                           }
                           return const SizedBox();
                         }))
-                      else
-                        Image.network(
-                            "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg"),
+                      // else
+                      //   Image.network(
+                      //       "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg"),
                     ],
                   ),
                 ),

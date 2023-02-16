@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,18 +15,34 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   List<Vehicle> _dbList = [];
   late NeatTipDatabase _db;
   late FirebaseFirestore _firestore;
-  late FirebaseStorage firebaseStorage;
+  late FirebaseStorage _firebaseStorage;
   late String _userId;
   VehicleListCubit() : super([]);
   get collection => state;
   get length => state.length;
 
-  void initializeDB(NeatTipDatabase db) {
+  void initialize({required NeatTipDatabase localDB}) async {
     _firestore = FirebaseFirestore.instance;
+    // _firestore.settings = Settings();
     _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    firebaseStorage = FirebaseStorage.instance;
-    _pullDataFirestore();
-    _db = db;
+    _firebaseStorage = FirebaseStorage.instance;
+    _db = localDB;
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    await _pullDataFromDB();
+    if (connectivityResult != ConnectivityResult.none) {
+      // I am connected to a mobile network.
+      _pullDataFirestore();
+    }
+  }
+
+  void reloadOnline() async {
+    await _pushDataFirestore();
+    // await _pullDataFirestore();
+  }
+
+  void end() async {
+    await _pushDataFirestore();
+    // await _pullDataFirestore();
   }
 
   Future<void> addDataToDB(Vehicle vehicle) async {
@@ -36,7 +53,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     await _db.vehicleDao.removeVehicle(vehicle);
   }
 
-  Future<void> addDataToFirestore(Vehicle vehicle) async {
+  Future<void> _addDataToFirestore(Vehicle vehicle) async {
     Directory tempDir = await getApplicationDocumentsDirectory();
     try {
       // log('vehicle $vehicle');
@@ -47,7 +64,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
           final filePhoto = File(
               '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName');
           log('filePhoto $filePhoto');
-          final storageRef = firebaseStorage
+          final storageRef = _firebaseStorage
               .ref("vehicles/${vehicle.ownerId}/${vehicle.id}/$photoName");
           await storageRef.putFile(filePhoto);
           final photoUrl = await storageRef.getDownloadURL();
@@ -106,7 +123,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   //   }
   // }
 
-  Future<void> pullDataFromDB() async {
+  Future<void> _pullDataFromDB() async {
     final dataDB = await _db.vehicleDao.findAllVehicle();
     _dbList = dataDB;
     emit(dataDB);
@@ -125,7 +142,24 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
               .map((e) => Vehicle.fromJson(e.value))
               .toList();
       _dbList = data;
+      log('data $data');
       emit(data);
+      // log('data ${data[0].brand}');
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<void> _pushDataFirestore() async {
+    // String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final Map<String, dynamic> mappedList = {
+      for (var e in _dbList) e.id: e.toJson()
+    };
+    log('mappedList $mappedList');
+    try {
+      await _firestore.collection("vehicles").doc(_userId).set(mappedList);
+      // emit(data);
       // log('data ${data[0].brand}');
     } catch (e) {
       // log('eee $e');
@@ -170,7 +204,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> addVehicle(Vehicle vehicle) async {
     _dbList = [..._dbList, vehicle];
     await addDataToDB(vehicle);
-    addDataToFirestore(vehicle);
+    _addDataToFirestore(vehicle);
     emit([...state, vehicle]);
   }
 }

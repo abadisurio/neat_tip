@@ -87,11 +87,11 @@ class Manage extends StatelessWidget {
                   radius: 32,
                   child: FirebaseAuth.instance.currentUser?.photoURL != null
                       ? ClipOval(
-                          child: Image.network(
-                            FirebaseAuth.instance.currentUser?.photoURL ?? '',
-                            fit: BoxFit.cover,
-                          ),
-                        )
+                          // child: Image.network(
+                          //   FirebaseAuth.instance.currentUser?.photoURL ?? '',
+                          //   fit: BoxFit.cover,
+                          // ),
+                          )
                       : Text(
                           (nameInitial.length > 3
                               ? nameInitial.substring(0, 3)

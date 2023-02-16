@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
+import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/screens/customer/explore_spot.dart';
 import 'package:neat_tip/screens/customer/home_customer.dart';
 import 'package:neat_tip/screens/host/home_host.dart';
@@ -77,86 +78,92 @@ class _HomeRootState extends State<HomeRoot> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          [
-            'Neat Tip',
-            userRole != 'Pengguna' ? 'Titipan' : 'Spots',
-            'Pindai',
-            'Kotak Masuk',
-            'Pengaturan'
-          ][_selectedIndex],
-          style: thinStyle,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: ClipOval(
-              clipBehavior: Clip.hardEdge,
-              child: GestureDetector(
-                onTap: () {
-                  log('tapp');
-                },
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Image.network(
-                    FirebaseAuth.instance.currentUser?.photoURL ??
-                        'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                    fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: () async {
+        context.read<VehicleListCubit>().end();
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            [
+              'Neat Tip',
+              userRole != 'Pengguna' ? 'Titipan' : 'Spots',
+              'Pindai',
+              'Kotak Masuk',
+              'Pengaturan'
+            ][_selectedIndex],
+            style: thinStyle,
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: ClipOval(
+                clipBehavior: Clip.hardEdge,
+                child: GestureDetector(
+                  onTap: () {
+                    log('tapp');
+                  },
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    // child: Image.network(
+                    //   FirebaseAuth.instance.currentUser?.photoURL ??
+                    //       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
+                    //   fit: BoxFit.cover,
+                    // ),
                   ),
                 ),
               ),
+            )
+          ],
+        ),
+        body: Center(
+          child: _widgetOptions.elementAt(_selectedIndex),
+        ),
+        // floatingActionButton: FloatingActionButton(
+        //   // shape: FloatingActionButtonSh,
+        //   onPressed: _onScanTapped,
+        //   child: const Icon(Icons.fit_screen_outlined),
+        // ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        bottomNavigationBar: SafeArea(
+          child: BottomAppBar(
+            elevation: 0,
+            color: Colors.transparent,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            shape: const CircularNotchedRectangle(),
+            child: BottomNavigationBar(
+              enableFeedback: false,
+              type: BottomNavigationBarType.fixed,
+              items: <BottomNavigationBarItem>[
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                      (userRole != 'Pengguna') ? Icons.motorcycle : Icons.map),
+                  label: (userRole != 'Pengguna') ? 'Titipan' : 'Spots',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.remove),
+                  label: 'Pindai',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.notifications_outlined),
+                  label: 'Inbox',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.grid_view_outlined),
+                  label: 'Atur',
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              selectedFontSize: 12,
+              unselectedItemColor: Colors.grey[700],
+              selectedItemColor: Colors.blue[500],
+              onTap: _onItemTapped,
             ),
-          )
-        ],
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //   // shape: FloatingActionButtonSh,
-      //   onPressed: _onScanTapped,
-      //   child: const Icon(Icons.fit_screen_outlined),
-      // ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: SafeArea(
-        child: BottomAppBar(
-          elevation: 0,
-          color: Colors.transparent,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          shape: const CircularNotchedRectangle(),
-          child: BottomNavigationBar(
-            enableFeedback: false,
-            type: BottomNavigationBarType.fixed,
-            items: <BottomNavigationBarItem>[
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                    (userRole != 'Pengguna') ? Icons.motorcycle : Icons.map),
-                label: (userRole != 'Pengguna') ? 'Titipan' : 'Spots',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.remove),
-                label: 'Pindai',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.notifications_outlined),
-                label: 'Inbox',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.grid_view_outlined),
-                label: 'Atur',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedFontSize: 12,
-            unselectedItemColor: Colors.grey[700],
-            selectedItemColor: Colors.blue[500],
-            onTap: _onItemTapped,
           ),
         ),
       ),

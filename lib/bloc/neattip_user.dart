@@ -25,9 +25,9 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     final currentUser = _sharedPreferences.getString('currentUser');
 
     try {
-      _firebaseUser
-          ?.reload()
-          .onError((error, stackTrace) => throw error.toString());
+      // _firebaseUser
+      //     ?.reload()
+      //     .onError((error, stackTrace) => throw error.toString());
       // log('currentUser $currentUser');
 
       // if (_firebaseUser != null) {

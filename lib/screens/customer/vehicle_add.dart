@@ -137,7 +137,7 @@ class VehicleAddState extends State<VehicleAdd> {
           model: vehicleFieldControllers['Model *']!.text);
       // log('message ${vehicleListCubit.state}');
       log('success');
-      await Navigator.pushNamed(context, '/loading', arguments: () async {
+      await Navigator.pushNamed(context, '/state_loading', arguments: () async {
         await vehicleListCubit.addVehicle(newVehicle);
         // await vehicleListCubit.add();
         log('hereeeeee');

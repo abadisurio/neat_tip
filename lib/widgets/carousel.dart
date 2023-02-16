@@ -23,17 +23,18 @@ class _CarouselState extends State<Carousel> {
             scrollDirection: Axis.vertical,
             enlargeCenterPage: true,
           ),
-          items: [1, 2, 3, 4, 5].map((i) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                'https://images.squarespace-cdn.com/content/v1/53fe73e3e4b051bac9406675/1517605854354-3H036ZYJ7E22GKDR24JV/Spotify+Ad+1.png',
-                // 'https://source.unsplash.com/random/360x640',
-                height: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            );
-          }).toList(),
+          items: [],
+          // items: [1, 2, 3, 4, 5].map((i) {
+          //   return ClipRRect(
+          //     borderRadius: BorderRadius.circular(12),
+          //     child: Image.network(
+          //       'https://images.squarespace-cdn.com/content/v1/53fe73e3e4b051bac9406675/1517605854354-3H036ZYJ7E22GKDR24JV/Spotify+Ad+1.png',
+          //       // 'https://source.unsplash.com/random/360x640',
+          //       height: double.infinity,
+          //       fit: BoxFit.cover,
+          //     ),
+          //   );
+          // }).toList(),
         ),
       ),
     );
