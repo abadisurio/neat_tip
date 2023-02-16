@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
@@ -12,17 +13,18 @@ import 'package:path_provider/path_provider.dart';
 class VehicleListCubit extends Cubit<List<Vehicle>> {
   List<Vehicle> _dbList = [];
   late NeatTipDatabase _db;
-  late FirebaseFirestore firestore;
+  late FirebaseFirestore _firestore;
   late FirebaseStorage firebaseStorage;
-  // late String userId;
+  late String _userId;
   VehicleListCubit() : super([]);
   get collection => state;
   get length => state.length;
 
   void initializeDB(NeatTipDatabase db) {
-    firestore = FirebaseFirestore.instance;
+    _firestore = FirebaseFirestore.instance;
+    _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     firebaseStorage = FirebaseStorage.instance;
-    // userId = FirebaseAuth.instance.currentUser!.uid;
+    _pullDataFirestore();
     _db = db;
   }
 
@@ -61,7 +63,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
       final Vehicle vehicleData = Function.apply(
           Vehicle.new, [], {...oldInfo, #imgSrcPhotos: uploadedPhotoUrls});
       log("vehicles/${vehicleData.ownerId}");
-      await firestore
+      await _firestore
           .collection("vehicles")
           .doc(vehicleData.ownerId)
           .set({vehicleData.id: vehicleData.toJson()}).then((value) {
@@ -76,7 +78,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> removeDataFromFirestore(Vehicle vehicle) async {
     log('vehicle ${vehicle.id}');
     try {
-      await firestore
+      await _firestore
           .collection("vehicles/${vehicle.ownerId}")
           .where("id", isEqualTo: vehicle.id)
           .get()
@@ -109,6 +111,26 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _dbList = dataDB;
     emit(dataDB);
     // log('tarikMang $state');
+  }
+
+  Future<void> _pullDataFirestore() async {
+    // String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    try {
+      final DocumentSnapshot doc =
+          await _firestore.collection("vehicles").doc(_userId).get();
+      final data =
+          // doc.data() as Map;
+          (doc.data() as Map)
+              .entries
+              .map((e) => Vehicle.fromJson(e.value))
+              .toList();
+      _dbList = data;
+      emit(data);
+      // log('data ${data[0].brand}');
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
   }
 
   void setList(List<Vehicle> list) {
