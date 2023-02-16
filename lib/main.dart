@@ -52,9 +52,9 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> initializeComponents() async {
     // log('panggil');
+    await appStateCubit.initialize();
     await initializeDateFormatting('id_ID', null);
     await AppFirebase.initializeFirebase();
-    await appStateCubit.initialize();
     await neatTipUserCubit.initialize();
     // await neatTipUserCubit.signOut();
 

@@ -38,7 +38,9 @@ class _StateLoadingState extends State<StateLoading>
   Widget build(BuildContext context) {
     argument = ModalRoute.of(context)!.settings.arguments as Function? ?? () {};
     return WillPopScope(
-        onWillPop: () async => true,
+        onWillPop: () async {
+          return isFinished;
+        },
         child: Center(
           child: AnimatedSwitcher(
             transitionBuilder: (Widget child, Animation<double> animation) {
