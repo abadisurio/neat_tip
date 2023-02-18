@@ -79,6 +79,7 @@ class VehicleAddState extends State<VehicleAdd> {
     });
     if (cameraController != null) {
       final photo = await cameraController!.takePicture();
+      log('photo ${photo.path}');
       setState(() {
         // imgSrcPhotos.add(photo.name);
         _imgFilePhotos.add(photo);
@@ -122,13 +123,13 @@ class VehicleAddState extends State<VehicleAdd> {
       // log('${element.path}');
       imgSrcNames += element.name;
     }
+    log('imgSrcNames $imgSrcNames');
     // if (imgSrcNames == '') return;
     if (_formKey.currentState!.validate()) {
       FocusManager.instance.primaryFocus?.unfocus();
       final newVehicle = Vehicle(
           ownerName: vehicleFieldControllers['Nama Pemilik *']!.text,
           createdAt: DateTime.now().toString(),
-          id: (BlocProvider.of<VehicleListCubit>(context).length).toString(),
           ownerId: context.read<NeatTipUserCubit>().state!.id,
           imgSrcPhotos: imgSrcNames,
           plate: vehicleFieldControllers['Plat Nomor *']!.text,

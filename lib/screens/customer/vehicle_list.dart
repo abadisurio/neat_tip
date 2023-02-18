@@ -133,6 +133,7 @@ class VehicleItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firstName = vehicle.imgSrcPhotos.split(',').first;
+    log('firstName $firstName');
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -157,8 +158,7 @@ class VehicleItem extends StatelessWidget {
                       ),
                       if (firstName != '')
                         FutureBuilder(future: () async {
-                          final appDir =
-                              await getApplicationDocumentsDirectory();
+                          final appDir = await getTemporaryDirectory();
                           log('${appDir.path}/$firstName');
                           return File(
                               '${appDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$firstName');

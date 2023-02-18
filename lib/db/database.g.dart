@@ -130,7 +130,6 @@ class _$VehicleDao extends VehicleDao {
             database,
             'Vehicle',
             (Vehicle item) => <String, Object?>{
-                  'id': item.id,
                   'createdAt': item.createdAt,
                   'ownerId': item.ownerId,
                   'plate': item.plate,
@@ -146,7 +145,6 @@ class _$VehicleDao extends VehicleDao {
             'Vehicle',
             ['id'],
             (Vehicle item) => <String, Object?>{
-                  'id': item.id,
                   'createdAt': item.createdAt,
                   'ownerId': item.ownerId,
                   'plate': item.plate,
@@ -173,7 +171,6 @@ class _$VehicleDao extends VehicleDao {
     return _queryAdapter.queryList('SELECT * FROM Vehicle',
         mapper: (Map<String, Object?> row) => Vehicle(
             createdAt: row['createdAt'] as String,
-            id: row['id'] as String,
             ownerId: row['ownerId'] as String,
             plate: row['plate'] as String,
             brand: row['brand'] as String,
@@ -183,23 +180,22 @@ class _$VehicleDao extends VehicleDao {
             wheel: row['wheel'] as int));
   }
 
-  @override
-  Stream<Vehicle?> findVehicleById(int id) {
-    return _queryAdapter.queryStream('SELECT * FROM Vehicle WHERE id = ?1',
-        mapper: (Map<String, Object?> row) => Vehicle(
-            createdAt: row['createdAt'] as String,
-            id: row['id'] as String,
-            ownerId: row['ownerId'] as String,
-            plate: row['plate'] as String,
-            brand: row['brand'] as String,
-            model: row['model'] as String,
-            ownerName: row['ownerName'] as String,
-            imgSrcPhotos: row['imgSrcPhotos'] as String,
-            wheel: row['wheel'] as int),
-        arguments: [id],
-        queryableName: 'Vehicle',
-        isView: false);
-  }
+  // @override
+  // Stream<Vehicle?> findVehicleById(int id) {
+  //   return _queryAdapter.queryStream('SELECT * FROM Vehicle WHERE id = ?1',
+  //       mapper: (Map<String, Object?> row) => Vehicle(
+  //           createdAt: row['createdAt'] as String,
+  //           ownerId: row['ownerId'] as String,
+  //           plate: row['plate'] as String,
+  //           brand: row['brand'] as String,
+  //           model: row['model'] as String,
+  //           ownerName: row['ownerName'] as String,
+  //           imgSrcPhotos: row['imgSrcPhotos'] as String,
+  //           wheel: row['wheel'] as int),
+  //       arguments: [id],
+  //       queryableName: 'Vehicle',
+  //       isView: false);
+  // }
 
   @override
   Future<void> insertVehicle(Vehicle vehicle) async {

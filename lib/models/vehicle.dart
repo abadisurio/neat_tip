@@ -3,11 +3,9 @@ import 'package:floor/floor.dart';
 @entity
 class Vehicle {
   @primaryKey
-  late String id;
-
+  late String plate;
   late String createdAt;
   late String ownerId;
-  late String plate;
   late String brand;
   late String model;
   late String ownerName;
@@ -16,7 +14,6 @@ class Vehicle {
 
   Vehicle({
     required this.createdAt,
-    required this.id,
     required this.ownerId,
     required this.plate,
     required this.brand,
@@ -28,7 +25,6 @@ class Vehicle {
 
   Vehicle.fromJson(Map<String, dynamic> json) {
     createdAt = json['createdAt'];
-    id = json['id'];
     ownerId = json['ownerId'];
     ownerName = json['ownerName'];
     plate = json['plate'];
@@ -40,7 +36,6 @@ class Vehicle {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
     data['createdAt'] = createdAt;
     data['ownerId'] = ownerId;
     data['ownerName'] = ownerName;

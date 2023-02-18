@@ -8,8 +8,8 @@ abstract class VehicleDao {
   @Query('SELECT * FROM Vehicle')
   Future<List<Vehicle>> findAllVehicle();
 
-  @Query('SELECT * FROM Vehicle WHERE id = :id')
-  Stream<Vehicle?> findVehicleById(int id);
+  // @Query('SELECT * FROM Vehicle WHERE id = :id')
+  // Stream<Vehicle?> findVehicleById(int id);
 
   @insert
   Future<void> insertVehicle(Vehicle vehicle);

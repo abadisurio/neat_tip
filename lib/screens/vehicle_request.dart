@@ -44,6 +44,9 @@ class _VehicleRequestState extends State<VehicleRequest> {
     setState(() {
       _isRequesting = false;
     });
+    if (mounted) {
+      Navigator.pop(context);
+    }
     // addDataToDB
   }
 

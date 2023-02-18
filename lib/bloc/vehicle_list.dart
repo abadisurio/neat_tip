@@ -78,43 +78,37 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
 
   Future<void> _addDataToFirestore(Vehicle vehicle) async {
     await _checkConnection();
-    Directory tempDir = await getApplicationDocumentsDirectory();
+    Directory tempDir = await getTemporaryDirectory();
     try {
       // log('vehicle $vehicle');
-      String uploadedPhotoUrls = '';
       for (var photoName in vehicle.imgSrcPhotos.split(',')) {
+        log('photoName $photoName');
         if (photoName != '') {
-          log('photoName $photoName');
           final filePhoto = File(
               '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName');
           log('filePhoto $filePhoto');
           final storageRef =
               _firebaseStorage.ref("vehicles/${vehicle.plate}/$photoName");
           await storageRef.putFile(filePhoto);
-          final photoUrl = await storageRef.getDownloadURL();
-          if (uploadedPhotoUrls != '') {
-            uploadedPhotoUrls += ',';
-          }
-          uploadedPhotoUrls += photoUrl;
         }
       }
       // log('uploadedPhotoUrls $uploadedPhotoUrls');
-      final oldInfo =
-          vehicle.toJson().map((key, value) => MapEntry(Symbol(key), value));
-      final Vehicle vehicleData = Function.apply(
-          Vehicle.new, [], {...oldInfo, #imgSrcPhotos: uploadedPhotoUrls});
-      log("vehicles/${vehicleData.ownerId}");
+      // final oldInfo =
+      //     vehicle.toJson().map((key, value) => MapEntry(Symbol(key), value));
+      // final Vehicle vehicleData = Function.apply(
+      //     Vehicle.new, [], {...oldInfo, #imgSrcPhotos: uploadedPhotoUrls});
+      log("vehicles/${vehicle.ownerId}");
       await _firestore
           .collection("vehicles")
-          .doc(vehicleData.plate)
-          .set(vehicleData.toJson())
+          .doc(vehicle.plate)
+          .set(vehicle.toJson())
           .then((value) {
         // log('DocumentSnapshot added with ID ${value.id}');
       });
       await _firestore
           .collection("userVehicles")
           .doc(_userId)
-          .update({"plates": state.map((e) => e.plate).toList()}).then((value) {
+          .set({"plates": state.map((e) => e.plate).toList()}).then((value) {
         // .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
         // log('DocumentSnapshot added with ID ${value.id}');
       });
@@ -240,6 +234,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   }
 
   Future<List<Vehicle>> _pullDataFirestore() async {
+    Directory tempDir = await getTemporaryDirectory();
     try {
       final DocumentSnapshot snapshot =
           await _firestore.collection("userVehicles").doc(_userId).get();
@@ -248,14 +243,38 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
       final List<Vehicle> vehicleList = [];
       if (plates != null) {
         for (var element in (plates["plates"] as List)) {
-          final DocumentSnapshot vehicleData = await _firestore
+          final DocumentSnapshot vehicleSnapshot = await _firestore
               .collection("vehicles")
               .doc((element as String))
               .get();
           // log('vehicleData ${vehicleData.data()}');
-          final vehicle = vehicleData.data() as Map<String, dynamic>?;
-          if (vehicle != null) {
-            vehicleList.add(Vehicle.fromJson((vehicle)));
+          final vehicleData = vehicleSnapshot.data() as Map<String, dynamic>?;
+          if (vehicleData != null) {
+            final vehicle = Vehicle.fromJson(vehicleData);
+            // String imgSrcPhotos = '';
+
+            for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
+              // log('photoName $photoName');
+              if (photoName != '') {
+                final filePhoto = await File(
+                        '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName')
+                    .create();
+                log('filePhoto $filePhoto');
+                final storageRef = _firebaseStorage
+                    .ref("vehicles/${vehicle.plate}/$photoName");
+                log('message $storageRef');
+                final imageBytes = await storageRef.getData();
+                if (imageBytes != null) {
+                  filePhoto.writeAsBytes(imageBytes.toList());
+                }
+                // final photoUrl = await storageRef.getDownloadURL();
+              }
+            }
+
+            // var myFile = File('${dir.path}/${vehicle['imgSrcPhotos']}');
+            log('vehicle $vehicle');
+
+            vehicleList.add(vehicle);
           }
         }
         _dbList = vehicleList;
@@ -273,18 +292,18 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
 
   Future<void> _pushDataFirestore() async {
     // String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final Map<String, dynamic> mappedList = {
-      for (var e in _dbList) e.id: e.toJson()
-    };
-    log('mappedList $mappedList');
-    try {
-      await _firestore.collection("vehicles").doc(_userId).set(mappedList);
-      // emit(data);
-      // log('data ${data[0].brand}');
-    } catch (e) {
-      // log('eee $e');
-      throw Exception(e);
-    }
+    // final Map<String, dynamic> mappedList = {
+    //   for (var e in _dbList) e.id: e.toJson()
+    // };
+    // log('mappedList $mappedList');
+    // try {
+    //   await _firestore.collection("vehicles").doc(_userId).set(mappedList);
+    //   // emit(data);
+    //   // log('data ${data[0].brand}');
+    // } catch (e) {
+    //   // log('eee $e');
+    //   throw Exception(e);
+    // }
   }
 
   Vehicle findByIndex(int index) {
@@ -312,11 +331,11 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     emit([...state]);
   }
 
-  void updateById(String id, Vehicle newVehicle) {
-    final listIndex = state.indexWhere((Vehicle vehicle) => vehicle.id == id);
-    state[listIndex] = newVehicle;
-    emit([...state]);
-  }
+  // void updateById(String id, Vehicle newVehicle) {
+  //   final listIndex = state.indexWhere((Vehicle vehicle) => vehicle.id == id);
+  //   state[listIndex] = newVehicle;
+  //   emit([...state]);
+  // }
 
   Future<void> addVehicle(Vehicle vehicle) async {
     _dbList = [..._dbList, vehicle];
