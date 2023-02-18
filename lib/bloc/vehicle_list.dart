@@ -29,18 +29,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     _firebaseStorage = FirebaseStorage.instance;
     _db = localDB;
-    final connectivityResult = await (Connectivity().checkConnectivity());
-    if (_userId != '') {
-      if (connectivityResult == ConnectivityResult.none) {
-        final dataLocalDB = await _pullDataFromDB();
-        log('dataLocalDB $dataLocalDB');
-        // final dataFirestore = await _pullDataFirestore();
-        _syncDataAndEmit(dataLocalDB, []);
-      } else {
-        final dataFirestore = await _pullDataFirestore();
-        _syncDataAndEmit([], dataFirestore);
-      }
-    }
+    if (_userId != '') _load();
     // if (connectivityResult != ConnectivityResult.none) {
     //   // I am connected to a mobile network.
     // }
@@ -51,9 +40,22 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     emit([...dataLocalDB, ...dataFirestore]);
   }
 
-  void reloadOnline() async {
-    await _pushDataFirestore();
-    // await _pullDataFirestore();
+  Future<void> _load() async {
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      final dataLocalDB = await _pullDataFromDB();
+      log('dataLocalDB $dataLocalDB');
+      // final dataFirestore = await _pullDataFirestore();
+      _syncDataAndEmit(dataLocalDB, []);
+    } else {
+      final dataFirestore = await _pullDataFirestore();
+      _syncDataAndEmit([], dataFirestore);
+    }
+  }
+
+  Future<void> reload() async {
+    _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    await _load();
   }
 
   void end() async {

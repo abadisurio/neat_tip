@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:neat_tip/bloc/vehicle_list.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Introduction extends StatefulWidget {
   const Introduction({super.key});
@@ -13,12 +15,16 @@ class Introduction extends StatefulWidget {
 class _IntroductionState extends State<Introduction> {
   double _maxPage = 0;
   int _pageIndex = 0;
+  int _vehicleLength = 0;
+  late VehicleListCubit _vehicleListCubit;
 
   navigateToAuthPage() async {
     final isLoggedIn = await Navigator.pushNamed(context, '/auth') as bool;
     log('isLoggedIn $isLoggedIn');
     if (isLoggedIn && mounted) {
+      await _vehicleListCubit.reload();
       setState(() {
+        _vehicleLength = _vehicleListCubit.state.length;
         _maxPage += 1;
       });
     }
@@ -59,6 +65,14 @@ class _IntroductionState extends State<Introduction> {
   }
 
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _vehicleListCubit = context.read<VehicleListCubit>();
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // log('_isVehicleAdded $_isVehicleAdded');
     // log('_isLoggedIn $_isLoggedIn');
@@ -77,6 +91,7 @@ class _IntroductionState extends State<Introduction> {
                     child: const Text('Masuk'),
                   ),
           ),
+          // if (_vehicleLength < 1)
           Center(
             child: _pageIndex <= _maxPage
                 ? null
@@ -86,7 +101,7 @@ class _IntroductionState extends State<Introduction> {
                   ),
           ),
           Center(
-            child: _pageIndex <= _maxPage
+            child: (_pageIndex <= _maxPage && _vehicleLength < 1)
                 ? null
                 : ElevatedButton(
                     onPressed: navigateToAddVehiclePage,
