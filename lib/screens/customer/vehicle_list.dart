@@ -76,49 +76,54 @@ class VehicleList extends StatelessWidget {
               )
             ],
           ),
-          body: SafeArea(child: () {
-            // if (vehicleList == null) {
-            //   return const Center(
-            //     child: CircularProgressIndicator(),
-            //   );
-            // } else
-            if (vehicleList.isEmpty) {
-              return const Center(
-                child: Text(
-                    'Kamu belum menambahkan kendaraanmu.\nTambahkan sekarang, yuk!'),
-              );
-            } else {
-              return ListView.builder(
-                itemCount: vehicleList.length,
-                itemBuilder: (context, index) {
-                  return PeekAndPopable(
-                      // removeByIndex
-                      actions: [
-                        {
-                          "name": "Hapus",
-                          "icon": Icons.delete,
-                          "color": Colors.red,
-                          "onTap": () => removeItem(vehicleList[index])
-                        },
-                        // {
-                        //   "name": "Ubah",
-                        //   "icon": Icons.edit,
-                        //   "color": Colors.white,
-                        //   "onTap": () {}
-                        // },
-                      ],
-                      peekPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 300),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: VehicleItem(
-                          vehicle: vehicleList[index],
-                        ),
-                      ));
-                },
-              );
-            }
-          }()));
+          body: RefreshIndicator(
+            onRefresh: () async {
+              await context.read<VehicleListCubit>().reload();
+            },
+            child: SafeArea(child: () {
+              // if (vehicleList == null) {
+              //   return const Center(
+              //     child: CircularProgressIndicator(),
+              //   );
+              // } else
+              if (vehicleList.isEmpty) {
+                return const Center(
+                  child: Text(
+                      'Kamu belum menambahkan kendaraanmu.\nTambahkan sekarang, yuk!'),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: vehicleList.length,
+                  itemBuilder: (context, index) {
+                    return PeekAndPopable(
+                        // removeByIndex
+                        actions: [
+                          {
+                            "name": "Hapus",
+                            "icon": Icons.delete,
+                            "color": Colors.red,
+                            "onTap": () => removeItem(vehicleList[index])
+                          },
+                          // {
+                          //   "name": "Ubah",
+                          //   "icon": Icons.edit,
+                          //   "color": Colors.white,
+                          //   "onTap": () {}
+                          // },
+                        ],
+                        peekPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 300),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: VehicleItem(
+                            vehicle: vehicleList[index],
+                          ),
+                        ));
+                  },
+                );
+              }
+            }()),
+          ));
     });
   }
 }
