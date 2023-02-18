@@ -2,6 +2,7 @@
 import 'dart:developer';
 import 'dart:io';
 // import 'package:camera/camera.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
@@ -16,13 +17,18 @@ class VehicleList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final navigator = Navigator.of(context);
-    checkPlate() {
-      showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return const DialogFindPlate();
-        },
-      );
+    checkPlate() async {
+      if (await Connectivity().checkConnectivity() != ConnectivityResult.none) {
+        showDialog<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return const DialogFindPlate();
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Hubungkan internet terlebih dahulu!')));
+      }
     }
 
     removeItem(Vehicle vehicle) async {
@@ -30,9 +36,14 @@ class VehicleList extends StatelessWidget {
       Future.delayed(peekDuration, () async {
         await Navigator.pushNamed(context, '/state_loading',
             arguments: () async {
-          await context.read<VehicleListCubit>().removeVehicle(vehicle);
-          // await vehicleListCubit.add();
-          log('hereeeeee');
+          try {
+            await context.read<VehicleListCubit>().removeVehicle(vehicle);
+            // await vehicleListCubit.add();
+            log('hereeeeee');
+          } catch (e) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('Gagal: $e')));
+          }
         });
       });
     }

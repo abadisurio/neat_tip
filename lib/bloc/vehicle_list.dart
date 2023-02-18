@@ -3,6 +3,7 @@ import 'dart:io';
 // import 'dart:js_util';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 // import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -28,14 +29,26 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     _firebaseStorage = FirebaseStorage.instance;
     _db = localDB;
-    // final connectivityResult = await (Connectivity().checkConnectivity());
+    final connectivityResult = await (Connectivity().checkConnectivity());
     if (_userId != '') {
-      // await _pullDataFirestore();
-      await _pullDataFromDB();
+      if (connectivityResult == ConnectivityResult.none) {
+        final dataLocalDB = await _pullDataFromDB();
+        log('dataLocalDB $dataLocalDB');
+        // final dataFirestore = await _pullDataFirestore();
+        _syncDataAndEmit(dataLocalDB, []);
+      } else {
+        final dataFirestore = await _pullDataFirestore();
+        _syncDataAndEmit([], dataFirestore);
+      }
     }
     // if (connectivityResult != ConnectivityResult.none) {
     //   // I am connected to a mobile network.
     // }
+  }
+
+  void _syncDataAndEmit(
+      List<Vehicle> dataLocalDB, List<Vehicle> dataFirestore) {
+    emit([...dataLocalDB, ...dataFirestore]);
   }
 
   void reloadOnline() async {
@@ -56,7 +69,15 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     await _db.vehicleDao.removeVehicle(vehicle);
   }
 
+  _checkConnection() async {
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      throw 'User must connected to internet!';
+    }
+  }
+
   Future<void> _addDataToFirestore(Vehicle vehicle) async {
+    await _checkConnection();
     Directory tempDir = await getApplicationDocumentsDirectory();
     try {
       // log('vehicle $vehicle');
@@ -209,15 +230,16 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   //   }
   // }
 
-  Future<void> _pullDataFromDB() async {
+  Future<List<Vehicle>> _pullDataFromDB() async {
     final dataDB = await _db.vehicleDao.findAllVehicle();
     _dbList = dataDB;
-    emit(dataDB);
+    // emit(dataDB);
+    return dataDB;
     // emit([...state, ...dataDB]);
     // log('tarikMang $state');
   }
 
-  Future<void> _pullDataFirestore() async {
+  Future<List<Vehicle>> _pullDataFirestore() async {
     try {
       final DocumentSnapshot snapshot =
           await _firestore.collection("userVehicles").doc(_userId).get();
@@ -239,8 +261,9 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
         _dbList = vehicleList;
         log('vehicleList $vehicleList');
         // emit([...state, ...vehicleList]);
-        emit(vehicleList);
+        // emit(vehicleList);
       }
+      return vehicleList;
       // log('data ${data[0].brand}');
     } catch (e) {
       // log('eee $e');
@@ -277,6 +300,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   }
 
   Future<void> removeVehicle(Vehicle vehicle) async {
+    await _checkConnection();
     final newList = state.where((element) => element != vehicle).toList();
     await removeDataFromDB(vehicle);
     emit([...newList]);
