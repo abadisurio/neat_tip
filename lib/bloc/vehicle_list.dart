@@ -168,6 +168,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
       if (data != null) {
         final newVehicle = Vehicle.fromJson(data);
         await addVehicle(newVehicle);
+        await _downloadImages(newVehicle);
         updateUserVehicles();
       }
       // deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
@@ -236,7 +237,6 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   }
 
   Future<List<Vehicle>> _pullDataFirestore() async {
-    Directory tempDir = await getTemporaryDirectory();
     try {
       final DocumentSnapshot snapshot =
           await _firestore.collection("userVehicles").doc(_userId).get();
@@ -254,24 +254,24 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
           if (vehicleData != null) {
             final vehicle = Vehicle.fromJson(vehicleData);
             // String imgSrcPhotos = '';
-
-            for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
-              // log('photoName $photoName');
-              if (photoName != '') {
-                final filePhoto = await File(
-                        '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName')
-                    .create();
-                log('filePhoto $filePhoto');
-                final storageRef = _firebaseStorage
-                    .ref("vehicles/${vehicle.plate}/$photoName");
-                log('message $storageRef');
-                final imageBytes = await storageRef.getData();
-                if (imageBytes != null) {
-                  filePhoto.writeAsBytes(imageBytes.toList());
-                }
-                // final photoUrl = await storageRef.getDownloadURL();
-              }
-            }
+            await _downloadImages(vehicle);
+            // for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
+            //   // log('photoName $photoName');
+            //   if (photoName != '') {
+            //     final filePhoto = await File(
+            //             '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName')
+            //         .create();
+            //     log('filePhoto $filePhoto');
+            //     final storageRef = _firebaseStorage
+            //         .ref("vehicles/${vehicle.plate}/$photoName");
+            //     log('message $storageRef');
+            //     final imageBytes = await storageRef.getData();
+            //     if (imageBytes != null) {
+            //       filePhoto.writeAsBytes(imageBytes.toList());
+            //     }
+            //     // final photoUrl = await storageRef.getDownloadURL();
+            //   }
+            // }
 
             // var myFile = File('${dir.path}/${vehicle['imgSrcPhotos']}');
             log('vehicle $vehicle');
@@ -289,6 +289,27 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     } catch (e) {
       // log('eee $e');
       throw Exception(e);
+    }
+  }
+
+  Future<void> _downloadImages(Vehicle vehicle) async {
+    Directory tempDir = await getTemporaryDirectory();
+    for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
+      // log('photoName $photoName');
+      if (photoName != '') {
+        final filePhoto = await File(
+                '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName')
+            .create();
+        log('filePhoto $filePhoto');
+        final storageRef =
+            _firebaseStorage.ref("vehicles/${vehicle.plate}/$photoName");
+        log('message $storageRef');
+        final imageBytes = await storageRef.getData();
+        if (imageBytes != null) {
+          filePhoto.writeAsBytes(imageBytes.toList());
+        }
+        // final photoUrl = await storageRef.getDownloadURL();
+      }
     }
   }
 
