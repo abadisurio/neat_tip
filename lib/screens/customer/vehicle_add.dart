@@ -150,6 +150,8 @@ class VehicleAddState extends State<VehicleAdd> {
 
   @override
   Widget build(BuildContext context) {
+    final String argument =
+        ModalRoute.of(context)!.settings.arguments as String? ?? '';
     return WillPopScope(
       onWillPop: () {
         return Future.value(true);
@@ -332,7 +334,11 @@ class VehicleAddState extends State<VehicleAdd> {
                       ),
                       ...vehicleFields.map((e) {
                         final controller = vehicleFieldControllers.putIfAbsent(
-                            e['fieldname'], () => TextEditingController());
+                            e['fieldname'],
+                            () => TextEditingController(
+                                text: e['fieldname'] == 'Plat Nomor *'
+                                    ? argument
+                                    : null));
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: TextFormField(

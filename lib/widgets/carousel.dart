@@ -23,7 +23,7 @@ class _CarouselState extends State<Carousel> {
             scrollDirection: Axis.vertical,
             enlargeCenterPage: true,
           ),
-          items: [],
+          items: const [],
           // items: [1, 2, 3, 4, 5].map((i) {
           //   return ClipRRect(
           //     borderRadius: BorderRadius.circular(12),

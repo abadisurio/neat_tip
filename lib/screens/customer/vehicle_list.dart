@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_print
 import 'dart:developer';
 import 'dart:io';
+// import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/screens/dialog_find_plate.dart';
 import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -13,7 +15,16 @@ class VehicleList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navigator = Navigator.of(context);
+    // final navigator = Navigator.of(context);
+    checkPlate() {
+      showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return const DialogFindPlate();
+        },
+      );
+    }
+
     removeItem(Vehicle vehicle) async {
       await Navigator.maybePop(context);
       Future.delayed(peekDuration, () async {
@@ -37,9 +48,7 @@ class VehicleList extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
                   child: ElevatedButton(
-                      onPressed: () {
-                        navigator.pushNamed('/vehicleadd');
-                      },
+                      onPressed: checkPlate,
                       child: Row(
                         children: [
                           Icon(

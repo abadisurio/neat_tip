@@ -14,7 +14,7 @@ import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/neattip_user.dart';
-import 'package:neat_tip/screens/host/home_host.dart';
+// import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/loading_window.dart';

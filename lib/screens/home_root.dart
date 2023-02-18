@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
@@ -104,7 +104,7 @@ class _HomeRootState extends State<HomeRoot> {
                   onTap: () {
                     log('tapp');
                   },
-                  child: AspectRatio(
+                  child: const AspectRatio(
                     aspectRatio: 1,
                     // child: Image.network(
                     //   FirebaseAuth.instance.currentUser?.photoURL ??

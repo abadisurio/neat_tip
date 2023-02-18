@@ -1,14 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
+// import 'dart:js_util';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/vehicle.dart';
-import 'package:neat_tip/utils/firestore_delete_document.dart';
+// import 'package:neat_tip/utils/firestore_delete_document.dart';
 import 'package:path_provider/path_provider.dart';
 
 class VehicleListCubit extends Cubit<List<Vehicle>> {
@@ -27,12 +28,12 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     _firebaseStorage = FirebaseStorage.instance;
     _db = localDB;
-    final connectivityResult = await (Connectivity().checkConnectivity());
+    // final connectivityResult = await (Connectivity().checkConnectivity());
+    await _pullDataFirestore();
     await _pullDataFromDB();
-    if (connectivityResult != ConnectivityResult.none) {
-      // I am connected to a mobile network.
-      _pullDataFirestore();
-    }
+    // if (connectivityResult != ConnectivityResult.none) {
+    //   // I am connected to a mobile network.
+    // }
   }
 
   void reloadOnline() async {
@@ -64,8 +65,8 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
           final filePhoto = File(
               '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName');
           log('filePhoto $filePhoto');
-          final storageRef = _firebaseStorage
-              .ref("vehicles/${vehicle.ownerId}/${vehicle.id}/$photoName");
+          final storageRef =
+              _firebaseStorage.ref("vehicles/${vehicle.plate}/$photoName");
           await storageRef.putFile(filePhoto);
           final photoUrl = await storageRef.getDownloadURL();
           if (uploadedPhotoUrls != '') {
@@ -82,8 +83,14 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
       log("vehicles/${vehicleData.ownerId}");
       await _firestore
           .collection("vehicles")
-          .doc(vehicleData.ownerId)
-          .set({vehicleData.id: vehicleData.toJson()}).then((value) {
+          .doc(vehicleData.plate)
+          .set(vehicleData.toJson())
+          .then((value) {
+        // log('DocumentSnapshot added with ID ${value.id}');
+      });
+      await _firestore.collection("userVehicles").doc(_userId)
+          // .update({"plates": []}).then((value) {
+          .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
         // log('DocumentSnapshot added with ID ${value.id}');
       });
     } catch (e) {
@@ -92,24 +99,73 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     }
   }
 
-  Future<void> removeDataFromFirestore(Vehicle vehicle) async {
-    log('vehicle ${vehicle.id}');
+  // Future<void> _addUserVehicle(Vehicle vehicle) async {
+  //   Directory tempDir = await getApplicationDocumentsDirectory();
+  //   try {
+  //     await _firestore
+  //         .collection("userVehicles")
+  //         .doc(_userId)
+  //         .update({"plates": []}).then((value) {
+  //       // .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
+  //       // log('DocumentSnapshot added with ID ${value.id}');
+  //     });
+  //   } catch (e) {
+  //     // log('eee $e');
+  //     throw Exception(e);
+  //   }
+  // }
+
+  Future<bool> checkIsPlateExists(String plateNumber) async {
+    // log('vehicle ${state.remove(vehicle)}');
+    // state
+    //     .asMap()
+    //     .forEach((index, value) => ({index.toString(): value.toJson()}));
     try {
-      await _firestore
-          .collection("vehicles/${vehicle.ownerId}")
-          .where("id", isEqualTo: vehicle.id)
-          .get()
-          .then((snapshot) {
-        for (var element in snapshot.docs) {
-          element.reference.delete();
-        }
-      });
-      deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
+      final plate =
+          await _firestore.collection("vehicles").doc(plateNumber).get();
+      log('plate ${plate.exists} ');
+      return plate.exists;
+      // deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
     } catch (e) {
       // log('eee $e');
       throw Exception(e);
     }
   }
+
+  Future<void> updateUserVehicles(Vehicle vehicle) async {
+    log('vehicle ${state.remove(vehicle)}');
+    state
+        .asMap()
+        .forEach((index, value) => ({index.toString(): value.toJson()}));
+    try {
+      await _firestore
+          .collection("userVehicles")
+          .doc(_userId)
+          .update({'plates': state}).then((value) {
+        // log('DocumentSnapshot added with ID ${value.id}');
+      });
+      // deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+  }
+
+  // Future<void> updateUserVehicles(Vehicle vehicle) async {
+  //   log('vehicle ${vehicle.id}');
+  //   try {
+  //     await _firestore
+  //         .collection("userVehicles")
+  //         .doc(_userId)
+  //         .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
+  //       // log('DocumentSnapshot added with ID ${value.id}');
+  //     });
+  //     // deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
+  //   } catch (e) {
+  //     // log('eee $e');
+  //     throw Exception(e);
+  //   }
+  // }
   // Future<void> pushDataToDB() async {
   //   for (var vehicle in state) {
   //     await _db.vehicleDao.insertVehicle(vehicle);
@@ -133,17 +189,25 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> _pullDataFirestore() async {
     // String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     try {
-      final DocumentSnapshot doc =
-          await _firestore.collection("vehicles").doc(_userId).get();
-      final data =
-          // doc.data() as Map;
-          (doc.data() as Map)
-              .entries
-              .map((e) => Vehicle.fromJson(e.value))
-              .toList();
-      _dbList = data;
-      log('data $data');
-      emit(data);
+      final DocumentSnapshot snapshot =
+          await _firestore.collection("userVehicles").doc(_userId).get();
+      final plates = (snapshot.data() as Map)["plates"];
+      log('plates $plates');
+      final List<Vehicle> vehicleList = [];
+      for (var element in (plates as List)) {
+        final DocumentSnapshot vehicleData = await _firestore
+            .collection("vehicles")
+            .doc((element as String))
+            .get();
+        // log('vehicleData ${vehicleData.data()}');
+        final vehicle = vehicleData.data() as Map<String, dynamic>?;
+        if (vehicle != null) {
+          vehicleList.add(Vehicle.fromJson((vehicle)));
+        }
+      }
+      _dbList = vehicleList;
+      log('vehicleList $vehicleList');
+      emit(vehicleList);
       // log('data ${data[0].brand}');
     } catch (e) {
       // log('eee $e');
@@ -186,7 +250,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> removeVehicle(Vehicle vehicle) async {
     final newList = state.where((element) => element != vehicle).toList();
     await removeDataFromDB(vehicle);
-    removeDataFromFirestore(vehicle);
+    updateUserVehicles(vehicle);
     emit([...newList]);
   }
 
