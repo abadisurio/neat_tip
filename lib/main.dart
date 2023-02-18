@@ -125,52 +125,100 @@ class _MyAppState extends State<MyApp> {
                 BlocProvider<NeatTipUserCubit>(
                     create: (BuildContext context) => neatTipUserCubit),
               ],
-              child: Builder(builder: (context2) {
-                log('connection ${snapshot.connectionState == ConnectionState.done}');
-                log('darkmode ${context2.watch<AppStateCubit>().state.darkMode}');
-                return MaterialApp(
-                  themeMode: (context2.watch<AppStateCubit>().state.darkMode)
-                      ? ThemeMode.dark
-                      : ThemeMode.light,
-                  title: 'Neat Tip',
-                  navigatorObservers: [routeObserver],
-                  debugShowCheckedModeBanner: false,
-                  // darkTheme: ThemeData.dark(),
-                  theme: (context2.watch<AppStateCubit>().state.darkMode)
-                      ? getThemeDataDark()
-                      : getThemeData(),
-                  onGenerateRoute: routeGenerator,
-                  home: () {
-                    // FlutterNativeSplash.remove();
-                    // return LoadingWindow();
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      //  FlutterNativeSplash.remove();
-                      return const LoadingWindow();
-                    } else {
-                      FlutterNativeSplash.remove();
-                      if (user == null) {
-                        return const Introduction();
-                      } else if (!isNeedPermission) {
-                        return Builder(builder: (context) {
-                          return PermissionWindow(
-                            onAllowedAll: () {
-                              Navigator.pushNamedAndRemoveUntil(context, () {
-                                switch (user!.role) {
-                                  case 'host_owner':
-                                    return '/homehost';
-                                  default:
-                                    return '/homeroot';
-                                }
-                              }(), (route) => false);
-                            },
-                          );
-                        });
+              child: BlocBuilder<AppStateCubit, AppState>(
+                builder: (context, appState) {
+                  return MaterialApp(
+                    themeMode:
+                        (appState.darkMode) ? ThemeMode.dark : ThemeMode.light,
+                    title: 'Neat Tip',
+                    navigatorObservers: [routeObserver],
+                    debugShowCheckedModeBanner: false,
+                    // darkTheme: ThemeData.dark(),
+                    theme: (appState.darkMode)
+                        ? getThemeDataDark()
+                        : getThemeData(),
+                    onGenerateRoute: routeGenerator,
+                    home: () {
+                      // FlutterNativeSplash.remove();
+                      // return LoadingWindow();
+                      log('snapshot.connectionState ${snapshot.connectionState}');
+                      log('darkmode ${appState.darkMode}');
+                      if (snapshot.connectionState != ConnectionState.done) {
+                        //  FlutterNativeSplash.remove();
+                        return const LoadingWindow();
+                      } else {
+                        FlutterNativeSplash.remove();
+                        if (user == null) {
+                          return const Introduction();
+                        } else if (!isNeedPermission) {
+                          return Builder(builder: (context) {
+                            return PermissionWindow(
+                              onAllowedAll: () {
+                                Navigator.pushNamedAndRemoveUntil(context, () {
+                                  switch (user!.role) {
+                                    case 'host_owner':
+                                      return '/homehost';
+                                    default:
+                                      return '/homeroot';
+                                  }
+                                }(), (route) => false);
+                              },
+                            );
+                          });
+                        }
+                        return const HomeRoot();
                       }
-                      return const HomeRoot();
-                    }
-                  }(),
-                );
-              }));
+                    }(),
+                  );
+                },
+              )
+              // child: Builder(builder: (context2) {
+              //   log('connection ${snapshot.connectionState == ConnectionState.done}');
+              //   return MaterialApp(
+              //     themeMode: (context2.watch<AppStateCubit>().state.darkMode)
+              //         ? ThemeMode.dark
+              //         : ThemeMode.light,
+              //     title: 'Neat Tip',
+              //     navigatorObservers: [routeObserver],
+              //     debugShowCheckedModeBanner: false,
+              //     // darkTheme: ThemeData.dark(),
+              //     theme: (context2.watch<AppStateCubit>().state.darkMode)
+              //         ? getThemeDataDark()
+              //         : getThemeData(),
+              //     onGenerateRoute: routeGenerator,
+              //     home: () {
+              //       // FlutterNativeSplash.remove();
+              //       // return LoadingWindow();
+              //       log('darkmode ${context2.watch<AppStateCubit>().state.darkMode}');
+              //       if (snapshot.connectionState != ConnectionState.done) {
+              //         //  FlutterNativeSplash.remove();
+              //         return const LoadingWindow();
+              //       } else {
+              //         FlutterNativeSplash.remove();
+              //         if (user == null) {
+              //           return const Introduction();
+              //         } else if (!isNeedPermission) {
+              //           return Builder(builder: (context) {
+              //             return PermissionWindow(
+              //               onAllowedAll: () {
+              //                 Navigator.pushNamedAndRemoveUntil(context, () {
+              //                   switch (user!.role) {
+              //                     case 'host_owner':
+              //                       return '/homehost';
+              //                     default:
+              //                       return '/homeroot';
+              //                   }
+              //                 }(), (route) => false);
+              //               },
+              //             );
+              //           });
+              //         }
+              //         return const HomeRoot();
+              //       }
+              //     }(),
+              //   );
+              // })
+              );
         });
   }
 }
