@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/bloc/vehicle_list.dart';
 
 class VehicleRequest extends StatefulWidget {
   const VehicleRequest({super.key});
@@ -11,6 +13,7 @@ class VehicleRequest extends StatefulWidget {
 
 class _VehicleRequestState extends State<VehicleRequest> {
   String _plateNumber = '';
+  bool _isRequesting = false;
 
   @override
   void initState() {
@@ -31,8 +34,17 @@ class _VehicleRequestState extends State<VehicleRequest> {
     });
   }
 
-  _requestPairing() {
-    log('pairing');
+  _requestPairing() async {
+    final vehicleListCubit = context.read<VehicleListCubit>();
+    setState(() {
+      _isRequesting = true;
+    });
+    // await Future.delayed(const Duration(milliseconds: 1000));
+    await vehicleListCubit.addUserVehicles(_plateNumber);
+    setState(() {
+      _isRequesting = false;
+    });
+    // addDataToDB
   }
 
   @override
@@ -45,8 +57,12 @@ class _VehicleRequestState extends State<VehicleRequest> {
           Text(_plateNumber),
           const Text(
               'Kendaraan sudah ada. Minta pemilik untuk hubungkan dengan akun Anda'),
-          ElevatedButton(
-              onPressed: _requestPairing, child: const Text('Minta Hubungkan'))
+          if (_isRequesting)
+            const CircularProgressIndicator()
+          else
+            ElevatedButton(
+                onPressed: _requestPairing,
+                child: const Text('Minta Hubungkan'))
         ],
       ),
     );

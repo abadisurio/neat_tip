@@ -29,8 +29,10 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     _firebaseStorage = FirebaseStorage.instance;
     _db = localDB;
     // final connectivityResult = await (Connectivity().checkConnectivity());
-    await _pullDataFirestore();
-    await _pullDataFromDB();
+    if (_userId != '') {
+      // await _pullDataFirestore();
+      await _pullDataFromDB();
+    }
     // if (connectivityResult != ConnectivityResult.none) {
     //   // I am connected to a mobile network.
     // }
@@ -88,9 +90,11 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
           .then((value) {
         // log('DocumentSnapshot added with ID ${value.id}');
       });
-      await _firestore.collection("userVehicles").doc(_userId)
-          // .update({"plates": []}).then((value) {
-          .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
+      await _firestore
+          .collection("userVehicles")
+          .doc(_userId)
+          .update({"plates": state.map((e) => e.plate).toList()}).then((value) {
+        // .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
         // log('DocumentSnapshot added with ID ${value.id}');
       });
     } catch (e) {
@@ -132,16 +136,42 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     }
   }
 
-  Future<void> updateUserVehicles(Vehicle vehicle) async {
-    log('vehicle ${state.remove(vehicle)}');
-    state
-        .asMap()
-        .forEach((index, value) => ({index.toString(): value.toJson()}));
+  bool checkIsPlateAdded(String plateNumber) {
+    // log('vehicleExiststs ${state.where((element) => element.id == plateNumber).isNotEmpty}');
+    log('state ${state.map((e) => e.plate)}');
+    return state.where((element) => element.plate == plateNumber).isNotEmpty;
+  }
+
+  Future<void> addUserVehicles(String plateNumber) async {
+    try {
+      final plate =
+          await _firestore.collection("vehicles").doc(plateNumber).get();
+      // log('plate ${plate.exists} ');
+      final Map<String, dynamic>? data = plate.data();
+      if (data != null) {
+        final newVehicle = Vehicle.fromJson(data);
+        await addVehicle(newVehicle);
+        updateUserVehicles();
+      }
+      // deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<void> updateUserVehicles() async {
+    log('vehicleList $state');
+    final newUserVehicles = state.map((e) => e.plate).toList();
+    log('vehicleList $newUserVehicles');
+    // state
+    //     .asMap()
+    //     .forEach((index, value) => ({index.toString(): value.toJson()}));
     try {
       await _firestore
           .collection("userVehicles")
           .doc(_userId)
-          .update({'plates': state}).then((value) {
+          .set({'plates': newUserVehicles}).then((value) {
         // log('DocumentSnapshot added with ID ${value.id}');
       });
       // deleteFolder("vehicles/${vehicle.ownerId}/${vehicle.id}");
@@ -183,31 +213,34 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     final dataDB = await _db.vehicleDao.findAllVehicle();
     _dbList = dataDB;
     emit(dataDB);
+    // emit([...state, ...dataDB]);
     // log('tarikMang $state');
   }
 
   Future<void> _pullDataFirestore() async {
-    // String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     try {
       final DocumentSnapshot snapshot =
           await _firestore.collection("userVehicles").doc(_userId).get();
-      final plates = (snapshot.data() as Map)["plates"];
+      final plates = snapshot.data() as Map?;
       log('plates $plates');
       final List<Vehicle> vehicleList = [];
-      for (var element in (plates as List)) {
-        final DocumentSnapshot vehicleData = await _firestore
-            .collection("vehicles")
-            .doc((element as String))
-            .get();
-        // log('vehicleData ${vehicleData.data()}');
-        final vehicle = vehicleData.data() as Map<String, dynamic>?;
-        if (vehicle != null) {
-          vehicleList.add(Vehicle.fromJson((vehicle)));
+      if (plates != null) {
+        for (var element in (plates["plates"] as List)) {
+          final DocumentSnapshot vehicleData = await _firestore
+              .collection("vehicles")
+              .doc((element as String))
+              .get();
+          // log('vehicleData ${vehicleData.data()}');
+          final vehicle = vehicleData.data() as Map<String, dynamic>?;
+          if (vehicle != null) {
+            vehicleList.add(Vehicle.fromJson((vehicle)));
+          }
         }
+        _dbList = vehicleList;
+        log('vehicleList $vehicleList');
+        // emit([...state, ...vehicleList]);
+        emit(vehicleList);
       }
-      _dbList = vehicleList;
-      log('vehicleList $vehicleList');
-      emit(vehicleList);
       // log('data ${data[0].brand}');
     } catch (e) {
       // log('eee $e');
@@ -231,10 +264,6 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     }
   }
 
-  void setList(List<Vehicle> list) {
-    emit(list);
-  }
-
   Vehicle findByIndex(int index) {
     return state.elementAt(index);
   }
@@ -250,8 +279,8 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> removeVehicle(Vehicle vehicle) async {
     final newList = state.where((element) => element != vehicle).toList();
     await removeDataFromDB(vehicle);
-    updateUserVehicles(vehicle);
     emit([...newList]);
+    updateUserVehicles();
   }
 
   void updateByIndex(int index, Vehicle newVehicle) {
@@ -268,7 +297,11 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
   Future<void> addVehicle(Vehicle vehicle) async {
     _dbList = [..._dbList, vehicle];
     await addDataToDB(vehicle);
-    _addDataToFirestore(vehicle);
     emit([...state, vehicle]);
+  }
+
+  Future<void> enrollVehicle(Vehicle vehicle) async {
+    _addDataToFirestore(vehicle);
+    await addVehicle(vehicle);
   }
 }
