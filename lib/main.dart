@@ -17,7 +17,6 @@ import 'package:neat_tip/models/neattip_user.dart';
 // import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
-import 'package:neat_tip/screens/loading_window.dart';
 import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/utils/route_generator.dart';
@@ -174,54 +173,7 @@ class _MyAppState extends State<MyApp> {
                           }(),
                         );
                 },
-              )
-              // child: Builder(builder: (context2) {
-              //   log('connection ${snapshot.connectionState == ConnectionState.done}');
-              //   return MaterialApp(
-              //     themeMode: (context2.watch<AppStateCubit>().state.darkMode)
-              //         ? ThemeMode.dark
-              //         : ThemeMode.light,
-              //     title: 'Neat Tip',
-              //     navigatorObservers: [routeObserver],
-              //     debugShowCheckedModeBanner: false,
-              //     // darkTheme: ThemeData.dark(),
-              //     theme: (context2.watch<AppStateCubit>().state.darkMode)
-              //         ? getThemeDataDark()
-              //         : getThemeData(),
-              //     onGenerateRoute: routeGenerator,
-              //     home: () {
-              //       // FlutterNativeSplash.remove();
-              //       // return LoadingWindow();
-              //       log('darkmode ${context2.watch<AppStateCubit>().state.darkMode}');
-              //       if (snapshot.connectionState != ConnectionState.done) {
-              //         //  FlutterNativeSplash.remove();
-              //         return const LoadingWindow();
-              //       } else {
-              //         FlutterNativeSplash.remove();
-              //         if (user == null) {
-              //           return const Introduction();
-              //         } else if (!isNeedPermission) {
-              //           return Builder(builder: (context) {
-              //             return PermissionWindow(
-              //               onAllowedAll: () {
-              //                 Navigator.pushNamedAndRemoveUntil(context, () {
-              //                   switch (user!.role) {
-              //                     case 'host_owner':
-              //                       return '/homehost';
-              //                     default:
-              //                       return '/homeroot';
-              //                   }
-              //                 }(), (route) => false);
-              //               },
-              //             );
-              //           });
-              //         }
-              //         return const HomeRoot();
-              //       }
-              //     }(),
-              //   );
-              // })
-              );
+              ));
         });
   }
 }

@@ -1,8 +1,5 @@
-// ignore_for_file: avoid_print
 import 'dart:developer';
 import 'dart:io';
-// import 'package:camera/camera.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -175,14 +172,16 @@ class VehicleItem extends StatelessWidget {
                           return const SizedBox();
                         }))
                       else
-                        CachedNetworkImage(
-                          imageUrl:
-                              "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg",
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
+                        Transform.scale(
+                            scale: 1.1, child: Image.asset('assets/vario.png')),
+                      // CachedNetworkImage(
+                      //   imageUrl:
+                      //       "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg",
+                      //   placeholder: (context, url) =>
+                      //       const CircularProgressIndicator(),
+                      //   errorWidget: (context, url, error) =>
+                      //       const Icon(Icons.error),
+                      // ),
                       // const Image(
                       //     image: CachedNetworkImageProvider(
                       //         "https://ik.imagekit.io/zlt25mb52fx/ahmcdn/uploads/product/feature/fa-clickable-feature-motor-700x700pxl-ys-1-26092022-061617.jpg"))

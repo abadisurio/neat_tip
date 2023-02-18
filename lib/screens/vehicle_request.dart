@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
@@ -41,9 +39,9 @@ class _VehicleRequestState extends State<VehicleRequest> {
     });
     // await Future.delayed(const Duration(milliseconds: 1000));
     await vehicleListCubit.addUserVehicles(_plateNumber);
-    setState(() {
-      _isRequesting = false;
-    });
+    // setState(() {
+    //   _isRequesting = false;
+    // });
     if (mounted) {
       Navigator.pop(context);
     }
