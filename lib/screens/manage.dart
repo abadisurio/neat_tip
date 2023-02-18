@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -86,13 +87,19 @@ class Manage extends StatelessWidget {
               leading: CircleAvatar(
                   radius: 32,
                   child: FirebaseAuth.instance.currentUser?.photoURL != null
-                      ? null
-                      //  ClipOval(
-                      //     // child: Image.network(
-                      //     //   FirebaseAuth.instance.currentUser?.photoURL ?? '',
-                      //     //   fit: BoxFit.cover,
-                      //     // ),
-                      //     )
+                      // ? null
+                      ? ClipOval(
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl:
+                                FirebaseAuth.instance.currentUser?.photoURL ??
+                                    '',
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
+                        )
                       : Text(
                           (nameInitial.length > 3
                               ? nameInitial.substring(0, 3)

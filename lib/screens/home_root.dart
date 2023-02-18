@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 // import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
@@ -104,13 +106,18 @@ class _HomeRootState extends State<HomeRoot> {
                   onTap: () {
                     log('tapp');
                   },
-                  child: const AspectRatio(
+                  child: AspectRatio(
                     aspectRatio: 1,
-                    // child: Image.network(
-                    //   FirebaseAuth.instance.currentUser?.photoURL ??
-                    //       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                    //   fit: BoxFit.cover,
-                    // ),
+                    child: CachedNetworkImage(
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                      imageUrl: FirebaseAuth.instance.currentUser?.photoURL ??
+                          'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
                   ),
                 ),
               ),

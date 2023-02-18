@@ -58,6 +58,7 @@ dependencies:
   cloud_firestore: ^4.3.1
   carousel_slider: ^4.2.1
   connectivity_plus: ^3.0.3
+  cached_network_image: ^3.2.3
 
 
 dev_dependencies:
