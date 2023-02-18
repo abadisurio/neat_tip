@@ -10,6 +10,7 @@ import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
 import 'package:neat_tip/screens/state_loading.dart';
+import 'package:neat_tip/screens/vehicle_request.dart';
 import 'package:neat_tip/screens/wallet.dart';
 import 'package:neat_tip/screens/customer/explore_spot.dart';
 import 'package:neat_tip/screens/customer/home_customer.dart';
@@ -46,9 +47,12 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/vehiclelist':
       return CupertinoPageRoute(
           builder: (_) => const VehicleList(), settings: settings);
-    case '/vehicleadd':
+    case '/vehicle_add':
       return CupertinoPageRoute(
           builder: (_) => const VehicleAdd(), settings: settings);
+    case '/vehicle_request':
+      return CupertinoPageRoute(
+          builder: (_) => const VehicleRequest(), settings: settings);
     case '/scan_vehicle':
       return CupertinoPageRoute(
           builder: (_) => const ScanVehicle(), settings: settings);

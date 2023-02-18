@@ -37,7 +37,7 @@ class _IntroductionState extends State<Introduction> {
 
   navigateToAddVehiclePage() async {
     final isVehicleAdded =
-        await Navigator.pushNamed(context, '/vehicleadd') as bool?;
+        await Navigator.pushNamed(context, '/vehicle_add') as bool?;
     log('isVehicleAdded $isVehicleAdded');
     if (isVehicleAdded ?? true && mounted) {
       setState(() {

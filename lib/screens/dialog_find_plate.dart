@@ -35,9 +35,13 @@ class _DialogFindPlateState extends State<DialogFindPlate> {
       });
       // await Future.delayed(const Duration(milliseconds: 1000));
     });
-    if (mounted && !_isPlateExists) {
+    if (mounted) {
       Navigator.pop(context);
-      Navigator.pushNamed(context, '/vehicleadd', arguments: _plate);
+    }
+    if (mounted && !_isPlateExists) {
+      Navigator.pushNamed(context, '/vehicle_add', arguments: _plate);
+    } else {
+      Navigator.pushNamed(context, '/vehicle_request', arguments: _plate);
     }
   }
 
