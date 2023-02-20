@@ -59,6 +59,8 @@ dependencies:
   carousel_slider: ^4.2.1
   connectivity_plus: ^3.0.3
   cached_network_image: ^3.2.3
+  firebase_messaging: ^14.2.4
+  flutter_local_notifications: ^8.2.0
 
 
 dev_dependencies:

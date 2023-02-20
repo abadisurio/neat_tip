@@ -14,17 +14,21 @@ import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/neattip_user.dart';
-// import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/permission_window.dart';
+import 'package:neat_tip/service/firebase_cloud_messaging.dart';
 import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/utils/route_generator.dart';
 import 'package:neat_tip/utils/theme_data.dart';
 import 'package:neat_tip/utils/theme_data_dark.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await AppFirebase.initializeFirebase();
+  await initializeFCM();
   runApp(const MyApp());
 }
 
@@ -53,7 +57,7 @@ class _MyAppState extends State<MyApp> {
     // log('panggil');
     await appStateCubit.initialize();
     await initializeDateFormatting('id_ID', null);
-    await AppFirebase.initializeFirebase();
+
     await neatTipUserCubit.initialize();
     // await neatTipUserCubit.signOut();
 
@@ -90,7 +94,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
     vehicleListCubit = VehicleListCubit();
     neatTipUserCubit = NeatTipUserCubit();
     transactionsListCubit = TransactionsListCubit();
@@ -98,7 +102,6 @@ class _MyAppState extends State<MyApp> {
     reservationsListCubit = ReservationsListCubit();
     cameraCubit = CameraCubit();
     routeObserverCubit = RouteObserverCubit();
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
   @override
