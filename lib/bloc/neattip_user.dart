@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/models/neattip_user.dart';
 import 'package:neat_tip/utils/firebase.dart';
@@ -13,6 +14,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
   late SharedPreferences _sharedPreferences;
   late FirebaseFirestore _firestore;
   late User? _firebaseUser;
+  late String? _fcmToken;
   NeatTipUser? _currentUser;
 
   User? get firebaseCurrentUser => FirebaseAuth.instance.currentUser;
@@ -20,10 +22,10 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
   Future<void> initialize() async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
+    // _fcmToken = await FirebaseMessaging.instance.getToken();
     _firestore = FirebaseFirestore.instance;
     _sharedPreferences = await SharedPreferences.getInstance();
     final currentUser = _sharedPreferences.getString('currentUser');
-
     try {
       // _firebaseUser
       //     ?.reload()

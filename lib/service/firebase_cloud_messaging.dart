@@ -1,12 +1,18 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:neat_tip/utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> initializeFCM() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   log('message ${await messaging.getToken()}');
+  // String? fcmToken = await _getFcmToken();
+  await _initializeFcmToken();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -53,6 +59,35 @@ Future<void> initializeFCM() async {
           ));
     }
   });
+}
+
+Future<String?> _initializeFcmToken() async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  // await sharedPreferences.remove("fcmToken");
+  final sharePrefFcm = sharedPreferences.getString("fcmToken");
+  // Map<String, dynamic>? fcmToken = jsonDecode(sharePrefFcm );
+  log('fcmToken $sharePrefFcm');
+  if (sharePrefFcm == null) {
+    final String? token = await FirebaseMessaging.instance.getToken();
+    final firestore = FirebaseFirestore.instance;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    log('uid $uid');
+    if (token != null && uid != null) {
+      final fcmTokenData = {
+        'fcmToken': token,
+        'timestamp': DateTime.now().toIso8601String()
+      };
+      // log('fcmTokenData.toString() ${fcmTokenData.toString()}');
+      await sharedPreferences.setString('fcmToken', fcmTokenData.toString());
+      await firestore
+          .collection("fcmToken")
+          .doc(uid)
+          .set(fcmTokenData, SetOptions(merge: true));
+    }
+    return token;
+    // return fcmToken;
+  }
+  return null;
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
