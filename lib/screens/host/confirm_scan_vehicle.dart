@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/models/reservation.dart';
+import 'package:neat_tip/service/fb_cloud_functions.dart';
 
 class ConfirmScanVehicle extends StatefulWidget {
   const ConfirmScanVehicle({Key? key}) : super(key: key);
@@ -35,6 +36,7 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
             plateNumber: element,
             timeCheckedIn: DateTime.now().toIso8601String());
         await reservationsListCubit.addReservation(reservation);
+        sendFcmNotification();
         // await reservationsListCubit.addReservation(reservation);
         // await vehicleListCubit.add();
         log('hereeeeee');
