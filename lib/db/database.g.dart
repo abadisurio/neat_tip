@@ -93,7 +93,7 @@ class _$NeatTipDatabase extends NeatTipDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Transactions` (`id` TEXT NOT NULL, `customerUserId` TEXT NOT NULL, `timeRequested` TEXT NOT NULL, `timeFinished` TEXT, `value` INTEGER, `service` TEXT, `status` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Reservation` (`id` TEXT NOT NULL, `spotId` TEXT NOT NULL, `hostUserId` TEXT NOT NULL, `customerUserId` TEXT NOT NULL, `timeCheckedIn` TEXT, `timeCheckedOut` TEXT, `note` TEXT, `charge` INTEGER, `status` TEXT, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Reservation` (`id` TEXT NOT NULL, `spotId` TEXT NOT NULL, `hostUserId` TEXT NOT NULL, `plateNumber` TEXT NOT NULL, `customerId` TEXT, `timeCheckedIn` TEXT, `timeCheckedOut` TEXT, `note` TEXT, `charge` INTEGER, `status` TEXT, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -267,7 +267,8 @@ class _$ReservationsDao extends ReservationsDao {
                   'id': item.id,
                   'spotId': item.spotId,
                   'hostUserId': item.hostUserId,
-                  'customerUserId': item.customerUserId,
+                  'plateNumber': item.plateNumber,
+                  'customerId': item.customerId,
                   'timeCheckedIn': item.timeCheckedIn,
                   'timeCheckedOut': item.timeCheckedOut,
                   'note': item.note,
@@ -291,7 +292,8 @@ class _$ReservationsDao extends ReservationsDao {
             id: row['id'] as String,
             spotId: row['spotId'] as String,
             hostUserId: row['hostUserId'] as String,
-            customerUserId: row['customerUserId'] as String,
+            plateNumber: row['plateNumber'] as String,
+            customerId: row['customerId'] as String?,
             timeCheckedIn: row['timeCheckedIn'] as String?,
             timeCheckedOut: row['timeCheckedOut'] as String?,
             note: row['note'] as String?,
@@ -306,7 +308,8 @@ class _$ReservationsDao extends ReservationsDao {
             id: row['id'] as String,
             spotId: row['spotId'] as String,
             hostUserId: row['hostUserId'] as String,
-            customerUserId: row['customerUserId'] as String,
+            plateNumber: row['plateNumber'] as String,
+            customerId: row['customerId'] as String?,
             timeCheckedIn: row['timeCheckedIn'] as String?,
             timeCheckedOut: row['timeCheckedOut'] as String?,
             note: row['note'] as String?,

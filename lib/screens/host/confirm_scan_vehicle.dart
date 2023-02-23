@@ -1,6 +1,9 @@
 import 'dart:developer';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:neat_tip/bloc/reservation_list.dart';
+import 'package:neat_tip/models/reservation.dart';
 
 class ConfirmScanVehicle extends StatefulWidget {
   const ConfirmScanVehicle({Key? key}) : super(key: key);
@@ -14,9 +17,28 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
   List<String> scannedVehicleList = [];
 
   _getArgument() async {
-    log('argument $argument');
     setState(() {
       scannedVehicleList = argument["scannedVehicleList"];
+    });
+    log('argument $argument');
+  }
+
+  _processVehicle() async {
+    final reservationsListCubit = context.read<ReservationsListCubit>();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    await Navigator.pushNamed(context, '/state_loading', arguments: () async {
+      for (var element in scannedVehicleList) {
+        final reservation = Reservation(
+            id: '',
+            spotId: 'S1',
+            hostUserId: uid ?? '',
+            plateNumber: element,
+            timeCheckedIn: DateTime.now().toIso8601String());
+        await reservationsListCubit.addReservation(reservation);
+        // await reservationsListCubit.addReservation(reservation);
+        // await vehicleListCubit.add();
+        log('hereeeeee');
+      }
     });
   }
 
@@ -31,26 +53,26 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
     argument =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ??
             {};
-    return WillPopScope(
-      onWillPop: () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/homeroot', (route) => false);
-        return Future.value(false);
-      },
-      child: Scaffold(
-        appBar: AppBar(),
-        body: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: scannedVehicleList.length,
-            itemBuilder: ((context, index) {
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(scannedVehicleList[index]),
-                ),
-              );
-            })),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Cek Plat Nomor'),
       ),
+      body: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: scannedVehicleList.length + 1,
+          itemBuilder: ((context, index) {
+            if (index == scannedVehicleList.length) {
+              return ElevatedButton(
+                  onPressed: _processVehicle,
+                  child: const Text('Proses Kendaraan'));
+            }
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(scannedVehicleList[index]),
+              ),
+            );
+          })),
     );
   }
 }

@@ -85,6 +85,13 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
       if (!_isScanning) return;
       if (!_isDetecting) _processCameraImage(image);
     });
+    Future.delayed(const Duration(seconds: 1), () {
+      stopScanning();
+      setState(() {
+        _lastDetectedPlate = 'B 3853 KZA';
+        _listDetectedPlate.add('B 3853 KZA');
+      });
+    });
   }
 
   stopScanning() async {
@@ -92,10 +99,12 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
     setState(() {
       _isScanning = false;
     });
-    textRecognizer.close();
-    if (cameraController!.value.isStreamingImages) {
-      await cameraController?.stopImageStream();
-    }
+    // textRecognizer.close();
+    // log('cameraController!.value.isStreamingImages ${cameraController!.value.isStreamingImages}');
+    // if (cameraController!.value.isStreamingImages) {
+    //   log('berenti');
+    //   await cameraController?.stopImageStream();
+    // }
   }
 
   void _itemDetected(String plateNumber) async {
@@ -141,6 +150,7 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
         isScreenActive = true;
       });
     });
+    startScanning();
     super.initState();
   }
 
@@ -167,28 +177,28 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
               // curve: Curves.easeOutCirc,
               // duration: const Duration(milliseconds: 500),
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width - 32,
               child: Stack(
                 fit: StackFit.loose,
                 children: [
-                  if (isScreenActive)
-                    AnimatedOpacity(
-                      opacity: _isScanning ? 1 : 0,
-                      curve: Curves.easeOutCirc,
-                      duration: const Duration(milliseconds: 500),
-                      child: Transform.scale(
-                        scale: 1.4,
-                        child: CameraCapturer(
-                          resolution: ResolutionPreset.low,
-                          controller: (controller) {
-                            setState(() {
-                              cameraController = controller;
-                            });
-                            startScanning();
-                          },
-                        ),
-                      ),
-                    ),
+                  // if (isScreenActive)
+                  //   AnimatedOpacity(
+                  //     opacity: _isScanning ? 1 : 0.1,
+                  //     curve: Curves.easeOutCirc,
+                  //     duration: const Duration(milliseconds: 500),
+                  //     child: Transform.scale(
+                  //       scale: 1.4,
+                  //       child: CameraCapturer(
+                  //         resolution: ResolutionPreset.low,
+                  //         controller: (controller) {
+                  //           setState(() {
+                  //             cameraController = controller;
+                  //           });
+                  //           startScanning();
+                  //         },
+                  //       ),
+                  //     ),
+                  //   ),
                   AnimatedOpacity(
                     curve: Curves.easeOutCirc,
                     opacity: _isScanning ? 1 : 0,
@@ -286,58 +296,65 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
                           ],
                         )),
                   ),
-                  if (_isScanning)
-                    SizedBox.expand(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).canvasColor,
-                                borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.all(8),
-                            child: Column(children: [
-                              Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(' Pindai Sekaligus'),
-                                  ),
-                                  if (isBatchScanning)
-                                    ElevatedButton(
-                                        onPressed: stopScanning,
-                                        child: const Text('Selesai')),
-                                  Switch(
-                                    // This bool value toggles the switch.
-                                    value: isBatchScanning,
-                                    // overlayColor: overlayColor,
-                                    // trackColor: trackColor,
-                                    thumbColor:
-                                        const MaterialStatePropertyAll<Color>(
-                                            Colors.black),
-                                    onChanged: (bool value) {
-                                      // This is called when the user toggles the switch.
-                                      setState(() {
-                                        isBatchScanning = !isBatchScanning;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ]),
-                          ),
-                        ],
-                      ),
-                    ),
+                  // if (_isScanning)
+                  //   SizedBox.expand(
+                  //     child: Column(
+                  //       mainAxisAlignment: MainAxisAlignment.end,
+                  //       children: [
+                  //         Container(
+                  //           decoration: BoxDecoration(
+                  //               color: Theme.of(context).canvasColor,
+                  //               borderRadius: BorderRadius.circular(8)),
+                  //           padding: const EdgeInsets.all(8),
+                  //           margin: const EdgeInsets.all(8),
+                  //           child: Column(children: [
+                  //             Row(
+                  //               children: [
+                  //                 const Expanded(
+                  //                   child: Text(' Pindai Sekaligus'),
+                  //                 ),
+                  //                 if (isBatchScanning)
+                  //                   ElevatedButton(
+                  //                       onPressed: stopScanning,
+                  //                       child: const Text('Selesai')),
+                  //                 Switch(
+                  //                   // This bool value toggles the switch.
+                  //                   value: isBatchScanning,
+                  //                   // overlayColor: overlayColor,
+                  //                   // trackColor: trackColor,
+                  //                   thumbColor:
+                  //                       const MaterialStatePropertyAll<Color>(
+                  //                           Colors.black),
+                  //                   onChanged: (bool value) {
+                  //                     // This is called when the user toggles the switch.
+                  //                     setState(() {
+                  //                       isBatchScanning = !isBatchScanning;
+                  //                     });
+                  //                   },
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ]),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
                 ],
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Kendaraan Terdeteksi',
-              style: Theme.of(context).textTheme.headline6,
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Kendaraan Terdeteksi',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                ElevatedButton(
+                    onPressed: confirmScan, child: const Text('Proses'))
+              ],
             ),
           ),
           ListView.builder(

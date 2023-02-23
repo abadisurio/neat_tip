@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
     transactionsListCubit.initializeDB(database);
     transactionsListCubit.pullDataFromDB();
 
-    reservationsListCubit.initializeDB(database);
+    reservationsListCubit.initialize(localDB: database);
     reservationsListCubit.pullDataFromDB();
 
     cameras = await availableCameras();
