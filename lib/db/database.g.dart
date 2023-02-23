@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: library_private_types_in_public_api
-
 part of 'database.dart';
 
 // **************************************************************************
@@ -91,7 +89,7 @@ class _$NeatTipDatabase extends NeatTipDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Vehicle` (`id` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `plate` TEXT NOT NULL, `brand` TEXT NOT NULL, `model` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `imgSrcPhotos` TEXT NOT NULL, `wheel` INTEGER NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Vehicle` (`plate` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `brand` TEXT NOT NULL, `model` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `imgSrcPhotos` TEXT NOT NULL, `wheel` INTEGER NOT NULL, PRIMARY KEY (`plate`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Transactions` (`id` TEXT NOT NULL, `customerUserId` TEXT NOT NULL, `timeRequested` TEXT NOT NULL, `timeFinished` TEXT, `value` INTEGER, `service` TEXT, `status` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
@@ -125,36 +123,34 @@ class _$VehicleDao extends VehicleDao {
   _$VehicleDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database, changeListener),
+  )   : _queryAdapter = QueryAdapter(database),
         _vehicleInsertionAdapter = InsertionAdapter(
             database,
             'Vehicle',
             (Vehicle item) => <String, Object?>{
+                  'plate': item.plate,
                   'createdAt': item.createdAt,
                   'ownerId': item.ownerId,
-                  'plate': item.plate,
                   'brand': item.brand,
                   'model': item.model,
                   'ownerName': item.ownerName,
                   'imgSrcPhotos': item.imgSrcPhotos,
                   'wheel': item.wheel
-                },
-            changeListener),
+                }),
         _vehicleDeletionAdapter = DeletionAdapter(
             database,
             'Vehicle',
-            ['id'],
+            ['plate'],
             (Vehicle item) => <String, Object?>{
+                  'plate': item.plate,
                   'createdAt': item.createdAt,
                   'ownerId': item.ownerId,
-                  'plate': item.plate,
                   'brand': item.brand,
                   'model': item.model,
                   'ownerName': item.ownerName,
                   'imgSrcPhotos': item.imgSrcPhotos,
                   'wheel': item.wheel
-                },
-            changeListener);
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -180,26 +176,14 @@ class _$VehicleDao extends VehicleDao {
             wheel: row['wheel'] as int));
   }
 
-  // @override
-  // Stream<Vehicle?> findVehicleById(int id) {
-  //   return _queryAdapter.queryStream('SELECT * FROM Vehicle WHERE id = ?1',
-  //       mapper: (Map<String, Object?> row) => Vehicle(
-  //           createdAt: row['createdAt'] as String,
-  //           ownerId: row['ownerId'] as String,
-  //           plate: row['plate'] as String,
-  //           brand: row['brand'] as String,
-  //           model: row['model'] as String,
-  //           ownerName: row['ownerName'] as String,
-  //           imgSrcPhotos: row['imgSrcPhotos'] as String,
-  //           wheel: row['wheel'] as int),
-  //       arguments: [id],
-  //       queryableName: 'Vehicle',
-  //       isView: false);
-  // }
+  @override
+  Future<void> flushAllVehicle() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM Vehicle');
+  }
 
   @override
   Future<void> insertVehicle(Vehicle vehicle) async {
-    await _vehicleInsertionAdapter.insert(vehicle, OnConflictStrategy.ignore);
+    await _vehicleInsertionAdapter.insert(vehicle, OnConflictStrategy.abort);
   }
 
   @override
@@ -331,6 +315,11 @@ class _$ReservationsDao extends ReservationsDao {
         arguments: [id],
         queryableName: 'Reservation',
         isView: false);
+  }
+
+  @override
+  Future<void> flushAllReservation() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM Reservation');
   }
 
   @override

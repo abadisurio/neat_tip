@@ -40,6 +40,10 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
     emit([...state]);
   }
 
+  Future<void> flushDataFromDB() async {
+    await _db.reservationsDao.flushAllReservation();
+  }
+
   void removeById(String id) {
     final newList = state.where((element) => element.id != id).toList();
     emit([...newList]);

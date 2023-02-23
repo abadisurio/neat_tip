@@ -13,4 +13,7 @@ abstract class ReservationsDao {
 
   @insert
   Future<void> insertReservation(Reservation reservation);
+
+  @Query('DELETE FROM Reservation')
+  Future<void> flushAllReservation();
 }

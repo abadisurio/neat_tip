@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/bloc/app_state.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
+import 'package:neat_tip/bloc/reservation_list.dart';
+import 'package:neat_tip/bloc/vehicle_list.dart';
 
 class SignOut extends StatefulWidget {
   const SignOut({Key? key}) : super(key: key);
@@ -10,14 +13,27 @@ class SignOut extends StatefulWidget {
 }
 
 class _SignOutState extends State<SignOut> {
+  Future<void> _doSignOut() async {
+    final NeatTipUserCubit neatTipUserCubit = context.read<NeatTipUserCubit>();
+    final AppStateCubit appStateCubit = context.read<AppStateCubit>();
+    final VehicleListCubit vehicleListCubit = context.read<VehicleListCubit>();
+    final ReservationsListCubit reservationsListCubit =
+        context.read<ReservationsListCubit>();
+
+    await neatTipUserCubit.signOut();
+    await appStateCubit.flush();
+    await vehicleListCubit.flushDataFromDB();
+    await reservationsListCubit.flushDataFromDB();
+    if (mounted) {
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushNamedAndRemoveUntil(context, '/intro', (route) => false);
+      });
+    }
+  }
+
   @override
   void initState() {
-    if (mounted) {
-      BlocProvider.of<NeatTipUserCubit>(context).signOut();
-    }
-    Future.delayed(const Duration(milliseconds: 3000), () {
-      Navigator.pushNamedAndRemoveUntil(context, '/intro', (route) => false);
-    });
+    _doSignOut();
     super.initState();
   }
 

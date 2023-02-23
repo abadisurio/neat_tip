@@ -62,6 +62,11 @@ class AppStateCubit extends Cubit<AppState> {
     }
   }
 
+  Future<void> flush() async {
+    await sharedPreferences.remove('appState');
+    emit(defaultAppState);
+  }
+
   void updateConfig(String configName, dynamic value) {
     final AppState newState = Function.apply(AppState.new, [], {
       ...state.members.map((key, oldValue) => MapEntry(Symbol(key), oldValue)),

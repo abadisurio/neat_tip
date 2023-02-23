@@ -17,6 +17,8 @@ abstract class VehicleDao {
   @delete
   Future<void> removeVehicle(Vehicle vehicle);
 
+  @Query('DELETE FROM Vehicle')
+  Future<void> flushAllVehicle();
   // @Query('DELETE FROM Vehicle')
   // @insert
   // Future<void> dropAndPushVehicleList(List<Vehicle> vehicle);

@@ -71,6 +71,10 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     await _db.vehicleDao.removeVehicle(vehicle);
   }
 
+  Future<void> flushDataFromDB() async {
+    await _db.vehicleDao.flushAllVehicle();
+  }
+
   _checkConnection() async {
     final connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
