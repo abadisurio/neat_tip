@@ -8,7 +8,7 @@ String dateTimeToString(String stringISO8601) {
   String formatted;
   if (difference.inDays == 0) {
     log('hari ini');
-    formatted = 'Hari ini ${DateFormat('H.MM', 'id_ID').format(date)}';
+    formatted = 'Hari ini ${DateFormat('H.mm', 'id_ID').format(date)}';
   } else if (difference.inDays == 1) {
     log('Kemarin');
     formatted = 'Kemarin';
