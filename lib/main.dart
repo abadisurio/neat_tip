@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:camera/camera.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -17,7 +19,7 @@ import 'package:neat_tip/models/neattip_user.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/permission_window.dart';
-import 'package:neat_tip/service/firebase_cloud_messaging.dart';
+import 'package:neat_tip/service/fb_cloud_messaging.dart';
 import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/utils/route_generator.dart';
 import 'package:neat_tip/utils/theme_data.dart';
@@ -27,8 +29,27 @@ import 'package:permission_handler/permission_handler.dart';
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await AppFirebase.initializeFirebase();
+  await Firebase.initializeApp();
   await initializeFCM();
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //   // RemoteNotification? notification = ;
+  //   log('sinik ${message.data}');
+  //   // if (notification != null) {
+  //   //   log('notification.hashCode ${notification.hashCode}');
+  //   //   ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+  //   //     icon: const Icon(Icons.motorcycle),
+  //   //     content: ListTile(
+  //   //       onTap: () {},
+  //   //       // dense: true,
+  //   //       leading: const Icon(Icons.notifications),
+  //   //       title: Text(notification.title ?? ''),
+  //   //       subtitle: Text(notification.body ?? ''),
+  //   //       // trailing:
+  //   //     ),
+  //   //   ).create() // SnackBar(
+  //   //       );
+  //   // }
+  // });
 
   runApp(const MyApp());
 }

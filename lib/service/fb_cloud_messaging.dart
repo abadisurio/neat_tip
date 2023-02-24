@@ -11,8 +11,9 @@ Future<void> initializeFCM() async {
   // FirebaseMessaging messaging = FirebaseMessaging.instance;
   // log('message ${await messaging.getToken()}');
   // String? fcmToken = await _getFcmToken();
+  log('siniii');
   await reloadFcmToken();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -34,30 +35,30 @@ Future<void> initializeFCM() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    log('messageww ${message.notification!.body}');
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //   log('messageww ${message.notification!.body}');
+  //   //   RemoteNotification? notification = message.notification;
+  //   //   AndroidNotification? android = message.notification?.android;
 
-    // If `onMessage` is triggered with a notification, construct our own
-    // local notification to show to users using the created channel.
-    if (notification != null && android != null) {
-      log('notification.hashCode ${notification.hashCode}');
-      flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channel.description,
-              icon: android.smallIcon,
-              // other properties...
-            ),
-          ));
-    }
-  });
+  //   //   // If `onMessage` is triggered with a notification, construct our own
+  //   //   // local notification to show to users using the created channel.
+  //   //   if (notification != null && android != null) {
+  //   //     log('notification.hashCode ${notification.hashCode}');
+  //   //     flutterLocalNotificationsPlugin.show(
+  //   //         notification.hashCode,
+  //   //         notification.title,
+  //   //         notification.body,
+  //   //         NotificationDetails(
+  //   //           android: AndroidNotificationDetails(
+  //   //             channel.id,
+  //   //             channel.name,
+  //   //             channel.description,
+  //   //             icon: android.smallIcon,
+  //   //             // other properties...
+  //   //           ),
+  //   //         ));
+  //   //   }
+  // });
 }
 
 Future<String?> reloadFcmToken() async {
@@ -65,9 +66,9 @@ Future<String?> reloadFcmToken() async {
   // await sharedPreferences.remove("fcmToken");
   final sharePrefFcm = sharedPreferences.getString("fcmToken");
   // Map<String, dynamic>? fcmToken = jsonDecode(sharePrefFcm );
+  final String? token = await FirebaseMessaging.instance.getToken();
   log('fcmToken $sharePrefFcm');
   if (sharePrefFcm == null) {
-    final String? token = await FirebaseMessaging.instance.getToken();
     final firestore = FirebaseFirestore.instance;
     final uid = FirebaseAuth.instance.currentUser?.uid;
     log('uid $uid $token');

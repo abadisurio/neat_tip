@@ -64,25 +64,25 @@ class _HomeRootState extends State<HomeRoot> {
       _widgetOptions[1] = const VehicleList();
     }
 
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   log('sinik');
-    //   RemoteNotification? notification = message.notification;
-    //   if (notification != null) {
-    //     log('notification.hashCode ${notification.hashCode}');
-    //     ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-    //       icon: const Icon(Icons.motorcycle),
-    //       content: ListTile(
-    //         onTap: () {},
-    //         // dense: true,
-    //         leading: const Icon(Icons.notifications),
-    //         title: Text(notification.title ?? ''),
-    //         subtitle: Text(notification.body ?? ''),
-    //         // trailing:
-    //       ),
-    //     ).create() // SnackBar(
-    //         );
-    //   }
-    // });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      log('sinikwaokwoa ${notification?.toMap()}');
+      if (notification != null) {
+        log('notification.hashCode ${notification.hashCode}');
+        ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+          icon: const Icon(Icons.motorcycle),
+          content: ListTile(
+            onTap: () {},
+            // dense: true,
+            leading: const CircleAvatar(child: Icon(Icons.notifications)),
+            title: Text(notification.title ?? ''),
+            subtitle: Text(notification.body ?? ''),
+            // trailing:
+          ),
+        ).create() // SnackBar(
+            );
+      }
+    });
 
     super.initState();
   }
