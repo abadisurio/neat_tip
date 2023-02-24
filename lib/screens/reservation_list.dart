@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/models/reservation.dart';
+import 'package:neat_tip/utils/date_time_to_string.dart';
 import 'package:skeletons/skeletons.dart';
 
 class ReservationList extends StatelessWidget {
@@ -23,7 +24,7 @@ class ReservationList extends StatelessWidget {
             if (reservationList!.isEmpty) {
               return const Center(child: Text('Belum ada transaksi!'));
             }
-            log('reservationList ${reservationList.first.toJson()}');
+            // log('reservationList ${reservationList.first.toJson()}');
             return ListView.builder(
                 itemCount: reservationList.length,
                 shrinkWrap: true,
@@ -63,8 +64,7 @@ class ReservationList extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                             Text(
-                              DateFormat('EEEE d', 'ID_id').format(
-                                  DateTime.parse(item.timeCheckedIn ?? '')),
+                              dateTimeToString(item.timeCheckedIn ?? ''),
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ]),

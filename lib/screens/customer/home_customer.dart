@@ -8,6 +8,7 @@ import 'package:neat_tip/bloc/transaction_list.dart';
 import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
+import 'package:neat_tip/utils/date_time_to_string.dart';
 import 'package:neat_tip/widgets/carousel.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
 import 'package:skeletons/skeletons.dart';
@@ -101,8 +102,7 @@ class HomeCustomer extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               Text(
-                                DateFormat('EEEE d', 'ID_id').format(
-                                    DateTime.parse(item.timeCheckedIn ?? '')),
+                                dateTimeToString(item.timeCheckedIn ?? ''),
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ]),
