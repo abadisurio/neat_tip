@@ -71,27 +71,35 @@ class HomeCustomer extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushNamed(context, '/reservation_detail',
+                              arguments: item.id);
+                        },
                         // dense: true,
                         leading: const CircleAvatar(
                           child: Icon(
                             Icons.motorcycle,
                           ),
                         ),
-                        title: Text(item.plateNumber),
-                        subtitle: Text(DateFormat('EEEE d')
-                            .format(DateTime.parse(item.timeCheckedIn ?? ''))),
+                        title: Text(item.spotName ?? ''),
+                        subtitle: Text(item.plateNumber),
                         trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                (item.charge ?? 0).toString(),
+                                'Rp${(item.charge ?? 0)}',
                                 style: Theme.of(context).textTheme.bodyText1,
                               ),
                               Text(
                                 item.status ?? '',
                                 style: Theme.of(context).textTheme.caption,
-                              )
+                              ),
+                              Text(
+                                DateFormat('EEEE d', 'ID_id').format(
+                                    DateTime.parse(item.timeCheckedIn ?? '')),
+                                style: Theme.of(context).textTheme.caption,
+                              ),
                             ]),
                       ),
                     );

@@ -68,16 +68,23 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
           .where("status", isEqualTo: "ongoing")
           .limit(10)
           .snapshots();
-      snapshot.listen((event) {
-        final data = event.docs.map((e) {
-          final snapshotData = e.data();
+      snapshot.listen((event) async {
+        final data = await Future.wait(event.docs.map((e) async {
+          final spot = await _firestore
+              .collection("spots")
+              .doc("voX3FwgED5lggS4RnKaQ")
+              .get();
+          // await _firestore.collection("spots").doc(e.get("spotName")).get();
+          log('spot.get("spotName") ${spot.get("name")}');
+
           return Reservation.fromJson({
             'id': e.id,
             'spotId': 'spotId',
             'hostUserId': 'hostUserId',
-            ...snapshotData,
+            'spotName': spot.get("name"),
+            ...e.data(),
           });
-        }).toList();
+        }).toList());
         _syncDataAndEmit([], data);
       });
     } catch (e) {

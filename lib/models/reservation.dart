@@ -7,6 +7,7 @@ class Reservation {
   late String spotId;
   late String hostUserId;
   late String plateNumber;
+  String? spotName;
   String? customerId;
   String? timeCheckedIn;
   String? timeCheckedOut;
@@ -19,6 +20,7 @@ class Reservation {
       required this.spotId,
       required this.hostUserId,
       required this.plateNumber,
+      this.spotName,
       this.customerId,
       this.timeCheckedIn,
       this.timeCheckedOut,
@@ -29,6 +31,8 @@ class Reservation {
   Reservation.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     spotId = json['spotId'];
+    customerId = json['customerId'];
+    spotName = json['spotName'];
     customerId = json['customerId'];
     hostUserId = json['hostUserId'];
     plateNumber = json['plateNumber'];
@@ -44,6 +48,8 @@ class Reservation {
     data['id'] = id;
     data['spotId'] = spotId;
     data['hostUserId'] = hostUserId;
+    data['customerId'] = customerId;
+    data['spotName'] = spotName;
     data['customerId'] = customerId;
     data['plateNumber'] = plateNumber;
     data['timeCheckedIn'] = timeCheckedIn;

@@ -7,6 +7,7 @@ import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/host/scan_vehicle.dart';
 import 'package:neat_tip/screens/profile_edit.dart';
+import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
 import 'package:neat_tip/screens/state_loading.dart';
@@ -77,6 +78,9 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/reservations':
       return CupertinoPageRoute(
           builder: (_) => const ReservationList(), settings: settings);
+    case '/reservation_detail':
+      return CupertinoPageRoute(
+          builder: (_) => const ReservationDetail(), settings: settings);
     case '/state_loading':
       return PageRouteBuilder(
           transitionsBuilder: (ctx, anim1, anim2, child) {
