@@ -41,8 +41,8 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
       // final dataFirestore = await _pullDataFirestore();
       _syncDataAndEmit(dataLocalDB, []);
     } else {
-      final dataFirestore = await _pullDataFirestore();
-      _syncDataAndEmit([], dataFirestore);
+      // final dataFirestore = await _pullDataFirestore();
+      // _syncDataAndEmit([], dataFirestore);
     }
   }
 
@@ -164,10 +164,11 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
     emit([...state]);
   }
 
-  Future<void> addReservation(Reservation reservation) async {
+  Future<Reservation> addReservation(Reservation reservation) async {
     final data = await _addDataToFirestore(reservation);
     await _db.reservationsDao.insertReservation(data);
     emit([...state, data]);
+    return data;
   }
 
   _checkConnection() async {

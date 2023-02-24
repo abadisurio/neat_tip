@@ -4,6 +4,7 @@ import 'package:neat_tip/bloc/app_state.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignOut extends StatefulWidget {
   const SignOut({Key? key}) : super(key: key);
@@ -19,7 +20,8 @@ class _SignOutState extends State<SignOut> {
     final VehicleListCubit vehicleListCubit = context.read<VehicleListCubit>();
     final ReservationsListCubit reservationsListCubit =
         context.read<ReservationsListCubit>();
-
+    final sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.remove("fcmToken");
     await neatTipUserCubit.signOut();
     await appStateCubit.flush();
     await vehicleListCubit.flushDataFromDB();

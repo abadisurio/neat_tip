@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/models/neattip_user.dart';
+import 'package:neat_tip/service/firebase_cloud_messaging.dart';
 import 'package:neat_tip/utils/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,6 +51,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       user ??= await AppFirebase.signUpWithEmailPassword(email, password);
+      reloadFcmToken();
       log('user $user');
     } catch (e) {
       log('$e');
@@ -64,6 +66,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
         throw Exception('User not found!');
       }
       updateLocalInfo({});
+      reloadFcmToken();
       log('user $user');
     } catch (e) {
       log('sinii $e');
@@ -77,6 +80,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       if (user == null) {
         throw Exception('User not found!');
       }
+      reloadFcmToken();
       updateLocalInfo({});
       log('user $user');
     } catch (e) {

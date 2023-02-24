@@ -28,6 +28,7 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await AppFirebase.initializeFirebase();
+  await initializeFCM();
 
   runApp(const MyApp());
 }
@@ -58,8 +59,6 @@ class _MyAppState extends State<MyApp> {
     await initializeDateFormatting('id_ID', null);
     await neatTipUserCubit.initialize();
     await appStateCubit.initialize();
-
-    await initializeFCM();
     // await neatTipUserCubit.signOut();
 
     isNeedPermission = await checkPermission();

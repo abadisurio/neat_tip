@@ -8,10 +8,10 @@ import 'package:neat_tip/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> initializeFCM() async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  log('message ${await messaging.getToken()}');
+  // FirebaseMessaging messaging = FirebaseMessaging.instance;
+  // log('message ${await messaging.getToken()}');
   // String? fcmToken = await _getFcmToken();
-  await _initializeFcmToken();
+  await reloadFcmToken();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -60,7 +60,7 @@ Future<void> initializeFCM() async {
   });
 }
 
-Future<String?> _initializeFcmToken() async {
+Future<String?> reloadFcmToken() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   // await sharedPreferences.remove("fcmToken");
   final sharePrefFcm = sharedPreferences.getString("fcmToken");
@@ -70,7 +70,7 @@ Future<String?> _initializeFcmToken() async {
     final String? token = await FirebaseMessaging.instance.getToken();
     final firestore = FirebaseFirestore.instance;
     final uid = FirebaseAuth.instance.currentUser?.uid;
-    log('uid $uid');
+    log('uid $uid $token');
     if (token != null && uid != null) {
       final fcmTokenData = {
         'fcmToken': token,

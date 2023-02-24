@@ -3,6 +3,7 @@ import 'dart:developer';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
@@ -50,19 +51,6 @@ class _HomeRootState extends State<HomeRoot> {
   void _onScanTapped() {
     if (userRole != 'Pengguna') {
       Navigator.pushNamed(context, '/scan_vehicle');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-        icon: const Icon(Icons.motorcycle),
-        content: ListTile(
-          onTap: () {},
-          // dense: true,
-          leading: const Icon(Icons.motorcycle),
-          title: const Text('Kurnia Motor'),
-          subtitle: const Text('Dititipkan • Hari ini'),
-          // trailing:
-        ),
-      ).create() // SnackBar(
-          );
     }
   }
 
@@ -75,6 +63,27 @@ class _HomeRootState extends State<HomeRoot> {
       _widgetOptions[0] = const HomeHost();
       _widgetOptions[1] = const VehicleList();
     }
+
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   log('sinik');
+    //   RemoteNotification? notification = message.notification;
+    //   if (notification != null) {
+    //     log('notification.hashCode ${notification.hashCode}');
+    //     ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+    //       icon: const Icon(Icons.motorcycle),
+    //       content: ListTile(
+    //         onTap: () {},
+    //         // dense: true,
+    //         leading: const Icon(Icons.notifications),
+    //         title: Text(notification.title ?? ''),
+    //         subtitle: Text(notification.body ?? ''),
+    //         // trailing:
+    //       ),
+    //     ).create() // SnackBar(
+    //         );
+    //   }
+    // });
+
     super.initState();
   }
 

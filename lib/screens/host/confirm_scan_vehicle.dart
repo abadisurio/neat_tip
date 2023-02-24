@@ -35,8 +35,10 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
             hostUserId: uid ?? '',
             plateNumber: element,
             timeCheckedIn: DateTime.now().toIso8601String());
-        await reservationsListCubit.addReservation(reservation);
-        sendFcmNotification();
+        final reservationData =
+            await reservationsListCubit.addReservation(reservation);
+        sendFcmNotification(
+            reservationData.customerId!, reservationData.plateNumber);
         // await reservationsListCubit.addReservation(reservation);
         // await vehicleListCubit.add();
         log('hereeeeee');
