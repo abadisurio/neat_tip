@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -20,7 +19,6 @@ import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
 import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/service/fb_cloud_messaging.dart';
-import 'package:neat_tip/utils/firebase.dart';
 import 'package:neat_tip/utils/route_generator.dart';
 import 'package:neat_tip/utils/theme_data.dart';
 import 'package:neat_tip/utils/theme_data_dark.dart';

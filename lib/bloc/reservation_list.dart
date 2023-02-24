@@ -60,61 +60,61 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
     // log('tarikMang $state');
   }
 
-  Future<List<Reservation>> _pullDataFirestore() async {
-    try {
-      final DocumentSnapshot snapshot =
-          await _firestore.collection("userVehicles").doc(_userId).get();
-      final plates = snapshot.data() as Map?;
-      log('plates $plates');
-      final List<Reservation> vehicleList = [];
-      if (plates != null) {
-        for (var element in (plates["plates"] as List)) {
-          final DocumentSnapshot vehicleSnapshot = await _firestore
-              .collection("vehicles")
-              .doc((element as String))
-              .get();
-          // log('vehicleData ${vehicleData.data()}');
-          final vehicleData = vehicleSnapshot.data() as Map<String, dynamic>?;
-          if (vehicleData != null) {
-            final vehicle = Reservation.fromJson(vehicleData);
-            // String imgSrcPhotos = '';
-            // await _downloadImages(vehicle);
-            // for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
-            //   // log('photoName $photoName');
-            //   if (photoName != '') {
-            //     final filePhoto = await File(
-            //             '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName')
-            //         .create();
-            //     log('filePhoto $filePhoto');
-            //     final storageRef = _firebaseStorage
-            //         .ref("vehicles/${vehicle.plate}/$photoName");
-            //     log('message $storageRef');
-            //     final imageBytes = await storageRef.getData();
-            //     if (imageBytes != null) {
-            //       filePhoto.writeAsBytes(imageBytes.toList());
-            //     }
-            //     // final photoUrl = await storageRef.getDownloadURL();
-            //   }
-            // }
+  // Future<List<Reservation>> _pullDataFirestore() async {
+  //   try {
+  //     final DocumentSnapshot snapshot =
+  //         await _firestore.collection("userVehicles").doc(_userId).get();
+  //     final plates = snapshot.data() as Map?;
+  //     log('plates $plates');
+  //     final List<Reservation> vehicleList = [];
+  //     if (plates != null) {
+  //       for (var element in (plates["plates"] as List)) {
+  //         final DocumentSnapshot vehicleSnapshot = await _firestore
+  //             .collection("vehicles")
+  //             .doc((element as String))
+  //             .get();
+  //         // log('vehicleData ${vehicleData.data()}');
+  //         final vehicleData = vehicleSnapshot.data() as Map<String, dynamic>?;
+  //         if (vehicleData != null) {
+  //           final vehicle = Reservation.fromJson(vehicleData);
+  //           // String imgSrcPhotos = '';
+  //           // await _downloadImages(vehicle);
+  //           // for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
+  //           //   // log('photoName $photoName');
+  //           //   if (photoName != '') {
+  //           //     final filePhoto = await File(
+  //           //             '${tempDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$photoName')
+  //           //         .create();
+  //           //     log('filePhoto $filePhoto');
+  //           //     final storageRef = _firebaseStorage
+  //           //         .ref("vehicles/${vehicle.plate}/$photoName");
+  //           //     log('message $storageRef');
+  //           //     final imageBytes = await storageRef.getData();
+  //           //     if (imageBytes != null) {
+  //           //       filePhoto.writeAsBytes(imageBytes.toList());
+  //           //     }
+  //           //     // final photoUrl = await storageRef.getDownloadURL();
+  //           //   }
+  //           // }
 
-            // var myFile = File('${dir.path}/${vehicle['imgSrcPhotos']}');
-            log('vehicle $vehicle');
+  //           // var myFile = File('${dir.path}/${vehicle['imgSrcPhotos']}');
+  //           log('vehicle $vehicle');
 
-            vehicleList.add(vehicle);
-          }
-        }
-        _dbList = vehicleList;
-        log('vehicleList $vehicleList');
-        // emit([...state, ...vehicleList]);
-        // emit(vehicleList);
-      }
-      return vehicleList;
-      // log('data ${data[0].brand}');
-    } catch (e) {
-      // log('eee $e');
-      throw Exception(e);
-    }
-  }
+  //           vehicleList.add(vehicle);
+  //         }
+  //       }
+  //       _dbList = vehicleList;
+  //       log('vehicleList $vehicleList');
+  //       // emit([...state, ...vehicleList]);
+  //       // emit(vehicleList);
+  //     }
+  //     return vehicleList;
+  //     // log('data ${data[0].brand}');
+  //   } catch (e) {
+  //     // log('eee $e');
+  //     throw Exception(e);
+  //   }
+  // }
 
   Future<void> pushDataToDB() async {
     final newData = state.sublist(_dbList.length);

@@ -6,7 +6,6 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/utils/constants.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
-import 'package:neat_tip/widgets/camera_capturer.dart';
 
 class ScanVehicle extends StatefulWidget {
   const ScanVehicle({Key? key}) : super(key: key);

@@ -67,7 +67,7 @@ class _HomeRootState extends State<HomeRoot> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       log('sinikwaokwoa ${notification?.toMap()}');
-      if (notification != null) {
+      if (notification != null && mounted) {
         log('notification.hashCode ${notification.hashCode}');
         ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
           icon: const Icon(Icons.motorcycle),
