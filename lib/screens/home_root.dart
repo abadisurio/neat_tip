@@ -67,26 +67,35 @@ class _HomeRootState extends State<HomeRoot> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       log('sinikwaokwoa ${notification?.toMap()}');
-      if (notification != null) {
+      if (notification != null && mounted) {
         log('notification.hashCode ${notification.hashCode}');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-            icon: const Icon(Icons.motorcycle),
-            content: ListTile(
-              onTap: () {},
-              // dense: true,
-              leading: const CircleAvatar(child: Icon(Icons.notifications)),
-              title: Text(notification.title ?? ''),
-              subtitle: Text(notification.body ?? ''),
-              // trailing:
-            ),
-          ).create() // SnackBar(
-              );
-          context.read<NotificationListCubit>().add(NeatTipNotification(
-              createdAt: DateTime.now().toIso8601String(),
-              title: notification.title ?? '',
-              body: notification.body ?? ''));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+          icon: const Icon(Icons.motorcycle),
+          content: ListTile(
+            onTap: () {},
+            // dense: true,
+            leading: const CircleAvatar(child: Icon(Icons.notifications)),
+            title: Text(notification.title ?? ''),
+            subtitle: Text(notification.body ?? ''),
+            // trailing:
+          ),
+        ).create() // SnackBar(
+            );
+        context.read<NotificationListCubit>().add(NeatTipNotification(
+            createdAt: DateTime.now().toIso8601String(),
+            title: notification.title ?? '',
+            body: notification.body ?? ''));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      log('baruuu');
+      RemoteNotification? notification = message.notification;
+      if (notification != null && mounted) {
+        context.read<NotificationListCubit>().add(NeatTipNotification(
+            createdAt: DateTime.now().toIso8601String(),
+            title: notification.title ?? '',
+            body: notification.body ?? ''));
       }
     });
 

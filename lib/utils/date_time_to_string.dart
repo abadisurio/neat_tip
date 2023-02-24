@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:intl/intl.dart';
 
 String dateTimeToString(String stringISO8601) {
@@ -7,16 +5,16 @@ String dateTimeToString(String stringISO8601) {
   final difference = DateTime.now().difference(date);
   String formatted;
   if (difference.inDays == 0) {
-    log('hari ini');
+    // log('hari ini');
     formatted = 'Hari ini ${DateFormat('H.mm', 'id_ID').format(date)}';
   } else if (difference.inDays == 1) {
-    log('Kemarin');
+    // log('Kemarin');
     formatted = 'Kemarin';
   } else {
-    log('Dah lama');
+    // log('Dah lama');
     formatted = DateFormat('EEEE d HH', 'id_ID').format(date);
   }
-  log('formatted $formatted');
+  // log('formatted $formatted');
   //
   return formatted;
 }

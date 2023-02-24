@@ -21,7 +21,7 @@ class Notifications extends StatelessWidget {
       return ListView.builder(
           itemCount: neatTipNotification.length,
           itemBuilder: ((context, index) {
-            final item = neatTipNotification[index];
+            final item = neatTipNotification.reversed.elementAt(index);
             return ListTile(
               leading: const CircleAvatar(child: Icon(Icons.info_outline)),
               title: Text(item.title),
