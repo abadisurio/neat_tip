@@ -10,6 +10,7 @@ import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/widgets/carousel.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
+import 'package:skeletons/skeletons.dart';
 
 class HomeCustomer extends StatelessWidget {
   const HomeCustomer({super.key});
@@ -18,7 +19,7 @@ class HomeCustomer extends StatelessWidget {
   Widget build(BuildContext context) {
     seeMoreTransaction() {
       log('message');
-      Navigator.pushNamed(context, '/transactions');
+      Navigator.pushNamed(context, '/reservations');
     }
 
     return Scaffold(
@@ -51,12 +52,16 @@ class HomeCustomer extends StatelessWidget {
               // height: 0,
               thickness: 2,
             ),
-            BlocBuilder<ReservationsListCubit, List<Reservation>>(
+            BlocBuilder<ReservationsListCubit, List<Reservation>?>(
                 builder: (context, reservationList) {
+              log('reservationList $reservationList');
+              if (reservationList == null) {
+                return SizedBox(height: 500, child: SkeletonListView());
+              }
               if (reservationList.isEmpty) {
                 return const Center(child: Text('Belum ada transaksi!'));
               }
-              log('reservationList ${reservationList.first.toJson()}');
+              // log('reservationList ${reservationList.first.toJson()}');
               return ListView.builder(
                   itemCount: reservationList.length,
                   shrinkWrap: true,
@@ -89,7 +94,7 @@ class HomeCustomer extends StatelessWidget {
                             children: [
                               Text(
                                 'Rp${(item.charge ?? 0)}',
-                                style: Theme.of(context).textTheme.bodyText1,
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               Text(
                                 item.status ?? '',

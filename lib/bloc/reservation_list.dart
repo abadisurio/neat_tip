@@ -8,14 +8,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/reservation.dart';
 
-class ReservationsListCubit extends Cubit<List<Reservation>> {
-  List<Reservation> _dbList = [];
+class ReservationsListCubit extends Cubit<List<Reservation>?> {
+  ReservationsListCubit() : super(null);
+  // List<Reservation> _dbList = [];
   late NeatTipDatabase _db;
   late FirebaseFirestore _firestore;
   late String _userId;
-  ReservationsListCubit() : super([]);
-  get collection => state;
-  get length => state.length;
+  // get collection => state;
+  // get length => state.length;
 
   void initializeDB(NeatTipDatabase db) {
     _db = db;
@@ -53,7 +53,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
 
   Future<List<Reservation>> _pullDataFromDB() async {
     final dataDB = await _db.reservationsDao.findAllReservation();
-    _dbList = dataDB;
+    // _dbList = dataDB;
     // emit(dataDB);
     return dataDB;
     // emit([...state, ...dataDB]);
@@ -93,16 +93,16 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
     }
   }
 
-  Future<void> pushDataToDB() async {
-    final newData = state.sublist(_dbList.length);
-    for (var transactions in newData) {
-      await _db.reservationsDao.insertReservation(transactions);
-    }
-  }
+  // Future<void> pushDataToDB() async {
+  //   final newData = state.sublist(_dbList.length);
+  //   for (var transactions in newData) {
+  //     await _db.reservationsDao.insertReservation(transactions);
+  //   }
+  // }
 
   Future<void> pullDataFromDB() async {
     final dataDB = await _db.reservationsDao.findAllReservation();
-    _dbList = dataDB;
+    // _dbList = dataDB;
     emit(dataDB);
     // log('tarikMang $state');
   }
@@ -111,13 +111,13 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
     emit(list);
   }
 
-  Reservation findByIndex(int index) {
-    return state.elementAt(index);
+  Reservation? findByIndex(int index) {
+    return state?.elementAt(index);
   }
 
   void removeByIndex(int index) {
-    state.removeAt(index);
-    emit([...state]);
+    state?.removeAt(index);
+    emit([...?state]);
   }
 
   Future<void> flushDataFromDB() async {
@@ -125,26 +125,26 @@ class ReservationsListCubit extends Cubit<List<Reservation>> {
   }
 
   void removeById(String id) {
-    final newList = state.where((element) => element.id != id).toList();
-    emit([...newList]);
+    final newList = state?.where((element) => element.id != id).toList();
+    emit([...?newList]);
   }
 
   void updateByIndex(int index, Reservation newReservation) {
-    state[index] = newReservation;
-    emit([...state]);
+    state?[index] = newReservation;
+    emit([...?state]);
   }
 
-  void updateById(String id, Reservation newReservation) {
-    final listIndex =
-        state.indexWhere((Reservation reservation) => reservation.id == id);
-    state[listIndex] = newReservation;
-    emit([...state]);
-  }
+  // void updateById(String id, Reservation newReservation) {
+  //   final listIndex =
+  //       state?.indexWhere((Reservation reservation) => reservation.id == id);
+  //   state[listIndex] = newReservation;
+  //   emit([...?state]);
+  // }
 
   Future<Reservation> addReservation(Reservation reservation) async {
     final data = await _addDataToFirestore(reservation);
     await _db.reservationsDao.insertReservation(data);
-    emit([...state, data]);
+    emit([...?state, data]);
     return data;
   }
 

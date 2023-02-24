@@ -10,24 +10,25 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ReservationsListCubit, List<Reservation>>(
-        builder: (context, reservationList) {
-      log('reservationList $reservationList');
-      return Scaffold(
-          appBar: AppBar(),
-          body: () {
-            if (reservationList.isEmpty) {
-              return const Center(
-                child: Text('Kamu belum buat transaksi'),
-              );
-            } else {
-              return ListView.builder(
-                  itemCount: reservationList.length,
-                  itemBuilder: ((context, index) {
-                    return const ListTile();
-                  }));
-            }
-          }());
-    });
+    return SizedBox();
+    // return BlocBuilder<ReservationsListCubit, List<Reservation>>(
+    //     builder: (context, reservationList) {
+    //   log('reservationList $reservationList');
+    //   return Scaffold(
+    //       appBar: AppBar(),
+    //       body: () {
+    //         if (reservationList.isEmpty) {
+    //           return const Center(
+    //             child: Text('Kamu belum buat transaksi'),
+    //           );
+    //         } else {
+    //           return ListView.builder(
+    //               itemCount: reservationList.length,
+    //               itemBuilder: ((context, index) {
+    //                 return const ListTile();
+    //               }));
+    //         }
+    //       }());
+    // });
   }
 }
