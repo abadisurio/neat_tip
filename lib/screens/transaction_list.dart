@@ -1,16 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neat_tip/bloc/reservation_list.dart';
-import 'package:neat_tip/models/reservation.dart';
 
 class TransactionList extends StatelessWidget {
   const TransactionList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox();
+    return const SizedBox();
     // return BlocBuilder<ReservationsListCubit, List<Reservation>>(
     //     builder: (context, reservationList) {
     //   log('reservationList $reservationList');

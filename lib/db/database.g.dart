@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: library_private_types_in_public_api
+
 part of 'database.dart';
 
 // **************************************************************************
@@ -63,6 +65,8 @@ class _$NeatTipDatabase extends NeatTipDatabase {
 
   VehicleDao? _vehicleDaoInstance;
 
+  NeatTipNotificationsDao? _neatTipNotificationsDaoInstance;
+
   TransactionsDao? _transactionsDaoInstance;
 
   ReservationsDao? _reservationsDaoInstance;
@@ -94,6 +98,8 @@ class _$NeatTipDatabase extends NeatTipDatabase {
             'CREATE TABLE IF NOT EXISTS `Transactions` (`id` TEXT NOT NULL, `customerUserId` TEXT NOT NULL, `timeRequested` TEXT NOT NULL, `timeFinished` TEXT, `value` INTEGER, `service` TEXT, `status` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Reservation` (`id` TEXT NOT NULL, `spotId` TEXT NOT NULL, `hostUserId` TEXT NOT NULL, `plateNumber` TEXT NOT NULL, `spotName` TEXT, `customerId` TEXT, `timeCheckedIn` TEXT, `timeCheckedOut` TEXT, `note` TEXT, `charge` INTEGER, `status` TEXT, PRIMARY KEY (`id`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `NeatTipNotification` (`createdAt` TEXT NOT NULL, `title` TEXT NOT NULL, `body` TEXT NOT NULL, PRIMARY KEY (`createdAt`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -104,6 +110,12 @@ class _$NeatTipDatabase extends NeatTipDatabase {
   @override
   VehicleDao get vehicleDao {
     return _vehicleDaoInstance ??= _$VehicleDao(database, changeListener);
+  }
+
+  @override
+  NeatTipNotificationsDao get neatTipNotificationsDao {
+    return _neatTipNotificationsDaoInstance ??=
+        _$NeatTipNotificationsDao(database, changeListener);
   }
 
   @override
@@ -189,6 +201,82 @@ class _$VehicleDao extends VehicleDao {
   @override
   Future<void> removeVehicle(Vehicle vehicle) async {
     await _vehicleDeletionAdapter.delete(vehicle);
+  }
+}
+
+class _$NeatTipNotificationsDao extends NeatTipNotificationsDao {
+  _$NeatTipNotificationsDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
+        _neatTipNotificationInsertionAdapter = InsertionAdapter(
+            database,
+            'NeatTipNotification',
+            (NeatTipNotification item) => <String, Object?>{
+                  'createdAt': item.createdAt,
+                  'title': item.title,
+                  'body': item.body
+                },
+            changeListener),
+        _neatTipNotificationDeletionAdapter = DeletionAdapter(
+            database,
+            'NeatTipNotification',
+            ['createdAt'],
+            (NeatTipNotification item) => <String, Object?>{
+                  'createdAt': item.createdAt,
+                  'title': item.title,
+                  'body': item.body
+                },
+            changeListener);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<NeatTipNotification>
+      _neatTipNotificationInsertionAdapter;
+
+  final DeletionAdapter<NeatTipNotification>
+      _neatTipNotificationDeletionAdapter;
+
+  @override
+  Future<List<NeatTipNotification>> findAllNotifications() async {
+    return _queryAdapter.queryList('SELECT * FROM NeatTipNotification',
+        mapper: (Map<String, Object?> row) => NeatTipNotification(
+            title: row['title'] as String,
+            createdAt: row['createdAt'] as String,
+            body: row['body'] as String));
+  }
+
+  @override
+  Stream<NeatTipNotification?> findNeatTipNotificationById(int id) {
+    return _queryAdapter.queryStream(
+        'SELECT * FROM NeatTipNotification WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => NeatTipNotification(
+            createdAt: row['createdAt'] as String,
+            title: row['title'] as String,
+            body: row['body'] as String),
+        arguments: [id],
+        queryableName: 'NeatTipNotification',
+        isView: false);
+  }
+
+  @override
+  Future<void> flushAllNotification() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM NeatTipNotification');
+  }
+
+  @override
+  Future<void> insertNotification(NeatTipNotification reservation) async {
+    await _neatTipNotificationInsertionAdapter.insert(
+        reservation, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> removeNotification(NeatTipNotification vehicle) async {
+    await _neatTipNotificationDeletionAdapter.delete(vehicle);
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:neat_tip/bloc/app_state.dart';
 import 'package:neat_tip/bloc/camera.dart';
+import 'package:neat_tip/bloc/notification_list.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/transaction_list.dart';
@@ -67,6 +68,7 @@ class _MyAppState extends State<MyApp> {
   late NeatTipDatabase database;
   late VehicleListCubit vehicleListCubit;
   late AppStateCubit appStateCubit;
+  late NotificationListCubit notificationListCubit;
   late TransactionsListCubit transactionsListCubit;
   late ReservationsListCubit reservationsListCubit;
   late NeatTipUserCubit neatTipUserCubit;
@@ -86,6 +88,7 @@ class _MyAppState extends State<MyApp> {
         await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
 
     vehicleListCubit.initialize(localDB: database);
+    notificationListCubit.initialize(localDB: database);
     // vehicleListCubit.pullDataFromDB();
 
     transactionsListCubit.initializeDB(database);
@@ -118,6 +121,7 @@ class _MyAppState extends State<MyApp> {
     neatTipUserCubit = NeatTipUserCubit();
     transactionsListCubit = TransactionsListCubit();
     appStateCubit = AppStateCubit();
+    notificationListCubit = NotificationListCubit();
     reservationsListCubit = ReservationsListCubit();
     cameraCubit = CameraCubit();
     routeObserverCubit = RouteObserverCubit();
@@ -133,6 +137,8 @@ class _MyAppState extends State<MyApp> {
               providers: [
                 BlocProvider<AppStateCubit>(
                     create: (BuildContext context) => appStateCubit),
+                BlocProvider<NotificationListCubit>(
+                    create: (BuildContext context) => notificationListCubit),
                 BlocProvider<CameraCubit>(
                     create: (BuildContext context) => cameraCubit),
                 BlocProvider<RouteObserverCubit>(

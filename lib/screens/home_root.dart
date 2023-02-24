@@ -6,13 +6,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
+import 'package:neat_tip/bloc/notification_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
+import 'package:neat_tip/models/neattip_notification.dart';
 import 'package:neat_tip/screens/customer/explore_spot.dart';
 import 'package:neat_tip/screens/customer/home_customer.dart';
 import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/screens/customer/vehicle_list.dart';
+import 'package:neat_tip/screens/notifications.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
 
 class HomeRoot extends StatefulWidget {
@@ -26,15 +29,12 @@ class _HomeRootState extends State<HomeRoot> {
   int _selectedIndex = 0;
   String userRole = 'Pengguna';
   static const thinStyle = TextStyle(fontSize: 24, fontWeight: FontWeight.w300);
-  static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
+  // static const TextStyle optionStyle = TextStyle(fontWeight: FontWeight.bold);
   final List<Widget> _widgetOptions = <Widget>[
     const HomeCustomer(),
     const ExploreSpot(),
     const SizedBox(),
-    const Text(
-      'Kotak Masuk',
-      style: optionStyle,
-    ),
+    const Notifications(),
     const Manage(),
   ];
 
@@ -67,20 +67,26 @@ class _HomeRootState extends State<HomeRoot> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       log('sinikwaokwoa ${notification?.toMap()}');
-      if (notification != null && mounted) {
+      if (notification != null) {
         log('notification.hashCode ${notification.hashCode}');
-        ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-          icon: const Icon(Icons.motorcycle),
-          content: ListTile(
-            onTap: () {},
-            // dense: true,
-            leading: const CircleAvatar(child: Icon(Icons.notifications)),
-            title: Text(notification.title ?? ''),
-            subtitle: Text(notification.body ?? ''),
-            // trailing:
-          ),
-        ).create() // SnackBar(
-            );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+            icon: const Icon(Icons.motorcycle),
+            content: ListTile(
+              onTap: () {},
+              // dense: true,
+              leading: const CircleAvatar(child: Icon(Icons.notifications)),
+              title: Text(notification.title ?? ''),
+              subtitle: Text(notification.body ?? ''),
+              // trailing:
+            ),
+          ).create() // SnackBar(
+              );
+          context.read<NotificationListCubit>().add(NeatTipNotification(
+              createdAt: DateTime.now().toIso8601String(),
+              title: notification.title ?? '',
+              body: notification.body ?? ''));
+        }
       }
     });
 
