@@ -39,6 +39,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
   Spot? _detectedSpot;
+  bool _isInLocation = false;
   late VehicleListCubit _vehicleListCubit;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
@@ -153,6 +154,20 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     }
   }
 
+  _processCheckout() async {
+    final result = await Navigator.pushNamed(context, '/authorization',
+        arguments:
+            'Konfirmasi pengambilan dan pembayaran penitipan motor di Kurnia Motor');
+    if (mounted) {
+      log('result $result');
+      if (result == true) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/reservation_detail', (route) => route.isFirst,
+            arguments: '');
+      }
+    }
+  }
+
   @override
   void initState() {
     _vehicleListCubit = context.read<VehicleListCubit>();
@@ -242,7 +257,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                             Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(6),
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Theme.of(context).canvasColor,
                                 ),
                                 child: _detectedVehicle != null
                                     ? VehicleItem(vehicle: _detectedVehicle!)
@@ -269,75 +284,47 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
             secondChild: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: ClipOval(
-                            clipBehavior: Clip.hardEdge,
-                            child: GestureDetector(
-                              onTap: () {
-                                log('tapp');
-                              },
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: CachedNetworkImage(
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                  imageUrl: FirebaseAuth
-                                          .instance.currentUser?.photoURL ??
-                                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                                  placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator()),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                              ),
-                            ),
-                          )),
-                      const VerticalDivider(),
-                      const CircleAvatar(
-                        radius: 30,
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_forward,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                      const VerticalDivider(),
-                      SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: ClipOval(
-                            clipBehavior: Clip.hardEdge,
-                            child: GestureDetector(
-                              onTap: () {
-                                log('tapp');
-                              },
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: CachedNetworkImage(
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                  imageUrl: FirebaseAuth
-                                          .instance.currentUser?.photoURL ??
-                                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                                  placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator()),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                              ),
-                            ),
-                          )),
-                    ],
-                  ),
+                const Divider(
+                  thickness: 0,
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Penitipan',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          'Kurnia Motor',
+                        ),
+                      ],
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              _isInLocation ? Colors.green : Colors.red),
+                      label: Text(
+                          '${_isInLocation ? 'Berada di' : 'Jauh dari'} lokasi'),
+                      onPressed: () {},
+                      icon: Icon(_isInLocation
+                          ? Icons.check
+                          : Icons.wrong_location_rounded),
+                    )
+                  ],
+                ),
+                if (!_isInLocation)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Pindai kendaraan Anda sesuai dengan tempat penitipan!',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                  ),
+                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -443,7 +430,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                     children: [
                       Icon(
                         Icons.wallet,
-                        color: Colors.red.shade500,
+                        color: Colors.red.shade400,
                       ),
                       const SizedBox(
                         width: 12,
@@ -463,7 +450,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 //   title: Text('Credit'),
                 // ),
                 ElevatedButton(
-                    onPressed: () {}, child: const Text('Ambil Kendaraan'))
+                    onPressed: _isInLocation ? _processCheckout : null,
+                    child: const Text('Ambil Kendaraan'))
               ],
             ),
           ),

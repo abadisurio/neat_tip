@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
+import 'package:neat_tip/screens/authorization.dart';
 import 'package:neat_tip/screens/customer/scan_vehicle_customer.dart';
 import 'package:neat_tip/screens/host/confirm_scan_vehicle.dart';
 import 'package:neat_tip/screens/host/home_host.dart';
@@ -107,6 +108,17 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           },
           opaque: false,
           pageBuilder: (context, anim1, anim2) => const SignOut(),
+          settings: settings);
+    case '/authorization':
+      return PageRouteBuilder(
+          transitionsBuilder: (ctx, anim1, anim2, child) {
+            return BackdropFilter(
+                filter: ImageFilter.blur(
+                    sigmaX: 7 * anim1.value, sigmaY: 7 * anim1.value),
+                child: Opacity(opacity: anim1.value, child: child));
+          },
+          opaque: false,
+          pageBuilder: (context, anim1, anim2) => const Authorization(),
           settings: settings);
   }
   return null;
