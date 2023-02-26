@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +7,6 @@ import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/screens/dialog_find_plate.dart';
 import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
-import 'package:path_provider/path_provider.dart';
 
 class VehicleList extends StatelessWidget {
   const VehicleList({super.key});

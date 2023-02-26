@@ -1,21 +1,15 @@
 import 'dart:developer';
-import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camera/camera.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:intl/intl.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
-import 'package:neat_tip/models/spot.dart';
 import 'package:neat_tip/models/vehicle.dart';
-import 'package:neat_tip/screens/customer/vehicle_list.dart';
 import 'package:neat_tip/utils/constants.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ScanVehicleCustomer extends StatefulWidget {
   const ScanVehicleCustomer({Key? key}) : super(key: key);
@@ -38,8 +32,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   String _lastDetectedPlate = "";
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
-  Spot? _detectedSpot;
-  bool _isInLocation = false;
+  // Spot? _detectedSpot;
+  final bool _isInLocation = true;
   late VehicleListCubit _vehicleListCubit;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
@@ -278,7 +272,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 : CrossFadeState.showSecond,
             // opacity: (_isScanning) ? 0 : 1,
             firstChild: const Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(100.0),
               child: Center(child: CircularProgressIndicator()),
             ),
             secondChild: Column(
@@ -297,7 +291,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           'Penitipan',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        Text(
+                        const Text(
                           'Kurnia Motor',
                         ),
                       ],
@@ -307,8 +301,9 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           backgroundColor:
                               _isInLocation ? Colors.green : Colors.red),
                       label: Text(
-                          '${_isInLocation ? 'Berada di' : 'Jauh dari'} lokasi'),
-                      onPressed: () {},
+                          '${_isInLocation ? 'Sudah di' : 'Jauh dari'} lokasi'),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/spot_detail'),
                       icon: Icon(_isInLocation
                           ? Icons.check
                           : Icons.wrong_location_rounded),
@@ -319,7 +314,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Pindai kendaraan Anda sesuai dengan tempat penitipan!',
+                      'Pindai kendaraan Anda tepat pada lokasi penitipan!',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.caption,
                     ),
@@ -339,7 +334,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           DateFormat('EEE, dd MMM yyyy', 'id_ID')
                               .format(DateTime.now()),
                         ),
-                        Text(
+                        const Text(
                           '2 Hari yang lalu',
                         ),
                       ],
@@ -351,12 +346,13 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           'Check-out',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
+                        if (_isInLocation)
+                          Text(
+                            DateFormat('EEE, dd MMM yyyy', 'id_ID')
+                                .format(DateTime.now()),
+                          ),
                         Text(
-                          DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                              .format(DateTime.now()),
-                        ),
-                        const Text(
-                          'Sekarang',
+                          _isInLocation ? 'Sekarang' : 'Nanti\n',
                         ),
                       ],
                     ),
@@ -378,8 +374,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                       const SizedBox(
                         width: 12,
                       ),
-                      Expanded(child: Text('Dapatkan potongan harga')),
-                      Icon(Icons.chevron_right)
+                      const Expanded(child: Text('Dapatkan potongan harga')),
+                      const Icon(Icons.chevron_right)
                     ],
                   ),
                 ),
@@ -451,7 +447,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 // ),
                 ElevatedButton(
                     onPressed: _isInLocation ? _processCheckout : null,
-                    child: const Text('Ambil Kendaraan'))
+                    child: Text(
+                        'Ambil Kendaraan${_isInLocation ? '' : ' Ditunda'}'))
               ],
             ),
           ),

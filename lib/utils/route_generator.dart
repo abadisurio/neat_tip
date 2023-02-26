@@ -13,6 +13,7 @@ import 'package:neat_tip/screens/profile_edit.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
+import 'package:neat_tip/screens/spot_detail.dart';
 import 'package:neat_tip/screens/state_loading.dart';
 import 'package:neat_tip/screens/vehicle_request.dart';
 import 'package:neat_tip/screens/wallet.dart';
@@ -87,6 +88,9 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/homehost':
       return MaterialPageRoute(
           builder: (_) => const HomeHost(), settings: settings);
+    case '/spot_detail':
+      return CupertinoPageRoute(
+          builder: (_) => const SpotDetail(), settings: settings);
     case '/state_loading':
       return PageRouteBuilder(
           transitionsBuilder: (ctx, anim1, anim2, child) {
