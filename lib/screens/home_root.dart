@@ -49,7 +49,9 @@ class _HomeRootState extends State<HomeRoot> {
   }
 
   void _onScanTapped() {
-    if (userRole != 'Pengguna') {
+    if (userRole == 'Pengguna') {
+      Navigator.pushNamed(context, '/scan_vehicle_customer');
+    } else {
       Navigator.pushNamed(context, '/scan_vehicle');
     }
   }

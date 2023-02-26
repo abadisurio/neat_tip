@@ -18,6 +18,7 @@ import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/neattip_user.dart';
 import 'package:neat_tip/screens/home_root.dart';
 import 'package:neat_tip/screens/introduction.dart';
+import 'package:neat_tip/screens/loading_window.dart';
 import 'package:neat_tip/screens/permission_window.dart';
 import 'package:neat_tip/service/fb_cloud_messaging.dart';
 import 'package:neat_tip/utils/route_generator.dart';
@@ -155,51 +156,51 @@ class _MyAppState extends State<MyApp> {
               child: BlocBuilder<AppStateCubit, AppState>(
                 builder: (context, appState) {
                   log('appState ${appState.darkMode}');
-                  return snapshot.connectionState != ConnectionState.done
-                      ? const SizedBox()
-                      : MaterialApp(
-                          themeMode: (appState.darkMode)
-                              ? ThemeMode.dark
-                              : ThemeMode.light,
-                          title: 'Neat Tip',
-                          navigatorObservers: [routeObserver],
-                          debugShowCheckedModeBanner: false,
-                          darkTheme: getThemeDataDark(),
-                          theme: getThemeData(),
-                          onGenerateRoute: routeGenerator,
-                          home: () {
-                            // FlutterNativeSplash.remove();
-                            // return LoadingWindow();
-                            log('snapshot.connectionState ${snapshot.connectionState}');
-                            log('darkmode ${appState.darkMode}');
-                            // if (snapshot.connectionState != ConnectionState.done) {
-                            //   //  FlutterNativeSplash.remove();
-                            //   return const LoadingWindow();
-                            // } else {
-                            // }
-                            FlutterNativeSplash.remove();
-                            if (user == null) {
-                              return const Introduction();
-                            } else if (!isNeedPermission) {
-                              return Builder(builder: (context) {
-                                return PermissionWindow(
-                                  onAllowedAll: () {
-                                    Navigator.pushNamedAndRemoveUntil(context,
-                                        () {
-                                      switch (user!.role) {
-                                        case 'host_owner':
-                                          return '/homehost';
-                                        default:
-                                          return '/homeroot';
-                                      }
-                                    }(), (route) => false);
-                                  },
-                                );
-                              });
-                            }
-                            return const HomeRoot();
-                          }(),
-                        );
+                  return
+                      // snapshot.connectionState != ConnectionState.done
+                      //     ? const SizedBox()
+                      //     :
+                      MaterialApp(
+                    themeMode:
+                        (appState.darkMode) ? ThemeMode.dark : ThemeMode.light,
+                    title: 'Neat Tip',
+                    navigatorObservers: [routeObserver],
+                    debugShowCheckedModeBanner: false,
+                    darkTheme: getThemeDataDark(),
+                    theme: getThemeData(),
+                    onGenerateRoute: routeGenerator,
+                    home: () {
+                      // FlutterNativeSplash.remove();
+                      // return LoadingWindow();
+                      log('snapshot.connectionState ${snapshot.connectionState}');
+                      log('darkmode ${appState.darkMode}');
+                      if (snapshot.connectionState != ConnectionState.done) {
+                        //  FlutterNativeSplash.remove();
+                        return const LoadingWindow();
+                        // } else {
+                      }
+                      FlutterNativeSplash.remove();
+                      if (user == null) {
+                        return const Introduction();
+                      } else if (!isNeedPermission) {
+                        return Builder(builder: (context) {
+                          return PermissionWindow(
+                            onAllowedAll: () {
+                              Navigator.pushNamedAndRemoveUntil(context, () {
+                                switch (user!.role) {
+                                  case 'host_owner':
+                                    return '/homehost';
+                                  default:
+                                    return '/homeroot';
+                                }
+                              }(), (route) => false);
+                            },
+                          );
+                        });
+                      }
+                      return const HomeRoot();
+                    }(),
+                  );
                 },
               ));
         });
