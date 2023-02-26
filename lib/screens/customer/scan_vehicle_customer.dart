@@ -83,6 +83,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _startScanning() {
+    _detectedVehicle = null;
     setState(() {
       _isScanning = true;
     });
@@ -253,231 +254,219 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
               ),
             ),
           ),
-          if (_detectedVehicle != null)
-            AnimatedOpacity(
-              curve: Curves.easeOutCirc,
-              duration: const Duration(milliseconds: 500),
-              opacity: (_isScanning) ? 0 : 1,
-              child: AnimatedSize(
-                curve: Curves.easeOutCirc,
-                duration: const Duration(milliseconds: 500),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _detectedVehicle == null
-                      ? []
-                      : [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                    height: 60,
-                                    width: 60,
-                                    child: ClipOval(
-                                      clipBehavior: Clip.hardEdge,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          log('tapp');
-                                        },
-                                        child: AspectRatio(
-                                          aspectRatio: 1,
-                                          child: CachedNetworkImage(
-                                            height: double.infinity,
-                                            fit: BoxFit.cover,
-                                            imageUrl: FirebaseAuth.instance
-                                                    .currentUser?.photoURL ??
-                                                'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                                            placeholder: (context, url) =>
-                                                const Center(
-                                                    child:
-                                                        CircularProgressIndicator()),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
-                                        ),
-                                      ),
-                                    )),
-                                const VerticalDivider(),
-                                const CircleAvatar(
-                                  radius: 30,
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.arrow_forward,
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                                const VerticalDivider(),
-                                SizedBox(
-                                    height: 60,
-                                    width: 60,
-                                    child: ClipOval(
-                                      clipBehavior: Clip.hardEdge,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          log('tapp');
-                                        },
-                                        child: AspectRatio(
-                                          aspectRatio: 1,
-                                          child: CachedNetworkImage(
-                                            height: double.infinity,
-                                            fit: BoxFit.cover,
-                                            imageUrl: FirebaseAuth.instance
-                                                    .currentUser?.photoURL ??
-                                                'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
-                                            placeholder: (context, url) =>
-                                                const Center(
-                                                    child:
-                                                        CircularProgressIndicator()),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
-                                        ),
-                                      ),
-                                    )),
-                              ],
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Check-in',
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  Text(
-                                    DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                                        .format(DateTime.now()),
-                                  ),
-                                  Text(
-                                    '2 Hari yang lalu',
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Check-out',
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  Text(
-                                    DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                                        .format(DateTime.now()),
-                                  ),
-                                  const Text(
-                                    'Sekarang',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const Divider(),
-                          Text(
-                            'Penawaran',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.discount,
-                                  color: Colors.orange.shade800,
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                Expanded(
-                                    child: Text('Dapatkan potongan harga')),
-                                Icon(Icons.chevron_right)
-                              ],
-                            ),
-                          ),
-                          const Divider(),
-                          Text(
-                            'Rincian',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                          ...prices.map(
-                            (e) {
-                              final isSurplus = (e['price'] as int) < 0;
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(e['name']),
-                                  Text(
-                                    '${isSurplus ? '-' : ''}Rp${(e['price'] as int).abs()}',
-                                    style: TextStyle(
-                                        color: (isSurplus
-                                            ? Colors.green.shade700
-                                            : null)),
-                                  )
-                                ],
-                              );
-                            },
-                          ).toList(),
-                          Row(
-                            children: [
-                              const Expanded(child: Text('Jumlah')),
-                              Text(
-                                'Rp${(prices.fold(0, (previousValue, element) => previousValue + ((element['price'] as int) > 0 ? (element['price'] as int) : 0)))} ',
-                                style: const TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey),
-                              ),
-                              Text(
-                                  'Rp${(prices.fold(0, (previousValue, element) => previousValue + (element['price'] as int)))}')
-                            ],
-                          ),
-                          const Divider(),
-                          Text(
-                            'Pembayaran',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-
-                          TextButton(
-                            onPressed: () {},
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.wallet,
-                                  color: Colors.red.shade500,
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                const Expanded(
-                                    child: Text('Rp${5000} dari Saldo')),
-                                // Icon(Icons.chevron_right)
-                              ],
-                            ),
-                          ),
-                          // const ListTile(
-                          //   leading: Center(child: Icon(Icons.wallet)),
-                          //   dense: true,
-                          //   title: Text('Credit'),
-                          // ),
-                          // const ListTile(
-                          //   dense: true,
-                          //   title: Text('Credit'),
-                          // ),
-                          ElevatedButton(
-                              onPressed: () {},
-                              child: const Text('Ambil Kendaraan'))
-                        ],
-                ),
-              ),
+          AnimatedCrossFade(
+            firstCurve: Curves.easeOutCirc,
+            secondCurve: Curves.easeOutCirc,
+            duration: const Duration(milliseconds: 250),
+            crossFadeState: _detectedVehicle == null
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            // opacity: (_isScanning) ? 0 : 1,
+            firstChild: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Center(child: CircularProgressIndicator()),
             ),
+            secondChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: ClipOval(
+                            clipBehavior: Clip.hardEdge,
+                            child: GestureDetector(
+                              onTap: () {
+                                log('tapp');
+                              },
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: CachedNetworkImage(
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  imageUrl: FirebaseAuth
+                                          .instance.currentUser?.photoURL ??
+                                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
+                                  placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator()),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                              ),
+                            ),
+                          )),
+                      const VerticalDivider(),
+                      const CircleAvatar(
+                        radius: 30,
+                        child: Center(
+                          child: Icon(
+                            Icons.arrow_forward,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                      const VerticalDivider(),
+                      SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: ClipOval(
+                            clipBehavior: Clip.hardEdge,
+                            child: GestureDetector(
+                              onTap: () {
+                                log('tapp');
+                              },
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: CachedNetworkImage(
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  imageUrl: FirebaseAuth
+                                          .instance.currentUser?.photoURL ??
+                                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=240',
+                                  placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator()),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                              ),
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Check-in',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          DateFormat('EEE, dd MMM yyyy', 'id_ID')
+                              .format(DateTime.now()),
+                        ),
+                        Text(
+                          '2 Hari yang lalu',
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Check-out',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          DateFormat('EEE, dd MMM yyyy', 'id_ID')
+                              .format(DateTime.now()),
+                        ),
+                        const Text(
+                          'Sekarang',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Divider(),
+                Text(
+                  'Penawaran',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.discount,
+                        color: Colors.orange.shade800,
+                      ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      Expanded(child: Text('Dapatkan potongan harga')),
+                      Icon(Icons.chevron_right)
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Text(
+                  'Rincian',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                ...prices.map(
+                  (e) {
+                    final isSurplus = (e['price'] as int) < 0;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(e['name']),
+                        Text(
+                          '${isSurplus ? '-' : ''}Rp${(e['price'] as int).abs()}',
+                          style: TextStyle(
+                              color:
+                                  (isSurplus ? Colors.green.shade700 : null)),
+                        )
+                      ],
+                    );
+                  },
+                ).toList(),
+                Row(
+                  children: [
+                    const Expanded(child: Text('Jumlah')),
+                    Text(
+                      'Rp${(prices.fold(0, (previousValue, element) => previousValue + ((element['price'] as int) > 0 ? (element['price'] as int) : 0)))} ',
+                      style: const TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey),
+                    ),
+                    Text(
+                        'Rp${(prices.fold(0, (previousValue, element) => previousValue + (element['price'] as int)))}')
+                  ],
+                ),
+                const Divider(),
+                Text(
+                  'Pembayaran',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+
+                TextButton(
+                  onPressed: () {},
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.wallet,
+                        color: Colors.red.shade500,
+                      ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      const Expanded(child: Text('Rp${5000} dari Saldo')),
+                      // Icon(Icons.chevron_right)
+                    ],
+                  ),
+                ),
+                // const ListTile(
+                //   leading: Center(child: Icon(Icons.wallet)),
+                //   dense: true,
+                //   title: Text('Credit'),
+                // ),
+                // const ListTile(
+                //   dense: true,
+                //   title: Text('Credit'),
+                // ),
+                ElevatedButton(
+                    onPressed: () {}, child: const Text('Ambil Kendaraan'))
+              ],
+            ),
+          ),
         ],
       ),
     );
