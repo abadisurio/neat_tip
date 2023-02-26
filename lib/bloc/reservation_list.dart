@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
   late NeatTipDatabase _db;
   late FirebaseFirestore _firestore;
   late String _userId;
+  StreamSubscription<QuerySnapshot>? _streamSub;
   // get collection => state;
   // get length => state.length;
 
@@ -68,25 +70,27 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
           .where("status", isEqualTo: "ongoing")
           .limit(10)
           .snapshots();
-      snapshot.listen((event) async {
-        final data = await Future.wait(event.docs.map((e) async {
-          final spot = await _firestore
-              .collection("spots")
-              .doc("voX3FwgED5lggS4RnKaQ")
-              .get();
-          // await _firestore.collection("spots").doc(e.get("spotName")).get();
-          log('spot.get("spotName") ${spot.get("name")}');
+      _streamSub = snapshot.listen(
+        (event) async {
+          final data = await Future.wait(event.docs.map((e) async {
+            final spot = await _firestore
+                .collection("spots")
+                .doc("voX3FwgED5lggS4RnKaQ")
+                .get();
+            // await _firestore.collection("spots").doc(e.get("spotName")).get();
+            log('spot.get("spotName") ${spot.get("name")}');
 
-          return Reservation.fromJson({
-            'id': e.id,
-            'spotId': 'spotId',
-            'hostUserId': 'hostUserId',
-            'spotName': spot.get("name"),
-            ...e.data(),
-          });
-        }).toList());
-        _syncDataAndEmit([], data);
-      });
+            return Reservation.fromJson({
+              'id': e.id,
+              'spotId': 'spotId',
+              'hostUserId': 'hostUserId',
+              'spotName': spot.get("name"),
+              ...e.data(),
+            });
+          }).toList());
+          _syncDataAndEmit([], data);
+        },
+      );
     } catch (e) {
       // log('eee $e');
       throw Exception(e);
@@ -121,6 +125,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
   }
 
   Future<void> flushDataFromDB() async {
+    _streamSub?.cancel();
     await _db.reservationsDao.flushAllReservation();
   }
 

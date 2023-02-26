@@ -22,10 +22,10 @@ class _SignOutState extends State<SignOut> {
         context.read<ReservationsListCubit>();
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.remove("fcmToken");
-    await neatTipUserCubit.signOut();
-    await appStateCubit.flush();
     await vehicleListCubit.flushDataFromDB();
     await reservationsListCubit.flushDataFromDB();
+    await neatTipUserCubit.signOut();
+    await appStateCubit.flush();
     if (mounted) {
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pushNamedAndRemoveUntil(context, '/intro', (route) => false);
