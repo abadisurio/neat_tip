@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/host/confirm_scan_vehicle.dart';
 import 'package:neat_tip/screens/host/home_host.dart';
@@ -36,15 +37,6 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/auth':
       return CupertinoPageRoute(
           builder: (_) => const AuthScreen(), settings: settings);
-    case '/home':
-      return CupertinoPageRoute(
-          builder: (_) => const HomeCustomer(), settings: settings);
-    case '/homeroot':
-      return CupertinoPageRoute(
-          builder: (_) => const HomeRoot(), settings: settings);
-    case '/homehost':
-      return CupertinoPageRoute(
-          builder: (_) => const HomeHost(), settings: settings);
     case '/vehiclelist':
       return CupertinoPageRoute(
           builder: (_) => const VehicleList(), settings: settings);
@@ -81,6 +73,15 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/reservation_detail':
       return CupertinoPageRoute(
           builder: (_) => const ReservationDetail(), settings: settings);
+    case '/home':
+      return MaterialPageRoute(
+          builder: (_) => const HomeCustomer(), settings: settings);
+    case '/homeroot':
+      return MaterialPageRoute(
+          builder: (_) => const HomeRoot(), settings: settings);
+    case '/homehost':
+      return MaterialPageRoute(
+          builder: (_) => const HomeHost(), settings: settings);
     case '/state_loading':
       return PageRouteBuilder(
           transitionsBuilder: (ctx, anim1, anim2, child) {

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,6 +18,11 @@ class _IntroductionState extends State<Introduction> {
   int _pageIndex = 0;
   int _vehicleLength = 0;
   late VehicleListCubit _vehicleListCubit;
+  late ReservationsListCubit _reservationListCubit;
+
+  Future<void> _reloadData() async {
+    await _reservationListCubit.reload();
+  }
 
   navigateToAuthPage() async {
     final isLoggedIn = await Navigator.pushNamed(context, '/auth') as bool;
@@ -68,6 +74,7 @@ class _IntroductionState extends State<Introduction> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _vehicleListCubit = context.read<VehicleListCubit>();
+      _reservationListCubit = context.read<ReservationsListCubit>();
     });
     super.initState();
   }
@@ -100,8 +107,9 @@ class _IntroductionState extends State<Introduction> {
                     child: const Text('izin'),
                   ),
           ),
+
           Center(
-            child: (_pageIndex <= _maxPage && _vehicleLength < 1)
+            child: (_pageIndex <= _maxPage)
                 ? null
                 : ElevatedButton(
                     onPressed: navigateToAddVehiclePage,
@@ -111,7 +119,7 @@ class _IntroductionState extends State<Introduction> {
         ],
         onChange: setSuspend,
         showNextButton: _pageIndex <= _maxPage,
-        showDoneButton: _pageIndex <= _maxPage,
+        showDoneButton: _pageIndex <= _maxPage || _vehicleLength > 0,
         // overrideNext: _setPage(1),
         // overrideBack: _setPage(-1),
         next: const Text("Lanjut"),
@@ -121,13 +129,19 @@ class _IntroductionState extends State<Introduction> {
         showBackButton: true,
         allowImplicitScrolling: false,
         // allowImplicitScrolling: true,
-        onDone: () {
+        onDone: () async {
           // On button pressed
           // setState(() {
 
           // });
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/homeroot', (route) => false);
+          await Navigator.pushNamed(context, '/state_loading',
+              arguments: () async {
+            await _reloadData();
+          });
+          if (mounted) {
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/homeroot', (route) => false);
+          }
         },
       ),
     );

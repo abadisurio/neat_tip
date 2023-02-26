@@ -24,8 +24,8 @@ class _SignOutState extends State<SignOut> {
     await sharedPreferences.remove("fcmToken");
     await vehicleListCubit.flushDataFromDB();
     await reservationsListCubit.flushDataFromDB();
-    await neatTipUserCubit.signOut();
     await appStateCubit.flush();
+    await neatTipUserCubit.signOut();
     if (mounted) {
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pushNamedAndRemoveUntil(context, '/intro', (route) => false);

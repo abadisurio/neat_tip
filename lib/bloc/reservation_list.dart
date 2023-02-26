@@ -62,6 +62,11 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     // log('tarikMang $state');
   }
 
+  Future<void> reload() async {
+    _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    await _load();
+  }
+
   Future<void> _listenDataFirestore() async {
     try {
       final snapshot = _firestore
