@@ -26,11 +26,6 @@ class ScanVehicleCustomer extends StatefulWidget {
   State<ScanVehicleCustomer> createState() => _ScanVehicleCustomerState();
 }
 
-const List<Map<String, dynamic>> prices = [
-  {'name': 'Biaya Penitipan Perhari', 'price': 5000},
-  {'name': 'Potongan', 'price': -3000},
-];
-
 class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     with RouteAware {
   CameraController? cameraController;
@@ -39,10 +34,12 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   bool isBatchScanning = false;
   String _lastDetectedPlate = "";
   String _errorMessage = "";
+  int _storeDuration = 0;
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
   Reservation? _reservation;
   Spot? _detectedSpot;
+  List<Map<String, dynamic>>? _prices;
   final bool _isInLocation = true;
   late VehicleListCubit _vehicleListCubit;
   late ReservationsListCubit _reservationsListCubit;
@@ -169,8 +166,11 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   _loadReservation() {
     final data = _reservationsListCubit.findByPlate(_lastDetectedPlate);
     if (data != null) {
+      final duration =
+          DateTime.now().difference(DateTime.parse(data.timeCheckedIn!)).inDays;
       setState(() {
         _reservation = data;
+        _storeDuration = duration;
       });
     }
     // log('_reservation ${_reservation?.toJson()}');
@@ -178,6 +178,15 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
 
   _loadSpot() {
     _detectedSpot = Spot(id: 'id', farePerDay: 5000);
+  }
+
+  _loadPrices() {
+    final charge = _storeDuration * (_detectedSpot!.farePerDay ?? 0);
+    // (_detectedSpot!.farePerDay ?? 0) *
+    //                             ()
+    _prices = [
+      {'name': 'Ongkos Penitipan $_storeDuration Hari ', 'price': charge}
+    ];
   }
 
   void _itemDetected(String plateNumber) async {
@@ -192,6 +201,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
       await _stopScanning();
       _loadReservation();
       _loadSpot();
+      _loadPrices();
       // _startScanning();
     }
   }
@@ -230,10 +240,13 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
       log('result $result');
       if (result == true) {
         _reservation!.status = 'finished';
-        _reservation!.charge = DateTime.now()
-                .difference(DateTime.parse(_reservation!.timeCheckedIn!))
-                .inDays *
-            _detectedSpot!.farePerDay!;
+        _reservation!.charge = (_prices?.fold(
+            0,
+            (previousValue, element) =>
+                (previousValue ?? 0) +
+                ((element['price'] as int) > 0
+                    ? (element['price'] as int)
+                    : 0)));
         _reservation!.timeCheckedOut = DateTime.now().toIso8601String();
         log('_reservation ${_reservation!.toJson()}');
         _reservationsListCubit.updateReservation(_reservation!);
@@ -475,7 +488,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                               builder: (context, snapshot) {
                                 return Text(
                                   dateTimeCount(_reservation!.timeCheckedIn!,
-                                      DateTime.now().toIso8601String()),
+                                      DateTime.now().toIso8601String(),
+                                      onlyDay: true),
                                 );
                               },
                             ),
@@ -530,52 +544,55 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                   'Rincian',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
-                if (_reservation != null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                          'Ongkos Penitipan ${dateTimeCount(_reservation!.timeCheckedIn!, DateTime.now().toIso8601String(), onlyDay: true)}'),
-                      Text(
-                        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
-                            .format((_detectedSpot!.farePerDay ?? 0) *
-                                (DateTime.now()
-                                    .difference(DateTime.parse(
-                                        _reservation!.timeCheckedIn!))
-                                    .inDays)),
-                      )
-                    ],
-                  ),
-                ...prices.map(
-                  (e) {
-                    final isSurplus = (e['price'] as int) < 0;
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(e['name']),
-                        Text(
-                          '${isSurplus ? '-' : ''}Rp${(e['price'] as int).abs()}',
-                          style: TextStyle(
-                              color:
-                                  (isSurplus ? Colors.green.shade700 : null)),
+                // if (_reservation != null)
+                //   Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       Text(
+                //           'Ongkos Penitipan ${dateTimeCount(_reservation!.timeCheckedIn!, DateTime.now().toIso8601String(), onlyDay: true)}'),
+                //       Text(
+                //         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
+                //             .format((_detectedSpot!.farePerDay ?? 0) *
+                //                 (DateTime.now()
+                //                     .difference(DateTime.parse(
+                //                         _reservation!.timeCheckedIn!))
+                //                     .inDays)),
+                //       )
+                //     ],
+                //   ),
+                if (_prices != null)
+                  Column(
+                    children: _prices!
+                        .map(
+                          (e) => Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(e['name']),
+                              Text(
+                                NumberFormat.currency(
+                                        locale: 'id_ID', symbol: 'Rp')
+                                    .format((_detectedSpot!.farePerDay ?? 0) *
+                                        _storeDuration),
+                              )
+                            ],
+                          ),
                         )
-                      ],
-                    );
-                  },
-                ).toList(),
-                Row(
-                  children: [
-                    const Expanded(child: Text('Jumlah')),
-                    Text(
-                      'Rp${(prices.fold(0, (previousValue, element) => previousValue + ((element['price'] as int) > 0 ? (element['price'] as int) : 0)))} ',
-                      style: const TextStyle(
-                          decoration: TextDecoration.lineThrough,
-                          color: Colors.grey),
-                    ),
-                    Text(
-                        'Rp${(prices.fold(0, (previousValue, element) => previousValue + (element['price'] as int)))}')
-                  ],
-                ),
+                        .toList(),
+                  ),
+
+                // Row(
+                //   children: [
+                //     const Expanded(child: Text('Jumlah')),
+                //     Text(
+                //       'Rp${(prices.fold(0, (previousValue, element) => previousValue + ((element['price'] as int) > 0 ? (element['price'] as int) : 0)))} ',
+                //       style: const TextStyle(
+                //           decoration: TextDecoration.lineThrough,
+                //           color: Colors.grey),
+                //     ),
+                //     Text(
+                //         'Rp${(prices.fold(0, (previousValue, element) => previousValue + (element['price'] as int)))}')
+                //   ],
+                // ),
                 const Divider(),
                 Text(
                   'Pembayaran',
@@ -593,7 +610,9 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                       const SizedBox(
                         width: 12,
                       ),
-                      const Expanded(child: Text('Rp${5000} dari Saldo')),
+                      Expanded(
+                          child: Text(
+                              '${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp').format(5000)} Saldo')),
                       // Icon(Icons.chevron_right)
                     ],
                   ),
@@ -610,7 +629,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 ElevatedButton(
                     onPressed: _isInLocation ? _processCheckout : null,
                     child: Text(
-                        'Ambil Kendaraan${_isInLocation ? '' : ' Ditunda'}'))
+                        'Bayar dan Ambil Kendaraan${_isInLocation ? '' : ' Ditunda'}'))
               ],
             ),
           ),
