@@ -337,6 +337,13 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     return state.elementAt(index);
   }
 
+  Vehicle? findByPlate(String plateNumber) {
+    log('state $plateNumber');
+    log('state $state');
+    final data = state.where((element) => element.plate == plateNumber);
+    return data.isNotEmpty ? data.first : null;
+  }
+
   void removeByIndex(int index) {
     log('sss $index');
     log('ssblum $state');

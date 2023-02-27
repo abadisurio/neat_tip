@@ -156,6 +156,11 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     return state?.firstWhere((element) => element.id == id);
   }
 
+  Reservation? findByPlate(String plateNumber) {
+    final data = state?.where((element) => element.plateNumber == plateNumber);
+    return (data != null && data.isNotEmpty) ? data.first : null;
+  }
+
   void updateByIndex(int index, Reservation newReservation) {
     state?[index] = newReservation;
     emit([...?state]);

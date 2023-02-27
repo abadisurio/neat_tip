@@ -256,7 +256,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.flag_circle),
+                icon: const Icon(Icons.flag_circle),
                 onPressed: () {},
               ),
               Expanded(

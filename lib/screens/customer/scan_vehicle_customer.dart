@@ -12,7 +12,9 @@ import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/utils/constants.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
+import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
+import 'package:skeletons/skeletons.dart';
 
 class ScanVehicleCustomer extends StatefulWidget {
   const ScanVehicleCustomer({Key? key}) : super(key: key);
@@ -33,6 +35,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   bool isScreenActive = false;
   bool isBatchScanning = false;
   String _lastDetectedPlate = "";
+  String _errorMessage = "";
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
   Reservation? _reservation;
@@ -76,55 +79,99 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     super.didPopNext();
   }
 
-  onControllerMounted(controller) {
+  _onControllerMounted(controller) {
     setState(() {
       cameraController = controller;
     });
+    _startScanning();
   }
 
   _startScanning() {
-    _detectedVehicle = null;
-    setState(() {
-      _isScanning = true;
-    });
-    cameraController?.startImageStream((image) {
-      // log('hehe');
-      if (_lastDetectedPlate != "") {
-        setState(() {
-          _lastDetectedPlate = "";
-        });
-        return;
+    try {
+      if (cameraController != null && cameraController!.value.isPreviewPaused) {
+        cameraController?.resumePreview();
       }
-      if (!_isScanning) return;
-      if (!_isDetecting) _processCameraImage(image);
-    });
-    Future.delayed(const Duration(seconds: 1), () {
-      _itemDetected('B 3853 KZA');
-    });
+      _detectedVehicle = null;
+      setState(() {
+        _isScanning = true;
+      });
+      // if(cameraController != null && !cameraController!.value.isStreamingImages)
+      cameraController?.startImageStream((image) {
+        // log('hehe');
+        if (_lastDetectedPlate != "") {
+          setState(() {
+            _lastDetectedPlate = "";
+          });
+          return;
+        }
+        if (!_isScanning) return;
+        if (!_isDetecting) _processCameraImage(image);
+      });
+      // Future.delayed(const Duration(seconds: 1), () {
+      //   _itemDetected('B 3853 KZA');
+      // });
+    } catch (e) {
+      log('e $e');
+    }
   }
 
-  stopScanning() async {
-    log('_lastDetectedPlate $_lastDetectedPlate');
-    setState(() {
-      _isScanning = false;
-    });
-    // textRecognizer.close();
-    // log('cameraController!.value.isStreamingImages ${cameraController!.value.isStreamingImages}');
-    // if (cameraController!.value.isStreamingImages) {
-    //   log('berenti');
-    //   await cameraController?.stopImageStream();
-    // }
+  _stopScanning() async {
+    try {
+      await cameraController?.stopImageStream();
+      log('_lastDetectedPlate $_lastDetectedPlate');
+      setState(() {
+        _isScanning = false;
+      });
+      log('cameraController $cameraController');
+      await cameraController?.pausePreview();
+    } catch (e) {
+      log('e $e');
+    }
+  }
+
+  _loadVehicle() {
+    final data = _vehicleListCubit.findByPlate(_lastDetectedPlate);
+    if (data == null) {
+      setState(() {
+        _errorMessage = 'Kendaraan tidak dikenal';
+      });
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          setState(() {
+            _errorMessage = '';
+          });
+        }
+      });
+      // _startScanning();
+    } else {
+      setState(() {
+        _detectedVehicle = data;
+      });
+    }
+  }
+
+  _loadReservation() {
+    final data = _reservationsListCubit.findByPlate(_lastDetectedPlate);
+    if (data != null) {
+      setState(() {
+        _reservation = data;
+      });
+    }
+    // log('_reservation ${_reservation?.toJson()}');
   }
 
   void _itemDetected(String plateNumber) async {
-    log('_vehicleListCubit.state ${_vehicleListCubit.state}');
+    log('plateNumber $plateNumber');
     setState(() {
       _lastDetectedPlate = plateNumber;
-      _detectedVehicle = _vehicleListCubit.state.first;
-      _reservation = _reservationsListCubit.state?.first;
+      // _detectedVehicle = _vehicleListCubit.state.first;
+      // _reservation = _reservationsListCubit.state?.first;
     });
-    if (!isBatchScanning) {
-      stopScanning();
+    _loadVehicle();
+    if (_detectedVehicle != null) {
+      await _stopScanning();
+      _loadReservation();
+      // _startScanning();
     }
   }
 
@@ -179,21 +226,19 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
         isScreenActive = true;
       });
     });
-    _startScanning();
+    // _startScanning();
     super.initState();
   }
 
   @override
   void dispose() {
+    _stopScanning();
     cameraController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // if (cameraController != null) {
-    //   _startScanning();
-    // }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ambil Kendaraan'),
@@ -213,6 +258,12 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
               child: Stack(
                 fit: StackFit.loose,
                 children: [
+                  Transform.scale(
+                    scale: _isScanning ? 1.4 : 2,
+                    child: CameraCapturer(
+                        controller: _onControllerMounted,
+                        resolution: ResolutionPreset.low),
+                  ),
                   AnimatedOpacity(
                     curve: Curves.easeOutCirc,
                     opacity: _isScanning ? 1 : 0,
@@ -220,7 +271,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                     child: const Align(
                         alignment: Alignment.topCenter,
                         child: Text(
-                          '\nPindai plat motor',
+                          '\nPindai plat motor Anda',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -237,6 +289,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                     child: Container(
                         padding: const EdgeInsets.all(16),
                         alignment: Alignment.topLeft,
+                        color: Colors.black87,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -264,10 +317,29 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                                 ),
                                 child: _detectedVehicle != null
                                     ? VehicleItem(vehicle: _detectedVehicle!)
-                                    : null)
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SkeletonListTile(
+                                          hasSubtitle: true,
+                                        ),
+                                      ))
                           ],
                         )),
                   ),
+                  if (_errorMessage != '')
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Card(
+                        color: Colors.red.shade700,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            _errorMessage,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -280,9 +352,21 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
             // opacity: (_isScanning) ? 0 : 1,
-            firstChild: const Padding(
-              padding: EdgeInsets.all(100.0),
-              child: Center(child: CircularProgressIndicator()),
+            firstChild: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Mendeteksi kendaraan',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const Divider(),
+                  const Center(child: LinearProgressIndicator()),
+                ],
+              ),
             ),
             secondChild: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -329,65 +413,73 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                     ),
                   ),
                 const Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                () {
+                  log('_reservation ${_reservation?.toJson()}');
+                  if (_reservation != null) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Check-in',
-                          style: Theme.of(context).textTheme.titleSmall,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Check-in',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            Text(
+                              DateFormat('EEE, dd MMM yyyy', 'id_ID').format(
+                                  DateTime.parse(
+                                      _reservation!.timeCheckedIn ?? '')),
+                            ),
+                            const Text(
+                              '2 Hari yang lalu',
+                            ),
+                          ],
                         ),
-                        Text(
-                          DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                              .format(DateTime.now()),
-                        ),
-                        const Text(
-                          '2 Hari yang lalu',
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Check-out',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            if (_isInLocation)
+                              Text(
+                                DateFormat('EEE, dd MMM yyyy', 'id_ID')
+                                    .format(DateTime.now()),
+                              ),
+                            Text(
+                              _isInLocation ? 'Sekarang' : 'Nanti\n',
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Check-out',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        if (_isInLocation)
-                          Text(
-                            DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                                .format(DateTime.now()),
-                          ),
-                        Text(
-                          _isInLocation ? 'Sekarang' : 'Nanti\n',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const Divider(),
-                Text(
-                  'Penawaran',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.discount,
-                        color: Colors.orange.shade800,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      const Expanded(child: Text('Dapatkan potongan harga')),
-                      const Icon(Icons.chevron_right)
-                    ],
-                  ),
-                ),
+                    );
+                  } else {
+                    return SizedBox(height: 100, child: SkeletonParagraph());
+                  }
+                }(),
+                // const Divider(),
+                // Text(
+                //   'Penawaran',
+                //   style: Theme.of(context).textTheme.titleSmall,
+                // ),
+                // TextButton(
+                //   onPressed: () {},
+                //   child: Row(
+                //     children: [
+                //       Icon(
+                //         Icons.discount,
+                //         color: Colors.orange.shade800,
+                //       ),
+                //       const SizedBox(
+                //         width: 12,
+                //       ),
+                //       const Expanded(child: Text('Dapatkan potongan harga')),
+                //       const Icon(Icons.chevron_right)
+                //     ],
+                //   ),
+                // ),
                 const Divider(),
                 Text(
                   'Rincian',
