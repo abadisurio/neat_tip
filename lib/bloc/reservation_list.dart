@@ -67,6 +67,19 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     await _load();
   }
 
+  Future<void> _updateDataFirestore(Reservation reservation) async {
+    try {
+      await _firestore
+          .collection("reservation")
+          .doc(reservation.id)
+          .update(reservation.toJson())
+          .onError((error, stackTrace) => log('error $error'));
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+  }
+
   Future<void> _listenDataFirestore() async {
     try {
       final snapshot = _firestore
@@ -139,6 +152,10 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     emit([...?newList]);
   }
 
+  Reservation? findById(String id) {
+    return state?.firstWhere((element) => element.id == id);
+  }
+
   void updateByIndex(int index, Reservation newReservation) {
     state?[index] = newReservation;
     emit([...?state]);
@@ -156,6 +173,26 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     await _db.reservationsDao.insertReservation(data);
     emit([...?state, data]);
     return data;
+  }
+
+  Future<void> updateReservation(Reservation newData) async {
+    await _updateDataFirestore(newData);
+    // await _db.reservationsDao.update(data);
+    final oldData = state
+        ?.firstWhere(
+          (element) => element.id == newData.id,
+        )
+        .toJson();
+    oldData?.keys.map((e) {
+      oldData.update(e, (value) => newData.toJson()[e]);
+    });
+    emit([...?state]);
+    // return data;
+  }
+
+  Future<void> finishReservation(Reservation reservation) async {
+    _db.reservationsDao.finishReservationById(reservation.id);
+    _updateDataFirestore(reservation);
   }
 
   _checkConnection() async {

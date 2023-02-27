@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:intl/intl.dart';
+import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
+import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/utils/constants.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
@@ -32,9 +35,11 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   String _lastDetectedPlate = "";
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
+  Reservation? _reservation;
   // Spot? _detectedSpot;
   final bool _isInLocation = true;
   late VehicleListCubit _vehicleListCubit;
+  late ReservationsListCubit _reservationsListCubit;
   final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   @override
@@ -116,6 +121,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     setState(() {
       _lastDetectedPlate = plateNumber;
       _detectedVehicle = _vehicleListCubit.state.first;
+      _reservation = _reservationsListCubit.state?.first;
     });
     if (!isBatchScanning) {
       stopScanning();
@@ -155,9 +161,11 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     if (mounted) {
       log('result $result');
       if (result == true) {
+        log('_reservation!.id ${_reservation!.id}');
         Navigator.pushNamedAndRemoveUntil(
             context, '/reservation_detail', (route) => route.isFirst,
-            arguments: '');
+            arguments: ReservationArgument(
+                newlySucceded: true, reservationId: _reservation!.id));
       }
     }
   }
@@ -165,6 +173,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   @override
   void initState() {
     _vehicleListCubit = context.read<VehicleListCubit>();
+    _reservationsListCubit = context.read<ReservationsListCubit>();
     Future.delayed(const Duration(milliseconds: 350), () {
       setState(() {
         isScreenActive = true;

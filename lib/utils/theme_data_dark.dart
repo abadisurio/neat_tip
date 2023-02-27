@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 getThemeDataDark() {
   return ThemeData.dark().copyWith(
+    textTheme: const TextTheme(bodyMedium: TextStyle(height: 1.6)),
     appBarTheme: AppBarTheme(
       elevation: 0,
       titleTextStyle:

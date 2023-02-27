@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: library_private_types_in_public_api
-
 part of 'database.dart';
 
 // **************************************************************************
@@ -245,9 +243,9 @@ class _$NeatTipNotificationsDao extends NeatTipNotificationsDao {
   Future<List<NeatTipNotification>> findAllNotifications() async {
     return _queryAdapter.queryList('SELECT * FROM NeatTipNotification',
         mapper: (Map<String, Object?> row) => NeatTipNotification(
-            title: row['title'] as String,
             createdAt: row['createdAt'] as String,
-            body: row['body'] as String));
+            body: row['body'] as String,
+            title: row['title'] as String));
   }
 
   @override
@@ -256,8 +254,8 @@ class _$NeatTipNotificationsDao extends NeatTipNotificationsDao {
         'SELECT * FROM NeatTipNotification WHERE id = ?1',
         mapper: (Map<String, Object?> row) => NeatTipNotification(
             createdAt: row['createdAt'] as String,
-            title: row['title'] as String,
-            body: row['body'] as String),
+            body: row['body'] as String,
+            title: row['title'] as String),
         arguments: [id],
         queryableName: 'NeatTipNotification',
         isView: false);
@@ -392,7 +390,7 @@ class _$ReservationsDao extends ReservationsDao {
   }
 
   @override
-  Stream<Reservation?> findReservationById(int id) {
+  Stream<Reservation?> findReservationById(String id) {
     return _queryAdapter.queryStream('SELECT * FROM Reservation WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Reservation(
             id: row['id'] as String,
@@ -408,6 +406,27 @@ class _$ReservationsDao extends ReservationsDao {
             status: row['status'] as String?),
         arguments: [id],
         queryableName: 'Reservation',
+        isView: false);
+  }
+
+  @override
+  Stream<Reservation?> finishReservationById(String id) {
+    return _queryAdapter.queryStream(
+        'UPDATE Reservation SET status = `finished` WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => Reservation(
+            id: row['id'] as String,
+            spotId: row['spotId'] as String,
+            hostUserId: row['hostUserId'] as String,
+            plateNumber: row['plateNumber'] as String,
+            spotName: row['spotName'] as String?,
+            customerId: row['customerId'] as String?,
+            timeCheckedIn: row['timeCheckedIn'] as String?,
+            timeCheckedOut: row['timeCheckedOut'] as String?,
+            note: row['note'] as String?,
+            charge: row['charge'] as int?,
+            status: row['status'] as String?),
+        arguments: [id],
+        queryableName: 'no_table_name',
         isView: false);
   }
 

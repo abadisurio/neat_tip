@@ -9,7 +9,10 @@ abstract class ReservationsDao {
   Future<List<Reservation>> findAllReservation();
 
   @Query('SELECT * FROM Reservation WHERE id = :id')
-  Stream<Reservation?> findReservationById(int id);
+  Stream<Reservation?> findReservationById(String id);
+
+  @Query('UPDATE Reservation SET status = `finished` WHERE id = :id')
+  Stream<Reservation?> finishReservationById(String id);
 
   @insert
   Future<void> insertReservation(Reservation reservation);

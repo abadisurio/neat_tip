@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 getThemeData() {
   return ThemeData(
+    textTheme: const TextTheme(bodyMedium: TextStyle(height: 1.6)),
     appBarTheme: AppBarTheme(
       systemOverlayStyle:
           const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
