@@ -86,7 +86,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
           .collection("reservation")
           .where("customerId", isEqualTo: _userId)
           // .where("status", isEqualTo: "ongoing")
-          .limit(10)
+          // .limit(10)
           .snapshots();
       _streamSub = snapshot.listen(
         (event) async {

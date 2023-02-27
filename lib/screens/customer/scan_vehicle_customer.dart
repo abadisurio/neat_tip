@@ -34,7 +34,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   bool isBatchScanning = false;
   String _lastDetectedPlate = "";
   String _errorMessage = "";
-  int _storeDuration = 0;
+  Duration _storeDuration = const Duration(seconds: 0);
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
   Reservation? _reservation;
@@ -167,7 +167,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     final data = _reservationsListCubit.findByPlate(_lastDetectedPlate);
     if (data != null) {
       final duration =
-          DateTime.now().difference(DateTime.parse(data.timeCheckedIn!)).inDays;
+          dateTimeCount(data.timeCheckedIn!, DateTime.now().toIso8601String());
       setState(() {
         _reservation = data;
         _storeDuration = duration;
@@ -181,11 +181,17 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _loadPrices() {
-    final charge = _storeDuration * (_detectedSpot!.farePerDay ?? 0);
+    final charge = (_storeDuration.inDays == 0 ? 1 : _storeDuration.inDays) *
+        (_detectedSpot!.farePerDay ?? 0);
+    log('charge ${charge}');
     // (_detectedSpot!.farePerDay ?? 0) *
     //                             ()
     _prices = [
-      {'name': 'Ongkos Penitipan $_storeDuration Hari ', 'price': charge}
+      {
+        'name':
+            'Ongkos Penitipan ${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes} Menit' : 'Baru Saja'}',
+        'price': charge
+      }
     ];
   }
 
@@ -487,9 +493,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                                   Stream.periodic(const Duration(seconds: 1)),
                               builder: (context, snapshot) {
                                 return Text(
-                                  dateTimeCount(_reservation!.timeCheckedIn!,
-                                      DateTime.now().toIso8601String(),
-                                      onlyDay: true),
+                                  '${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes} Menit' : 'Baru Saja'}',
                                 );
                               },
                             ),
@@ -571,8 +575,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                               Text(
                                 NumberFormat.currency(
                                         locale: 'id_ID', symbol: 'Rp')
-                                    .format((_detectedSpot!.farePerDay ?? 0) *
-                                        _storeDuration),
+                                    .format(e['price']),
                               )
                             ],
                           ),

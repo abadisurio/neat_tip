@@ -200,8 +200,9 @@ class _ReservationDetailState extends State<ReservationDetail> {
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             Text(
-                              DateFormat('EEE, dd MMM yyyy', 'id_ID').format(
-                                  DateTime.parse(_reservation!.timeCheckedIn!)),
+                              DateFormat("EEE, dd MMM yyyy\nhh:mm:ss", "id_ID")
+                                  .format(DateTime.parse(
+                                      _reservation!.timeCheckedIn!)),
                             ),
                           ],
                         ),
@@ -217,9 +218,11 @@ class _ReservationDetailState extends State<ReservationDetail> {
                             Text(
                               (_reservation!.timeCheckedOut == null)
                                   ? 'Belum'
-                                  : DateFormat('EEE, dd MMM yyyy', 'id_ID')
+                                  : DateFormat(
+                                          "EEE, dd MMM yyyy\nhh:mm:ss", 'id_ID')
                                       .format(DateTime.parse(
                                           _reservation!.timeCheckedOut!)),
+                              textAlign: TextAlign.end,
                             ),
                           ],
                         ),
@@ -240,17 +243,23 @@ class _ReservationDetailState extends State<ReservationDetail> {
                         StreamBuilder(
                           stream: Stream.periodic(const Duration(seconds: 1)),
                           builder: (context, snapshot) {
+                            final duration = dateTimeCount(
+                                _reservation!.timeCheckedIn!,
+                                DateTime.now().toIso8601String());
                             return Text(
-                              dateTimeCount(_reservation!.timeCheckedIn!,
-                                  DateTime.now().toIso8601String()),
+                              '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes} Menit' : 'Baru Saja'}',
                             );
                           },
                         )
                       else
-                        Text(
-                          dateTimeCount(_reservation!.timeCheckedIn!,
-                              _reservation!.timeCheckedOut ?? ''),
-                        ),
+                        () {
+                          final duration = dateTimeCount(
+                              _reservation!.timeCheckedIn!,
+                              _reservation!.timeCheckedOut ?? '');
+                          return Text(
+                            '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes} Menit' : 'Baru Saja'}',
+                          );
+                        }()
                     ],
                   ),
                 ],
