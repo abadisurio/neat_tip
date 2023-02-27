@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:neat_tip/utils/theme_data_dark.dart';
 
 class Authorization extends StatefulWidget {
   const Authorization({Key? key}) : super(key: key);
@@ -52,7 +53,7 @@ class _AuthorizationState extends State<Authorization> {
   Widget build(BuildContext context) {
     _permissionMessage = ModalRoute.of(context)!.settings.arguments as String?;
     return Theme(
-      data: ThemeData.dark(),
+      data: getThemeDataDark(),
       child: WillPopScope(
         onWillPop: () async {
           return false;
@@ -76,7 +77,10 @@ class _AuthorizationState extends State<Authorization> {
                     Text(
                       '${_permissionMessage!} \n',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge!
+                          .copyWith(color: Colors.white),
                     ),
                   const Text(
                     'Masukkan PIN Anda\n',

@@ -54,7 +54,10 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           builder: (_) => const ScanVehicle(), settings: settings);
     case '/scan_vehicle_customer':
       return CupertinoPageRoute(
-          builder: (_) => const ScanVehicleCustomer(), settings: settings);
+          builder: (_) => ScanVehicleCustomer(
+                plateNumber: settings.arguments as String?,
+              ),
+          settings: settings);
     case '/confirm_scan_vehicle':
       return CupertinoPageRoute(
           builder: (_) => const ConfirmScanVehicle(), settings: settings);
@@ -78,7 +81,10 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           builder: (_) => const ReservationList(), settings: settings);
     case '/reservation_detail':
       return CupertinoPageRoute(
-          builder: (_) => const ReservationDetail(), settings: settings);
+          builder: (_) => ReservationDetail(
+                reservationArgument: settings.arguments as ReservationArgument,
+              ),
+          settings: settings);
     case '/home':
       return MaterialPageRoute(
           builder: (_) => const HomeCustomer(), settings: settings);

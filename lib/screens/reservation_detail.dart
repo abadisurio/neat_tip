@@ -5,7 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/reservation.dart';
+import 'package:neat_tip/models/spot.dart';
+import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/utils/date_time_count.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
 import 'package:skeletons/skeletons.dart';
 
@@ -21,17 +24,21 @@ const List<Map<String, dynamic>> prices = [
 ];
 
 class ReservationDetail extends StatefulWidget {
-  const ReservationDetail({Key? key}) : super(key: key);
+  final ReservationArgument reservationArgument;
+  const ReservationDetail({Key? key, required this.reservationArgument})
+      : super(key: key);
 
   @override
   State<ReservationDetail> createState() => _ReservationDetailState();
 }
 
 class _ReservationDetailState extends State<ReservationDetail> {
-  late ReservationArgument? _reservationArgument;
-  late Reservation? _reservation;
   late ReservationsListCubit _reservationsListCubit;
   late VehicleListCubit _vehicleListCubit;
+  String? _status;
+  Reservation? _reservation;
+  Transactions? _transactions;
+  Spot? _spot;
   Vehicle? _vehicle;
   int _animationStep = 0;
   int _reservationStep = 1;
@@ -41,9 +48,10 @@ class _ReservationDetailState extends State<ReservationDetail> {
     super.initState();
     _vehicleListCubit = context.read<VehicleListCubit>();
     _reservationsListCubit = context.read<ReservationsListCubit>();
-    _vehicle = _vehicleListCubit.state.first;
+    // context.read<Spot>
     _startAnimation();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _getDetail());
+    _getDetail();
+    // WidgetsBinding.instance.addPostFrameCallback((_) => _getDetail());
   }
 
   _startAnimation() {
@@ -56,216 +64,289 @@ class _ReservationDetailState extends State<ReservationDetail> {
     });
   }
 
-  _getDetail() async {
-    // await argument();
-    // log('_reservationArgument ${_reservationArgument!.reservationId}');
-    if (_reservationArgument == null) return;
-    log('_reservationArgument ${_reservationArgument!.reservationId}');
-    final reservation =
-        _reservationsListCubit.findById(_reservationArgument!.reservationId);
-    log('reservationdsda ${reservation!.id}');
+  Future<void> _getDetail() async {
+    // await Future.delayed(const Duration(milliseconds: 500));
+    log('_reservationArgument ${widget.reservationArgument.reservationId}');
+    final rsvpData = await _reservationsListCubit
+        .findById(widget.reservationArgument.reservationId);
+    setState(() {
+      _reservation = rsvpData;
+      _vehicle = _vehicleListCubit.findByPlate(_reservation!.plateNumber);
+      _spot = Spot(id: 'id', name: 'Kurnia Motor');
+      _transactions = Transactions(
+          id: 'id',
+          customerUserId: _reservation!.customerId ?? '',
+          timeRequested: 'timeRequested');
+      _status = _reservation!.status;
+    });
+    log('reservationdsda ${_reservation?.toJson()}');
+    log('_vehicle ${_vehicle?.toJson()}');
   }
 
   @override
   Widget build(BuildContext context) {
-    log('_reservationStep $_reservationStep');
-    _reservationArgument =
-        ModalRoute.of(context)!.settings.arguments as ReservationArgument?;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reservasi'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        children: [
-          Text(
-            'Selesai',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Penitipan',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const Text(
-                    'Kurnia Motor',
-                  ),
-                ],
-              ),
-              TextButton(
-                child: const Text('Lihat Tempat'),
-                onPressed: () => Navigator.pushNamed(context, '/spot_detail'),
-              )
-            ],
-          ),
-          const Divider(),
-          () {
-            if (_vehicle == null) {
-              return SizedBox(
-                height: 120,
-                child: Center(
-                  child: SkeletonListView(
-                    itemCount: 1,
-                  ),
+      body: RefreshIndicator(
+        onRefresh: _getDetail,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          children: [
+            SizedBox(
+              height: 200,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_status == null)
+                      const SkeletonLine()
+                    else
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _status == 'ongoing'
+                                ? 'Dalam titipan'
+                                : _status == 'cancelled'
+                                    ? 'Dibatalkan'
+                                    : 'Selesai',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                          if (_status == 'ongoing')
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.yellow.shade800),
+                                onPressed: () => Navigator.pushNamed(
+                                    context, '/scan_vehicle_customer',
+                                    arguments: _reservation?.plateNumber),
+                                child: const Text('Check-out sekarang'))
+                          else
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green),
+                                onPressed: () {},
+                                child: const Text('Lihat invoice'))
+                        ],
+                      ),
+                    const Divider(),
+                    () {
+                      if (_vehicle == null) {
+                        return SizedBox(
+                          height: 130,
+                          child: Center(
+                            child: SkeletonListTile(),
+                          ),
+                        );
+                      } else {
+                        return VehicleItem(vehicle: _vehicle!);
+                      }
+                    }(),
+                  ]),
+            ),
+            Center(
+              child: SizedBox(
+                width: 250,
+                height: 80,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    AnimatedAlign(
+                      alignment: _animationStep == 1 && _status == 'ongoing'
+                          ? Alignment.centerLeft
+                          : _status == 'finished' || _status == 'cancelled'
+                              ? Alignment.centerRight
+                              : Alignment.center,
+                      curve: Curves.easeOutExpo,
+                      duration: const Duration(milliseconds: 700),
+                      child: CircularProgressIndicator(
+                        value: _animationStep >= 1 ? 1 : null,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(6.0, 0, 6.0, 4.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Icon(Icons.home_filled),
+                          Icon(Icons.linear_scale),
+                          Icon(Icons.motorcycle),
+                          Icon(Icons.linear_scale),
+                          Icon(Icons.person)
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            } else {
-              return VehicleItem(vehicle: _vehicle!);
-            }
-          }(),
-          Center(
-            child: SizedBox(
-              width: 250,
-              height: 80,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  AnimatedAlign(
-                    alignment: _reservationStep == 0
-                        ? Alignment.centerLeft
-                        : _reservationStep == 1
-                            ? Alignment.center
-                            : Alignment.centerRight,
-                    curve: Curves.easeOutExpo,
-                    duration: const Duration(milliseconds: 700),
-                    child: CircularProgressIndicator(
-                      value: _animationStep >= 1 ? 1 : null,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(6.0, 0, 6.0, 4.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Icon(Icons.home_filled),
-                        Icon(Icons.linear_scale),
-                        Icon(Icons.motorcycle),
-                        Icon(Icons.linear_scale),
-                        Icon(Icons.person)
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ),
-          ),
-          Text(
-            'Sudah dikembalikan\n',
-            style: Theme.of(context).textTheme.titleSmall,
-            textAlign: TextAlign.center,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            if (_reservation == null)
+              SkeletonParagraph(
+                style: const SkeletonParagraphStyle(lines: 2),
+              )
+            else
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Check-in',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            Text(
+                              DateFormat('EEE, dd MMM yyyy', 'id_ID').format(
+                                  DateTime.parse(_reservation!.timeCheckedIn!)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Check-out',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            Text(
+                              (_reservation!.timeCheckedOut == null)
+                                  ? 'Belum'
+                                  : DateFormat('EEE, dd MMM yyyy', 'id_ID')
+                                      .format(DateTime.parse(
+                                          _reservation!.timeCheckedOut!)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Durasi',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      if (_reservation != null &&
+                          _reservation!.status == 'ongoing')
+                        StreamBuilder(
+                          stream: Stream.periodic(const Duration(seconds: 1)),
+                          builder: (context, snapshot) {
+                            return Text(
+                              dateTimeCount(_reservation!.timeCheckedIn!,
+                                  DateTime.now().toIso8601String()),
+                            );
+                          },
+                        )
+                      else
+                        Text(
+                          dateTimeCount(_reservation!.timeCheckedIn!,
+                              _reservation!.timeCheckedOut ?? ''),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            const Divider(),
+            if (_reservation != null && _status == 'finished')
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Check-in',
+                    'Rincian Pembayaran',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  Text(
-                    DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                        .format(DateTime.now()),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Total ongkos'),
+                      Text(
+                        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
+                            .format(_reservation!.charge ?? 0),
+                      )
+                    ],
                   ),
-                ],
-              ),
-              Column(
-                children: [
+                  const Divider(),
                   Text(
-                    'Durasi',
+                    'Pembayaran',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  const Text(
-                    '2 Hari',
+                  Row(
+                    children: [
+                      const Expanded(child: Text('Saldo Neat Tip')),
+                      Text(
+                        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
+                            .format(_reservation!.charge ?? 0),
+                      )
+                    ],
                   ),
+                  const Divider(),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Check-out',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Text(
-                    DateFormat('EEE, dd MMM yyyy', 'id_ID')
-                        .format(DateTime.now()),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(),
-          Text(
-            'Rincian Pembayaran',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          ...prices.map(
-            (e) {
-              final isSurplus = (e['price'] as int) < 0;
-              return Row(
+            if (_spot == null)
+              SkeletonParagraph(
+                style: const SkeletonParagraphStyle(lines: 2),
+              )
+            else
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(e['name']),
-                  Text(
-                    '${isSurplus ? '-' : ''}Rp${(e['price'] as int).abs()}',
-                    style: TextStyle(
-                        color: (isSurplus ? Colors.green.shade700 : null)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Penitipan',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const Text(
+                        'Kurnia Motor',
+                      ),
+                    ],
+                  ),
+                  TextButton(
+                    child: const Text('Lihat Tempat'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/spot_detail'),
                   )
                 ],
-              );
-            },
-          ).toList(),
-          Row(
-            children: [
-              Expanded(
-                  child: Text(
-                'Jumlah',
-                style: Theme.of(context).textTheme.titleSmall,
-              )),
-              Text(
-                'Rp${(prices.fold(0, (previousValue, element) => previousValue + ((element['price'] as int) > 0 ? (element['price'] as int) : 0)))} ',
-                style: const TextStyle(
-                    decoration: TextDecoration.lineThrough, color: Colors.grey),
               ),
-              Text(
-                  'Rp${(prices.fold(0, (previousValue, element) => previousValue + (element['price'] as int)))}')
-            ],
-          ),
-          const Divider(),
-          Text(
-            'Pembayaran',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          Row(
-            children: [
-              const Expanded(child: Text('Saldo Neat Tip')),
-              Text(
-                  'Rp${(prices.fold(0, (previousValue, element) => previousValue + (element['price'] as int)))}')
-            ],
-          ),
-          const Divider(),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.flag_circle),
-                onPressed: () {},
+            const Divider(
+              color: Colors.transparent,
+            ),
+            if (_reservation == null)
+              const SkeletonLine()
+            else
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.flag),
+                    onPressed: () {},
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () {}, child: const Text('Chat')),
+                  ),
+                  if (_status == 'finished')
+                    const VerticalDivider(
+                      color: Colors.transparent,
+                    ),
+                  if (_status == 'finished')
+                    Expanded(
+                      child: ElevatedButton(
+                          onPressed: () {}, child: const Text('Beri Ulasan')),
+                    ),
+                ],
               ),
-              Expanded(
-                child: ElevatedButton(
-                    onPressed: () {}, child: const Text('Beri Ulasan')),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -85,7 +85,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
       final snapshot = _firestore
           .collection("reservation")
           .where("customerId", isEqualTo: _userId)
-          .where("status", isEqualTo: "ongoing")
+          // .where("status", isEqualTo: "ongoing")
           .limit(10)
           .snapshots();
       _streamSub = snapshot.listen(
@@ -152,8 +152,25 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     emit([...?newList]);
   }
 
-  Reservation? findById(String id) {
-    return state?.firstWhere((element) => element.id == id);
+  Future<Reservation?> findById(String id) async {
+    try {
+      final docSnapshot =
+          await _firestore.collection("reservation").doc(id).get();
+      if (docSnapshot.data() != null) {
+        return Function.apply(Reservation.new, [], {
+          #id: id,
+          ...docSnapshot
+              .data()!
+              .map((key, value) => MapEntry(Symbol(key), value))
+        });
+      } else {
+        return null;
+      }
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+    // return state?.firstWhere((element) => element.id == id);
   }
 
   Reservation? findByPlate(String plateNumber) {
@@ -183,15 +200,15 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
   Future<void> updateReservation(Reservation newData) async {
     await _updateDataFirestore(newData);
     // await _db.reservationsDao.update(data);
-    final oldData = state
-        ?.firstWhere(
-          (element) => element.id == newData.id,
-        )
-        .toJson();
-    oldData?.keys.map((e) {
-      oldData.update(e, (value) => newData.toJson()[e]);
-    });
-    emit([...?state]);
+    // final oldData = state
+    //     ?.firstWhere(
+    //       (element) => element.id == newData.id,
+    //     )
+    //     .toJson();
+    // oldData?.keys.map((e) {
+    //   oldData.update(e, (value) => newData.toJson()[e]);
+    // });
+    // emit([...?state]);
     // return data;
   }
 

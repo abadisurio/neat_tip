@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/models/reservation.dart';
+import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/utils/date_time_to_string.dart';
 import 'package:skeletons/skeletons.dart';
 
@@ -38,7 +39,8 @@ class ReservationList extends StatelessWidget {
                     child: ListTile(
                       onTap: () {
                         Navigator.pushNamed(context, '/reservation_detail',
-                            arguments: item.id);
+                            arguments:
+                                ReservationArgument(reservationId: item.id));
                       },
                       // dense: true,
                       leading: const CircleAvatar(

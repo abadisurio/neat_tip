@@ -8,16 +8,19 @@ import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/reservation.dart';
+import 'package:neat_tip/models/spot.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/utils/constants.dart';
+import 'package:neat_tip/utils/date_time_count.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
 import 'package:neat_tip/widgets/camera_capturer.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
 import 'package:skeletons/skeletons.dart';
 
 class ScanVehicleCustomer extends StatefulWidget {
-  const ScanVehicleCustomer({Key? key}) : super(key: key);
+  final String? plateNumber;
+  const ScanVehicleCustomer({Key? key, this.plateNumber}) : super(key: key);
 
   @override
   State<ScanVehicleCustomer> createState() => _ScanVehicleCustomerState();
@@ -39,7 +42,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   bool _isDetecting = false;
   Vehicle? _detectedVehicle;
   Reservation? _reservation;
-  // Spot? _detectedSpot;
+  Spot? _detectedSpot;
   final bool _isInLocation = true;
   late VehicleListCubit _vehicleListCubit;
   late ReservationsListCubit _reservationsListCubit;
@@ -87,6 +90,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _startScanning() {
+    int captureCount = 0;
     try {
       if (cameraController != null && cameraController!.value.isPreviewPaused) {
         cameraController?.resumePreview();
@@ -96,14 +100,13 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
         _isScanning = true;
       });
       // if(cameraController != null && !cameraController!.value.isStreamingImages)
+      textRecognizer.close();
       cameraController?.startImageStream((image) {
-        // log('hehe');
-        if (_lastDetectedPlate != "") {
-          setState(() {
-            _lastDetectedPlate = "";
-          });
-          return;
+        // sumpah ribet bat gambar pertama masih nympen bekas yg sebelomnya
+        if (captureCount < 2) {
+          captureCount += 1;
         }
+        if (captureCount == 1) return;
         if (!_isScanning) return;
         if (!_isDetecting) _processCameraImage(image);
       });
@@ -118,36 +121,49 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   _stopScanning() async {
     try {
       await cameraController?.stopImageStream();
+      // await cameraController?.dispose();
       log('_lastDetectedPlate $_lastDetectedPlate');
       setState(() {
         _isScanning = false;
       });
       log('cameraController $cameraController');
-      await cameraController?.pausePreview();
+      // await cameraController?.pausePreview();
     } catch (e) {
       log('e $e');
     }
   }
 
   _loadVehicle() {
+    if (widget.plateNumber != null &&
+        widget.plateNumber != _lastDetectedPlate) {
+      _setError('Bukan kendaraan yang ingin di-checkout');
+      return;
+    }
     final data = _vehicleListCubit.findByPlate(_lastDetectedPlate);
     if (data == null) {
-      setState(() {
-        _errorMessage = 'Kendaraan tidak dikenal';
-      });
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          setState(() {
-            _errorMessage = '';
-          });
-        }
-      });
+      _setError('Kendaraan tidak dikenal');
+
       // _startScanning();
     } else {
       setState(() {
         _detectedVehicle = data;
       });
     }
+  }
+
+  _setError(String errorMessage) {
+    if (mounted) {
+      setState(() {
+        _errorMessage = errorMessage;
+      });
+    }
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _errorMessage = '';
+        });
+      }
+    });
   }
 
   _loadReservation() {
@@ -158,6 +174,10 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
       });
     }
     // log('_reservation ${_reservation?.toJson()}');
+  }
+
+  _loadSpot() {
+    _detectedSpot = Spot(id: 'id', farePerDay: 5000);
   }
 
   void _itemDetected(String plateNumber) async {
@@ -171,6 +191,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     if (_detectedVehicle != null) {
       await _stopScanning();
       _loadReservation();
+      _loadSpot();
       // _startScanning();
     }
   }
@@ -208,6 +229,14 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     if (mounted) {
       log('result $result');
       if (result == true) {
+        _reservation!.status = 'finished';
+        _reservation!.charge = DateTime.now()
+                .difference(DateTime.parse(_reservation!.timeCheckedIn!))
+                .inDays *
+            _detectedSpot!.farePerDay!;
+        _reservation!.timeCheckedOut = DateTime.now().toIso8601String();
+        log('_reservation ${_reservation!.toJson()}');
+        _reservationsListCubit.updateReservation(_reservation!);
         log('_reservation!.id ${_reservation!.id}');
         Navigator.pushNamedAndRemoveUntil(
             context, '/reservation_detail', (route) => route.isFirst,
@@ -260,9 +289,11 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 children: [
                   Transform.scale(
                     scale: _isScanning ? 1.4 : 2,
-                    child: CameraCapturer(
-                        controller: _onControllerMounted,
-                        resolution: ResolutionPreset.low),
+                    child: !_isScanning
+                        ? null
+                        : CameraCapturer(
+                            controller: _onControllerMounted,
+                            resolution: ResolutionPreset.low),
                   ),
                   AnimatedOpacity(
                     curve: Curves.easeOutCirc,
@@ -305,7 +336,11 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                                       fontWeight: FontWeight.w500),
                                 ),
                                 ElevatedButton(
-                                    onPressed: _startScanning,
+                                    onPressed: () {
+                                      setState(() {
+                                        _isScanning = true;
+                                      });
+                                    },
                                     child: const Icon(Icons.replay_outlined))
                               ],
                             ),
@@ -336,6 +371,9 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           child: Text(
                             _errorMessage,
                             textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -431,8 +469,15 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                                   DateTime.parse(
                                       _reservation!.timeCheckedIn ?? '')),
                             ),
-                            const Text(
-                              '2 Hari yang lalu',
+                            StreamBuilder(
+                              stream:
+                                  Stream.periodic(const Duration(seconds: 1)),
+                              builder: (context, snapshot) {
+                                return Text(
+                                  dateTimeCount(_reservation!.timeCheckedIn!,
+                                      DateTime.now().toIso8601String()),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -485,6 +530,22 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                   'Rincian',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
+                if (_reservation != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                          'Ongkos Penitipan ${dateTimeCount(_reservation!.timeCheckedIn!, DateTime.now().toIso8601String(), onlyDay: true)}'),
+                      Text(
+                        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
+                            .format((_detectedSpot!.farePerDay ?? 0) *
+                                (DateTime.now()
+                                    .difference(DateTime.parse(
+                                        _reservation!.timeCheckedIn!))
+                                    .inDays)),
+                      )
+                    ],
+                  ),
                 ...prices.map(
                   (e) {
                     final isSurplus = (e['price'] as int) < 0;
