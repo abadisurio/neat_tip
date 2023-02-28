@@ -16,6 +16,8 @@ import 'package:neat_tip/screens/manage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/screens/customer/vehicle_list.dart';
 import 'package:neat_tip/screens/notifications.dart';
+import 'package:neat_tip/screens/reservation_detail.dart';
+import 'package:neat_tip/service/fb_cloud_messaging.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
 
 class HomeRoot extends StatefulWidget {
@@ -58,6 +60,8 @@ class _HomeRootState extends State<HomeRoot> {
 
   @override
   void initState() {
+    // PushNotificationService.onMessageOpenedHandler()
+    //  FirebaseMessaging.onMessageOpenedApp.listen();
     // log('userRole ${context.read<NeatTipUserCubit>().state?.role}');
     userRole = context.read<NeatTipUserCubit>().state?.role ?? 'Pengguna';
     // log('userRole $userRole');
@@ -65,42 +69,65 @@ class _HomeRootState extends State<HomeRoot> {
       _widgetOptions[0] = const HomeHost();
       _widgetOptions[1] = const VehicleList();
     }
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      log('sinikwaokwoa ${notification?.toMap()}');
-      if (notification != null && mounted) {
-        log('notification.hashCode ${notification.hashCode}');
-        ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
-          icon: const Icon(Icons.motorcycle),
-          content: ListTile(
-            onTap: () {},
-            // dense: true,
-            leading: const CircleAvatar(child: Icon(Icons.notifications)),
-            title: Text(notification.title ?? ''),
-            subtitle: Text(notification.body ?? ''),
-            // trailing:
-          ),
-        ).create() // SnackBar(
-            );
-        context.read<NotificationListCubit>().add(NeatTipNotification(
-            createdAt: DateTime.now().toIso8601String(),
-            title: notification.title ?? '',
-            body: notification.body ?? ''));
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PushNotificationService.setRunOpenedMessage((RemoteMessage message) {
+        if (message.data['reservationId'] != null) {
+          Navigator.pushNamed(context, '/reservation_detail',
+              arguments: ReservationArgument(
+                  reservationId: message.data['reservationId']));
+        }
+      });
+      PushNotificationService.setRunOnMessage((RemoteMessage message) {
+        if (message.data['reservationId'] != null) {
+          log('di home inii');
+          RemoteNotification? notification = message.notification;
+          if (notification != null && mounted) {
+            log('sinikwaokwoa ${notification.toMap()}');
+            // log('notification.hashCode ${notification.hashCode}');
+            ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+              icon: const Icon(Icons.motorcycle),
+              content: ListTile(
+                onTap: () {},
+                // dense: true,
+                leading: const CircleAvatar(child: Icon(Icons.notifications)),
+                title: Text(notification.title ?? ''),
+                subtitle: Text(notification.body ?? ''),
+                // trailing:
+              ),
+            ).create() // SnackBar(
+                );
+            context.read<NotificationListCubit>().add(NeatTipNotification(
+                createdAt: DateTime.now().toIso8601String(),
+                title: notification.title ?? '',
+                body: notification.body ?? ''));
+          }
+        }
+      });
     });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      log('baruuu');
-      RemoteNotification? notification = message.notification;
-      if (notification != null && mounted) {
-        context.read<NotificationListCubit>().add(NeatTipNotification(
-            createdAt: DateTime.now().toIso8601String(),
-            title: notification.title ?? '',
-            body: notification.body ?? ''));
-      }
-    });
-
+    // PushNotificationService.messagesStream.listen((RemoteMessage message) {
+    // log('di home inii');
+    // RemoteNotification? notification = message.notification;
+    // if (notification != null && mounted) {
+    //   log('sinikwaokwoa ${notification.toMap()}');
+    //   // log('notification.hashCode ${notification.hashCode}');
+    //   ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
+    //     icon: const Icon(Icons.motorcycle),
+    //     content: ListTile(
+    //       onTap: () {},
+    //       // dense: true,
+    //       leading: const CircleAvatar(child: Icon(Icons.notifications)),
+    //       title: Text(notification.title ?? ''),
+    //       subtitle: Text(notification.body ?? ''),
+    //       // trailing:
+    //     ),
+    //   ).create() // SnackBar(
+    //       );
+    //   context.read<NotificationListCubit>().add(NeatTipNotification(
+    //       createdAt: DateTime.now().toIso8601String(),
+    //       title: notification.title ?? '',
+    //       body: notification.body ?? ''));
+    // }
+    // });
     super.initState();
   }
 

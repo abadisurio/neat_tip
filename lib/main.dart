@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -30,7 +31,11 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp();
-  await initializeFCM();
+  await PushNotificationService.initialize();
+  // PushNotificationService.messagesStream.listen((event) {
+  //   log('wkwk');
+  // });
+  // await initializeFCM();
   // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
   //   // RemoteNotification? notification = ;
   //   log('sinik ${message.data}');
@@ -39,7 +44,7 @@ void main() async {
   //   //   ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
   //   //     icon: const Icon(Icons.motorcycle),
   //   //     content: ListTile(
-  //   //       onTap: () {},
+  //   //       onTap: () {},s
   //   //       // dense: true,
   //   //       leading: const Icon(Icons.notifications),
   //   //       title: Text(notification.title ?? ''),
@@ -90,6 +95,9 @@ class _MyAppState extends State<MyApp> {
 
     vehicleListCubit.initialize(localDB: database);
     notificationListCubit.initialize(localDB: database);
+    ;
+    // await PushNotificationService.initialize(cubit: notificationListCubit);
+
     // vehicleListCubit.pullDataFromDB();
 
     transactionsListCubit.initializeDB(database);

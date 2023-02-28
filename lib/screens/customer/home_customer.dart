@@ -52,7 +52,7 @@ class HomeCustomer extends StatelessWidget {
             ),
             BlocBuilder<ReservationsListCubit, List<Reservation>?>(
                 builder: (context, reservationList) {
-              log('reservationList $reservationList');
+              // log('reservationList $reservationList');
               if (reservationList == null) {
                 return SizedBox(height: 500, child: SkeletonListView());
               }

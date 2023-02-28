@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/neattip_notification.dart';
+import 'package:neat_tip/service/fb_cloud_messaging.dart';
 
 class NotificationListCubit extends Cubit<List<NeatTipNotification>?> {
   NotificationListCubit() : super(null);
@@ -8,7 +11,16 @@ class NotificationListCubit extends Cubit<List<NeatTipNotification>?> {
   late NeatTipDatabase _db;
 
   void initialize({required NeatTipDatabase localDB}) async {
+    log('inittt');
     _db = localDB;
+    // PushNotificationService.messagesStream.listen((event) {
+    //   log('wkwkwkkwkw');
+    // });
+    // final notifStream = PushNotificationService.messagesStream;
+    // notifStream.listen((event) {
+    //   // event.
+    //   log('event $event');
+    // });
     await _pullDataFromDB();
     // _load();
   }
@@ -20,6 +32,7 @@ class NotificationListCubit extends Cubit<List<NeatTipNotification>?> {
   }
 
   Future<void> add(NeatTipNotification notif) async {
+    log('tambahh');
     await _db.neatTipNotificationsDao.insertNotification(notif);
     emit([...?state, notif]);
   }

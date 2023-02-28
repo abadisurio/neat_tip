@@ -11,6 +11,7 @@ import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/models/spot.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
+import 'package:neat_tip/service/fb_cloud_functions.dart';
 import 'package:neat_tip/utils/constants.dart';
 import 'package:neat_tip/utils/date_time_count.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
@@ -177,7 +178,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _loadSpot() {
-    _detectedSpot = Spot(id: 'id', farePerDay: 5000);
+    _detectedSpot = Spot(
+        name: 'Kurnia Motor', id: 'voX3FwgED5lggS4RnKaQ', farePerDay: 5000);
   }
 
   _loadPrices() {
@@ -245,6 +247,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     if (mounted) {
       log('result $result');
       if (result == true) {
+        _reservation!.spotId = _detectedSpot!.id;
+        _reservation!.spotName = _detectedSpot!.name;
         _reservation!.status = 'finished';
         _reservation!.charge = (_prices?.fold(
             0,
@@ -255,12 +259,15 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                     : 0)));
         _reservation!.timeCheckedOut = DateTime.now().toIso8601String();
         log('_reservation ${_reservation!.toJson()}');
-        _reservationsListCubit.updateReservation(_reservation!);
+        await _reservationsListCubit.updateReservation(_reservation!);
+        notifyRsvpFinished(_reservation!);
         log('_reservation!.id ${_reservation!.id}');
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/reservation_detail', (route) => route.isFirst,
-            arguments: ReservationArgument(
-                newlySucceded: true, reservationId: _reservation!.id));
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/reservation_detail', (route) => route.isFirst,
+              arguments: ReservationArgument(
+                  newlySucceded: true, reservationId: _reservation!.id));
+        }
       }
     }
   }
@@ -441,9 +448,12 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           'Penitipan',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        const Text(
-                          'Kurnia Motor',
-                        ),
+                        if (_detectedSpot != null)
+                          Text(
+                            _detectedSpot!.name ?? 'Mitra Neat Tip',
+                          )
+                        else
+                          const SizedBox(height: 14, child: SkeletonLine()),
                       ],
                     ),
                     ElevatedButton.icon(
@@ -480,7 +490,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Check-in',
+                              'Check-in ${_reservation!.id}',
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             Text(

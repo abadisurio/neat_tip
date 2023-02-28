@@ -32,13 +32,14 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
         final reservation = Reservation(
             id: '',
             spotId: 'S1',
+            spotName: 'Kurnia Motor',
+            customerId: FirebaseAuth.instance.currentUser!.uid,
             hostUserId: uid ?? '',
             plateNumber: element,
             timeCheckedIn: DateTime.now().toIso8601String());
         final reservationData =
             await reservationsListCubit.addReservation(reservation);
-        sendFcmNotification(
-            reservationData.customerId!, reservationData.plateNumber);
+        notifyRsvpAdded(reservationData);
         // await reservationsListCubit.addReservation(reservation);
         // await vehicleListCubit.add();
         log('hereeeeee');

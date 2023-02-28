@@ -119,7 +119,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
                                     backgroundColor: Colors.yellow.shade800),
                                 onPressed: () => Navigator.pushNamed(
                                     context, '/scan_vehicle_customer',
-                                    arguments: _reservation?.plateNumber),
+                                    arguments: _reservation?.id),
                                 child: const Text('Check-out sekarang'))
                           else
                             ElevatedButton(
@@ -247,7 +247,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
                                 _reservation!.timeCheckedIn!,
                                 DateTime.now().toIso8601String());
                             return Text(
-                              '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes} Menit' : 'Baru Saja'}',
+                              '${_reservation!.id} ${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes} Menit' : 'Baru Saja'}',
                             );
                           },
                         )

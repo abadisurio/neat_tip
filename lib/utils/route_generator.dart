@@ -15,6 +15,7 @@ import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/screens/sign_out.dart';
 import 'package:neat_tip/screens/spot_detail.dart';
 import 'package:neat_tip/screens/state_loading.dart';
+import 'package:neat_tip/screens/vehicle_allow.dart';
 import 'package:neat_tip/screens/vehicle_request.dart';
 import 'package:neat_tip/screens/wallet.dart';
 import 'package:neat_tip/screens/customer/explore_spot.dart';
@@ -49,14 +50,18 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/vehicle_request':
       return CupertinoPageRoute(
           builder: (_) => const VehicleRequest(), settings: settings);
+    case '/vehicle_allow':
+      return CupertinoPageRoute(
+          builder: (_) =>
+              VehicleAllow(plateNumber: settings.arguments as String),
+          settings: settings);
     case '/scan_vehicle':
       return CupertinoPageRoute(
           builder: (_) => const ScanVehicle(), settings: settings);
     case '/scan_vehicle_customer':
       return CupertinoPageRoute(
-          builder: (_) => ScanVehicleCustomer(
-                plateNumber: settings.arguments as String?,
-              ),
+          builder: (_) =>
+              ScanVehicleCustomer(plateNumber: settings.arguments as String?),
           settings: settings);
     case '/confirm_scan_vehicle':
       return CupertinoPageRoute(
@@ -82,8 +87,7 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
     case '/reservation_detail':
       return CupertinoPageRoute(
           builder: (_) => ReservationDetail(
-                reservationArgument: settings.arguments as ReservationArgument,
-              ),
+              reservationArgument: settings.arguments as ReservationArgument),
           settings: settings);
     case '/home':
       return MaterialPageRoute(

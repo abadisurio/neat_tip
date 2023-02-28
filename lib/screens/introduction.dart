@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:neat_tip/bloc/notification_list.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/service/fb_cloud_messaging.dart';
 
 class Introduction extends StatefulWidget {
   const Introduction({super.key});
@@ -21,7 +23,9 @@ class _IntroductionState extends State<Introduction> {
   late ReservationsListCubit _reservationListCubit;
 
   Future<void> _reloadData() async {
+    // await initializeFCM(cubit: context.read<NotificationListCubit>());
     await _reservationListCubit.reload();
+    reloadFcmToken();
   }
 
   navigateToAuthPage() async {
