@@ -82,12 +82,18 @@ class _HomeRootState extends State<HomeRoot> {
           log('di home inii');
           RemoteNotification? notification = message.notification;
           if (notification != null && mounted) {
-            log('sinikwaokwoa ${notification.toMap()}');
+            log('sinikwaokwoa ${message.data}');
             // log('notification.hashCode ${notification.hashCode}');
             ScaffoldMessenger.of(context).showSnackBar(SnacbarNotification(
               icon: const Icon(Icons.motorcycle),
               content: ListTile(
-                onTap: () {},
+                onTap: () {
+                  if (message.data['reservationId'] != null) {
+                    Navigator.pushNamed(context, '/reservation_detail',
+                        arguments: ReservationArgument(
+                            reservationId: message.data['reservationId']));
+                  }
+                },
                 // dense: true,
                 leading: const CircleAvatar(child: Icon(Icons.notifications)),
                 title: Text(notification.title ?? ''),

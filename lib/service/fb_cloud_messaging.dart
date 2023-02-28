@@ -149,6 +149,35 @@ class PushNotificationService {
     }
   }
 
+  static Future<String?> reloadFcmToken() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    // await sharedPreferences.remove("fcmToken");
+    final sharePrefFcm = sharedPreferences.getString("fcmToken");
+    // Map<String, dynamic>? fcmToken = jsonDecode(sharePrefFcm );
+    final String? token = await messaging.getToken();
+    log('fcmToken $sharePrefFcm');
+    if (sharePrefFcm == null) {
+      final firestore = FirebaseFirestore.instance;
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      log('uid $uid $token');
+      if (token != null && uid != null) {
+        final fcmTokenData = {
+          'fcmToken': token,
+          'timestamp': DateTime.now().toIso8601String()
+        };
+        // log('fcmTokenData.toString() ${fcmTokenData.toString()}');
+        await sharedPreferences.setString('fcmToken', fcmTokenData.toString());
+        await firestore
+            .collection("fcmToken")
+            .doc(uid)
+            .set(fcmTokenData, SetOptions(merge: true));
+      }
+      return token;
+      // return fcmToken;
+    }
+    return null;
+  }
+
   static closeStreams() {
     _messageStream.close();
   }
@@ -238,31 +267,4 @@ class PushNotificationService {
 //   // });
 // }
 
-Future<String?> reloadFcmToken() async {
-  final sharedPreferences = await SharedPreferences.getInstance();
-  // await sharedPreferences.remove("fcmToken");
-  final sharePrefFcm = sharedPreferences.getString("fcmToken");
-  // Map<String, dynamic>? fcmToken = jsonDecode(sharePrefFcm );
-  final String? token = await FirebaseMessaging.instance.getToken();
-  log('fcmToken $sharePrefFcm');
-  if (sharePrefFcm == null) {
-    final firestore = FirebaseFirestore.instance;
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    log('uid $uid $token');
-    if (token != null && uid != null) {
-      final fcmTokenData = {
-        'fcmToken': token,
-        'timestamp': DateTime.now().toIso8601String()
-      };
-      // log('fcmTokenData.toString() ${fcmTokenData.toString()}');
-      await sharedPreferences.setString('fcmToken', fcmTokenData.toString());
-      await firestore
-          .collection("fcmToken")
-          .doc(uid)
-          .set(fcmTokenData, SetOptions(merge: true));
-    }
-    return token;
-    // return fcmToken;
-  }
-  return null;
-}
+

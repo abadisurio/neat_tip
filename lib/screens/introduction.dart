@@ -25,7 +25,7 @@ class _IntroductionState extends State<Introduction> {
   Future<void> _reloadData() async {
     // await initializeFCM(cubit: context.read<NotificationListCubit>());
     await _reservationListCubit.reload();
-    reloadFcmToken();
+    PushNotificationService.reloadFcmToken();
   }
 
   navigateToAuthPage() async {
