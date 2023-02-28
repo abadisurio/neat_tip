@@ -20,7 +20,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
 
   Future<void> initialize() async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
-    log('_firebaseUser ${_firebaseUser!.uid}');
+    // log('_firebaseUser ${_firebaseUser!.uid}');
     // _fcmToken = await FirebaseMessaging.instance.getToken();
     _firestore = FirebaseFirestore.instance;
     _sharedPreferences = await SharedPreferences.getInstance();

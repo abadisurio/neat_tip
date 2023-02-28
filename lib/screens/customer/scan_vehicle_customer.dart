@@ -20,8 +20,8 @@ import 'package:neat_tip/widgets/vehicle_item.dart';
 import 'package:skeletons/skeletons.dart';
 
 class ScanVehicleCustomer extends StatefulWidget {
-  final String? plateNumber;
-  const ScanVehicleCustomer({Key? key, this.plateNumber}) : super(key: key);
+  final Reservation? reservation;
+  const ScanVehicleCustomer({Key? key, this.reservation}) : super(key: key);
 
   @override
   State<ScanVehicleCustomer> createState() => _ScanVehicleCustomerState();
@@ -132,8 +132,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _loadVehicle() {
-    if (widget.plateNumber != null &&
-        widget.plateNumber != _lastDetectedPlate) {
+    if (widget.reservation != null &&
+        widget.reservation!.plateNumber != _lastDetectedPlate) {
       _setError('Bukan kendaraan yang ingin di-checkout');
       return;
     }
@@ -165,7 +165,8 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _loadReservation() {
-    final data = _reservationsListCubit.findByPlate(_lastDetectedPlate);
+    final data = widget.reservation ??
+        _reservationsListCubit.findByPlate(_lastDetectedPlate);
     if (data != null) {
       final duration =
           dateTimeCount(data.timeCheckedIn!, DateTime.now().toIso8601String());
@@ -451,9 +452,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                         if (_detectedSpot != null)
                           Text(
                             _detectedSpot!.name ?? 'Mitra Neat Tip',
-                          )
-                        else
-                          const SizedBox(height: 14, child: SkeletonLine()),
+                          ),
                       ],
                     ),
                     ElevatedButton.icon(

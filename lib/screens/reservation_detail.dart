@@ -113,13 +113,13 @@ class _ReservationDetailState extends State<ReservationDetail> {
                                     : 'Selesai',
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
-                          if (_status == 'ongoing')
+                          if (_reservation != null && _status == 'ongoing')
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.yellow.shade800),
                                 onPressed: () => Navigator.pushNamed(
                                     context, '/scan_vehicle_customer',
-                                    arguments: _reservation?.id),
+                                    arguments: _reservation),
                                 child: const Text('Check-out sekarang'))
                           else
                             ElevatedButton(

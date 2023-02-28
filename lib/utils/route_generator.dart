@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/screens/auth_screen.dart';
 import 'package:neat_tip/screens/authorization.dart';
 import 'package:neat_tip/screens/customer/scan_vehicle_customer.dart';
@@ -60,8 +61,8 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           builder: (_) => const ScanVehicle(), settings: settings);
     case '/scan_vehicle_customer':
       return CupertinoPageRoute(
-          builder: (_) =>
-              ScanVehicleCustomer(plateNumber: settings.arguments as String?),
+          builder: (_) => ScanVehicleCustomer(
+              reservation: settings.arguments as Reservation?),
           settings: settings);
     case '/confirm_scan_vehicle':
       return CupertinoPageRoute(

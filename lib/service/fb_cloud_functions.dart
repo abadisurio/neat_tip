@@ -21,13 +21,13 @@ Future<void> notifyRsvpAdded(Reservation reservation) async {
 Future<void> notifyRsvpFinished(Reservation reservation) async {
   // final function = FirebaseFunctions.instance;
   // function.useFunctionsEmulator('127.0.0.1', 5001);
-  log('reservation ${reservation.toJson()}');
+  log('reservatiollppln ${reservation.toJson()}');
   HttpsCallable callable =
-      FirebaseFunctions.instance.httpsCallable('sendNotification');
+      FirebaseFunctions.instance.httpsCallable('notifyRsvpFinished');
   await callable.call({
     'customerId': reservation.customerId,
     'plateNumber': reservation.plateNumber,
-    'spotName': reservation.plateNumber,
+    'spotName': reservation.spotName,
     'reservationId': reservation.id,
     'spotId': reservation.spotId
   });
