@@ -192,7 +192,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     _prices = [
       {
         'name':
-            'Ongkos Penitipan ${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes} Menit' : 'Baru Saja'}',
+            'Ongkos Penitipan ${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours % 24} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes % 60} Menit' : 'Baru Saja'}',
         'price': charge
       }
     ];
@@ -456,9 +456,6 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                       ],
                     ),
                     ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _isInLocation ? Colors.green : Colors.red),
                       label: Text(
                           '${_isInLocation ? 'Sudah di' : 'Jauh dari'} lokasi'),
                       onPressed: () =>
@@ -639,6 +636,9 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                 //   title: Text('Credit'),
                 // ),
                 ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _isInLocation ? Colors.green : Colors.red),
                     onPressed: _isInLocation ? _processCheckout : null,
                     child: Text(
                         'Bayar dan Ambil Kendaraan${_isInLocation ? '' : ' Ditunda'}'))

@@ -25,20 +25,24 @@ class _CarouselState extends State<Carousel> {
             enlargeCenterPage: true,
           ),
           // items: const [],
-          items: [1, 2, 3, 4, 5].map((i) {
-            return ClipRRect(
+          items: [
+            ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
+              child: Image.asset(
+                'assets/ad_1.jpg',
                 height: double.infinity,
                 fit: BoxFit.cover,
-                imageUrl:
-                    'https://images.squarespace-cdn.com/content/v1/53fe73e3e4b051bac9406675/1517605854354-3H036ZYJ7E22GKDR24JV/Spotify+Ad+1.png',
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
-            );
-          }).toList(),
+            ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/ad_2.jpg',
+                height: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
         ),
       ),
     );
