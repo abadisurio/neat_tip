@@ -1,9 +1,9 @@
 class Spot {
   late String id;
+  late String latlong;
   String? ownerId;
   String? name;
   String? address;
-  String? latlong;
   String? phone;
   String? imgSrcBanner;
   String? gMapsLink;
@@ -16,10 +16,10 @@ class Spot {
 
   Spot(
       {required this.id,
+      required this.latlong,
       this.ownerId,
       this.name,
       this.address,
-      this.latlong,
       this.phone,
       this.imgSrcBanner,
       this.gMapsLink,

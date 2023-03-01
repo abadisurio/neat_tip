@@ -8,6 +8,7 @@ import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/models/spot.dart';
 import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/screens/customer/explore_spot.dart';
 import 'package:neat_tip/utils/date_time_count.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
 import 'package:skeletons/skeletons.dart';
@@ -72,7 +73,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
     setState(() {
       _reservation = rsvpData;
       _vehicle = _vehicleListCubit.findByPlate(_reservation!.plateNumber);
-      _spot = Spot(id: 'id', name: 'Kurnia Motor');
+      _spot = dummySpots[0];
       _transactions = Transactions(
           id: 'id',
           customerUserId: _reservation!.customerId ?? '',

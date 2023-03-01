@@ -101,7 +101,8 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           builder: (_) => const HomeHost(), settings: settings);
     case '/spot_detail':
       return CupertinoPageRoute(
-          builder: (_) => const SpotDetail(), settings: settings);
+          builder: (_) => SpotDetail(spotId: settings.arguments as String),
+          settings: settings);
     case '/state_loading':
       return PageRouteBuilder(
           transitionsBuilder: (ctx, anim1, anim2, child) {

@@ -10,6 +10,7 @@ import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/models/spot.dart';
 import 'package:neat_tip/models/vehicle.dart';
+import 'package:neat_tip/screens/customer/explore_spot.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/service/fb_cloud_functions.dart';
 import 'package:neat_tip/utils/constants.dart';
@@ -179,8 +180,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   }
 
   _loadSpot() {
-    _detectedSpot = Spot(
-        name: 'Kurnia Motor', id: 'voX3FwgED5lggS4RnKaQ', farePerDay: 5000);
+    _detectedSpot = dummySpots[0];
   }
 
   _loadPrices() {

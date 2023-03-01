@@ -63,6 +63,8 @@ dependencies:
   flutter_local_notifications: ^8.2.0
   cloud_functions: ^4.0.11
   skeletons: ^0.0.3
+  url_launcher: ^6.1.10
+  map_launcher: ^2.5.0+1
 
 
 dev_dependencies:
