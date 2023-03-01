@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class _ExploreSpotState extends State<ExploreSpot> {
   final LatLng _initialcameraposition = const LatLng(20.5937, 78.9629);
   late GoogleMapController _controller;
   final Location _location = Location();
+  late StreamSubscription<LocationData> _locationSubscription;
   Set<Marker> markers = {};
   // Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
@@ -44,7 +46,7 @@ class _ExploreSpotState extends State<ExploreSpot> {
       markers = markers;
     });
     _controller = cntlr;
-    _location.onLocationChanged.listen((l) {
+    _locationSubscription = _location.onLocationChanged.listen((l) {
       _controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -56,6 +58,7 @@ class _ExploreSpotState extends State<ExploreSpot> {
 
   @override
   void dispose() {
+    _locationSubscription.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -64,13 +67,13 @@ class _ExploreSpotState extends State<ExploreSpot> {
   void initState() {
 //     Google .provideAPIKey("Your key")
 // GMSServices.provideAPIKey("Your key")
-    location.onLocationChanged.listen((LocationData cLoc) {
-      // cLoc contains the lat and long of the
-      // current user's position in real time,
-      // so we're holding on to it
-      log("${cLoc.longitude} ${cLoc.latitude}");
-      currentLocation = cLoc;
-    });
+    // location.onLocationChanged.listen((LocationData cLoc) {
+    //   // cLoc contains the lat and long of the
+    //   // current user's position in real time,
+    //   // so we're holding on to it
+    //   log("${cLoc.longitude} ${cLoc.latitude}");
+    //   currentLocation = cLoc;
+    // });
     super.initState();
   }
 
