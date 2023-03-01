@@ -73,7 +73,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
     setState(() {
       _reservation = rsvpData;
       _vehicle = _vehicleListCubit.findByPlate(_reservation!.plateNumber);
-      _spot = dummySpots[0];
+      _spot = dummySpots[1];
       _transactions = Transactions(
           id: 'id',
           customerUserId: _reservation!.customerId ?? '',
@@ -323,8 +323,9 @@ class _ReservationDetailState extends State<ReservationDetail> {
                   ),
                   TextButton(
                     child: const Text('Lihat Tempat'),
-                    onPressed: () =>
-                        Navigator.pushNamed(context, '/spot_detail'),
+                    onPressed: () => Navigator.pushNamed(
+                        context, '/spot_detail',
+                        arguments: _spot!.id),
                   )
                 ],
               ),

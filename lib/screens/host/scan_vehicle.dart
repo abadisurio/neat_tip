@@ -6,6 +6,7 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:neat_tip/bloc/route_observer.dart';
 import 'package:neat_tip/utils/constants.dart';
 import 'package:neat_tip/utils/get_input_image.dart';
+import 'package:neat_tip/widgets/camera_capturer.dart';
 
 class ScanVehicle extends StatefulWidget {
   const ScanVehicle({Key? key}) : super(key: key);
@@ -84,13 +85,13 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
       if (!_isScanning) return;
       if (!_isDetecting) _processCameraImage(image);
     });
-    Future.delayed(const Duration(seconds: 1), () {
-      stopScanning();
-      setState(() {
-        _lastDetectedPlate = 'B 3853 KZA';
-        _listDetectedPlate.add('B 3853 KZA');
-      });
-    });
+    // Future.delayed(const Duration(seconds: 1), () {
+    //   stopScanning();
+    //   setState(() {
+    //     _lastDetectedPlate = 'B 3853 KZA';
+    //     _listDetectedPlate.add('B 3853 KZA');
+    //   });
+    // });
   }
 
   stopScanning() async {
@@ -180,24 +181,24 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
               child: Stack(
                 fit: StackFit.loose,
                 children: [
-                  // if (isScreenActive)
-                  //   AnimatedOpacity(
-                  //     opacity: _isScanning ? 1 : 0.1,
-                  //     curve: Curves.easeOutCirc,
-                  //     duration: const Duration(milliseconds: 500),
-                  //     child: Transform.scale(
-                  //       scale: 1.4,
-                  //       child: CameraCapturer(
-                  //         resolution: ResolutionPreset.low,
-                  //         controller: (controller) {
-                  //           setState(() {
-                  //             cameraController = controller;
-                  //           });
-                  //           startScanning();
-                  //         },
-                  //       ),
-                  //     ),
-                  //   ),
+                  if (isScreenActive)
+                    AnimatedOpacity(
+                      opacity: _isScanning ? 1 : 0.1,
+                      curve: Curves.easeOutCirc,
+                      duration: const Duration(milliseconds: 500),
+                      child: Transform.scale(
+                        scale: 1.4,
+                        child: CameraCapturer(
+                          resolution: ResolutionPreset.low,
+                          controller: (controller) {
+                            setState(() {
+                              cameraController = controller;
+                            });
+                            startScanning();
+                          },
+                        ),
+                      ),
+                    ),
                   AnimatedOpacity(
                     curve: Curves.easeOutCirc,
                     opacity: _isScanning ? 1 : 0,
