@@ -66,6 +66,7 @@ dependencies:
   url_launcher: ^6.1.10
   map_launcher: ^2.5.0+1
   flutter_launcher_icons: ^0.12.0
+  video_player: ^2.6.0
 
 
 dev_dependencies:
