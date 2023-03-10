@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:intl/intl.dart';
-
 Duration dateTimeCount(String stringISO8601start, String stringISO8601finish,
     {bool onlyDay = false}) {
   final start = DateTime.parse(stringISO8601start);

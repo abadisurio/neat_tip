@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:map_launcher/map_launcher.dart';
 import 'package:neat_tip/models/spot.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MapUtils {
   MapUtils._();

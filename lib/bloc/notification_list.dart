@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/db/database.dart';
 import 'package:neat_tip/models/neattip_notification.dart';
-import 'package:neat_tip/service/fb_cloud_messaging.dart';
 
 class NotificationListCubit extends Cubit<List<NeatTipNotification>?> {
   NotificationListCubit() : super(null);

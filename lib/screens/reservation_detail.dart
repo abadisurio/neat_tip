@@ -6,7 +6,6 @@ import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/models/spot.dart';
-import 'package:neat_tip/models/transactions.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:neat_tip/screens/customer/explore_spot.dart';
 import 'package:neat_tip/utils/date_time_count.dart';
@@ -38,11 +37,10 @@ class _ReservationDetailState extends State<ReservationDetail> {
   late VehicleListCubit _vehicleListCubit;
   String? _status;
   Reservation? _reservation;
-  Transactions? _transactions;
+  // Transactions? _transactions;
   Spot? _spot;
   Vehicle? _vehicle;
   int _animationStep = 0;
-  int _reservationStep = 1;
 
   @override
   void initState() {
@@ -58,7 +56,6 @@ class _ReservationDetailState extends State<ReservationDetail> {
   _startAnimation() {
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
-        _reservationStep = 2;
         _animationStep += 1;
       });
       // if (mounted) {}
@@ -74,10 +71,10 @@ class _ReservationDetailState extends State<ReservationDetail> {
       _reservation = rsvpData;
       _vehicle = _vehicleListCubit.findByPlate(_reservation!.plateNumber);
       _spot = dummySpots[1];
-      _transactions = Transactions(
-          id: 'id',
-          customerUserId: _reservation!.customerId ?? '',
-          timeRequested: 'timeRequested');
+      // _transactions = Transactions(
+      //     id: 'id',
+      //     customerUserId: _reservation!.customerId ?? '',
+      //     timeRequested: 'timeRequested');
       _status = _reservation!.status;
     });
     log('reservationdsda ${_reservation?.toJson()}');

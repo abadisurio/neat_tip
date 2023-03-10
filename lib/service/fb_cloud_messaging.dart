@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:neat_tip/bloc/notification_list.dart';
-import 'package:neat_tip/models/neattip_notification.dart';
+// import 'package:neat_tip/bloc/notification_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PushNotificationService {
@@ -19,7 +18,7 @@ class PushNotificationService {
     importance: Importance.max,
   );
   static String? idPush;
-  static late NotificationListCubit? _cubit;
+  // static late NotificationListCubit? _cubit;
   static late Function? _runOpenedMessage;
   static late Function? _runOnMessage;
   static final StreamController<RemoteMessage> _messageStream =

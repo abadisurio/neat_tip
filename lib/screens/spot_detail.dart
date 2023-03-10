@@ -15,7 +15,7 @@ class SpotDetail extends StatefulWidget {
 }
 
 class _SpotDetailState extends State<SpotDetail> {
-  late String _spotId;
+  // late String _spotId;
   Spot? _spot;
 
   _openDirection() {
@@ -26,9 +26,9 @@ class _SpotDetailState extends State<SpotDetail> {
   @override
   void initState() {
     _spot = dummySpots[1];
-    setState(() {
-      _spotId = widget.spotId;
-    });
+    // setState(() {
+    //   _spotId = widget.spotId;
+    // });
     super.initState();
   }
 

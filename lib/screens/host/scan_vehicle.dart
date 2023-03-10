@@ -74,17 +74,17 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
     setState(() {
       _isScanning = true;
     });
-    // cameraController?.startImageStream((image) {
-    //   // log('hehe');
-    //   if (_lastDetectedPlate != "") {
-    //     setState(() {
-    //       _lastDetectedPlate = "";
-    //     });
-    //     return;
-    //   }
-    //   if (!_isScanning) return;
-    //   if (!_isDetecting) _processCameraImage(image);
-    // });
+    cameraController?.startImageStream((image) {
+      // log('hehe');
+      if (_lastDetectedPlate != "") {
+        setState(() {
+          _lastDetectedPlate = "";
+        });
+        return;
+      }
+      if (!_isScanning) return;
+      if (!_isDetecting) _processCameraImage(image);
+    });
   }
 
   stopScanning() async {

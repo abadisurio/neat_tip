@@ -186,7 +186,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
   _loadPrices() {
     final charge = (_storeDuration.inDays == 0 ? 1 : _storeDuration.inDays) *
         (_detectedSpot!.farePerDay ?? 0);
-    log('charge ${charge}');
+    // log('charge ${charge}');
     // (_detectedSpot!.farePerDay ?? 0) *
     //                             ()
     _prices = [

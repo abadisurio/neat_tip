@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -34,7 +32,7 @@ final List<Spot> dummySpots = [
 ];
 
 class _ExploreSpotState extends State<ExploreSpot> {
-  LocationData? _currentLocation;
+  // LocationData? _currentLocation;
   Location location = Location();
 
   final LatLng _initialcameraposition = const LatLng(-6.1753924, 106.8249641);
@@ -57,7 +55,7 @@ class _ExploreSpotState extends State<ExploreSpot> {
       ),
     );
     _locationSubscription = _location.onLocationChanged.listen((l) {
-      _currentLocation = l;
+      // _currentLocation = l;
     });
 
     await _loadSpots();
