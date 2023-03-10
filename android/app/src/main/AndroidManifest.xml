@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="neat_tip"
+        android:label="Neat Tip"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

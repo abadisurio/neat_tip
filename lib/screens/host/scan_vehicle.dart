@@ -74,23 +74,16 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
     setState(() {
       _isScanning = true;
     });
-    cameraController?.startImageStream((image) {
-      // log('hehe');
-      if (_lastDetectedPlate != "") {
-        setState(() {
-          _lastDetectedPlate = "";
-        });
-        return;
-      }
-      if (!_isScanning) return;
-      if (!_isDetecting) _processCameraImage(image);
-    });
-    // Future.delayed(const Duration(seconds: 1), () {
-    //   stopScanning();
-    //   setState(() {
-    //     _lastDetectedPlate = 'B 3853 KZA';
-    //     _listDetectedPlate.add('B 3853 KZA');
-    //   });
+    // cameraController?.startImageStream((image) {
+    //   // log('hehe');
+    //   if (_lastDetectedPlate != "") {
+    //     setState(() {
+    //       _lastDetectedPlate = "";
+    //     });
+    //     return;
+    //   }
+    //   if (!_isScanning) return;
+    //   if (!_isDetecting) _processCameraImage(image);
     // });
   }
 
@@ -108,6 +101,7 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
   }
 
   void _itemDetected(String plateNumber) async {
+    log('siniiiwkwk');
     setState(() {
       _lastDetectedPlate = plateNumber;
       _listDetectedPlate.add(plateNumber);
@@ -132,7 +126,7 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
         for (TextBlock block in recognisedText.blocks) {
           log('block.text ${block.text}');
           if (regexPlate.hasMatch(block.text)) {
-            _itemDetected(block.text);
+            // _itemDetected(block.text);
           }
         }
       }
@@ -151,6 +145,10 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
       });
     });
     startScanning();
+
+    Future.delayed(const Duration(seconds: 3), () {
+      _itemDetected('B 3149 EGR');
+    });
     super.initState();
   }
 

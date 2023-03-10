@@ -248,7 +248,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
                                 _reservation!.timeCheckedIn!,
                                 DateTime.now().toIso8601String());
                             return Text(
-                              '${_reservation!.id} ${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours % 24} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes % 60} Menit' : 'Baru Saja'}',
+                              '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours % 24} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes % 60} Menit' : 'Baru Saja'}',
                             );
                           },
                         )

@@ -259,10 +259,10 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                     ? (element['price'] as int)
                     : 0)));
         _reservation!.timeCheckedOut = DateTime.now().toIso8601String();
-        log('_reservation ${_reservation!.toJson()}');
+        // log('_reservation ${_reservation!.toJson()}');
         await _reservationsListCubit.updateReservation(_reservation!);
         notifyRsvpFinished(_reservation!);
-        log('_reservation!.id ${_reservation!.id}');
+        // log('_reservation!.id ${_reservation!.id}');
         if (mounted) {
           Navigator.pushNamedAndRemoveUntil(
               context, '/reservation_detail', (route) => route.isFirst,
@@ -486,7 +486,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Check-in ${_reservation!.id}',
+                              'Check-in',
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             Text(
