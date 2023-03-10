@@ -13,12 +13,16 @@ final border = BorderRadius.circular(16);
 class PeekAndPopable extends StatefulWidget {
   final EdgeInsets? peekPadding;
   final Function? onDidPop;
+  final Function()? onTapChild;
+  final Function()? onTap;
   final Widget child;
   final List<Map<String, dynamic>> actions;
   final Widget? childToPeek;
   const PeekAndPopable(
       {super.key,
       required this.child,
+      this.onTap,
+      this.onTapChild,
       this.childToPeek,
       this.peekPadding,
       required this.actions,
@@ -79,7 +83,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
     // Future.delayed(const Duration(milliseconds: 300), () {});
   }
 
-  void onTapUp(TapUpDetails details) {
+  void onTapUp() {
     log('up ${onHold.isActive}');
     onHold.cancel();
     setState(() {
@@ -122,6 +126,7 @@ class _PeekAndPopableState extends State<PeekAndPopable>
             barrierLabel: '',
             barrierColor: Colors.black38,
             pageBuilder: (context, anim1, anim2) => PeekPage(
+                  onTapChild: widget.onTapChild,
                   actions: widget.actions,
                   peekPadding: widget.peekPadding,
                   childToPeek: widget.childToPeek,
@@ -149,8 +154,10 @@ class _PeekAndPopableState extends State<PeekAndPopable>
     return ClipRect(
       child: InkWell(
         // onLongPress: onLongPress,
+        onTap: widget.onTap,
         onTapDown: onTapDown,
-        onTapUp: onTapUp,
+        onTapUp: (_) => onTapUp(),
+        onTapCancel: () => onTapUp(),
         child: AnimatedScale(
             duration: const Duration(milliseconds: 500),
             curve: Curves.decelerate,
@@ -181,12 +188,14 @@ extension GlobalPaintBounds on BuildContext {
 class PeekPage extends StatefulWidget {
   final Animation<double> transitionAnimation;
   final Widget? childToPeek;
+  final Function()? onTapChild;
   final Widget child;
   final Rect childPosition;
   final EdgeInsets? peekPadding;
   final List<Map<String, dynamic>> actions;
   const PeekPage(
       {super.key,
+      this.onTapChild,
       required this.transitionAnimation,
       required this.childPosition,
       this.childToPeek,
@@ -202,6 +211,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
   late AnimationController controller;
   late List<Map<String, dynamic>> menuItem;
   double offsetY = 0;
+  bool isExpanded = false;
   bool isOpened = false;
   bool isOpened2 = false;
   double cardScale = 1;
@@ -232,7 +242,10 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
     final childToPeek = widget.childToPeek;
     final anim1 = widget.transitionAnimation;
     final childPosition = widget.childPosition;
-    final innerController = CurvedAnimation(parent: anim1, curve: curve);
+    final innerController = isExpanded
+        ? CurvedAnimation(
+            parent: AnimationController(vsync: this), curve: curve)
+        : CurvedAnimation(parent: anim1, curve: curve);
     // log('message $childPosition');
     return WillPopScope(
       onWillPop: () {
@@ -357,6 +370,8 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                 ),
                               ),
                             ),
+                            if (childToPeek != null)
+                              GestureDetector(onTap: () {}),
                           ],
                         ),
                       ),
@@ -390,7 +405,7 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                   color: Theme.of(context)
                                       .canvasColor
                                       .withOpacity(0.8),
-                                  borderRadius: border),
+                                  borderRadius: BorderRadius.circular(12)),
                               child: ClipRRect(
                                 borderRadius: border,
                                 child: ListView.separated(
@@ -411,8 +426,12 @@ class _PeekPageState extends State<PeekPage> with TickerProviderStateMixin {
                                             element['onTap']();
                                           },
                                           child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16.0,
+                                                vertical: 8.0),
                                             child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,

@@ -8,6 +8,7 @@ import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/utils/date_time_to_string.dart';
 import 'package:neat_tip/widgets/carousel.dart';
 import 'package:neat_tip/widgets/dashboard_menu.dart';
+import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 import 'package:skeletons/skeletons.dart';
 
 class HomeCustomer extends StatelessWidget {
@@ -73,37 +74,61 @@ class HomeCustomer extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: ListTile(
+                      child: PeekAndPopable(
+                        onTapChild: () {
+                          Navigator.pushNamed(context, '/reservation_detail',
+                              arguments:
+                                  ReservationArgument(reservationId: item.id));
+                        },
                         onTap: () {
                           Navigator.pushNamed(context, '/reservation_detail',
                               arguments:
                                   ReservationArgument(reservationId: item.id));
                         },
-                        // dense: true,
-                        leading: const CircleAvatar(
-                          child: Icon(
-                            Icons.motorcycle,
+                        childToPeek: ReservationDetail(
+                            reservationArgument:
+                                ReservationArgument(reservationId: item.id)),
+                        actions: [
+                          {
+                            "name": "Hapus",
+                            "icon": Icons.delete,
+                            "color": Colors.red,
+                            "onTap": () {}
+                          },
+                          // {
+                          //   "name": "Ubah",
+                          //   "icon": Icons.edit,
+                          //   "color": Colors.white,
+                          //   "onTap": () {}
+                          // },
+                        ],
+                        child: ListTile(
+                          // dense: true,
+                          leading: const CircleAvatar(
+                            child: Icon(
+                              Icons.motorcycle,
+                            ),
                           ),
+                          title: Text(item.spotName ?? ''),
+                          subtitle: Text(item.plateNumber),
+                          trailing: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Rp${(item.charge ?? 0)}',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                Text(
+                                  item.status ?? '',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                                Text(
+                                  dateTimeToString(item.timeCheckedIn ?? ''),
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                              ]),
                         ),
-                        title: Text(item.spotName ?? ''),
-                        subtitle: Text(item.plateNumber),
-                        trailing: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Rp${(item.charge ?? 0)}',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                              Text(
-                                item.status ?? '',
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                              Text(
-                                dateTimeToString(item.timeCheckedIn ?? ''),
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                            ]),
                       ),
                     );
                   }));
