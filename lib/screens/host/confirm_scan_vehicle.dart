@@ -27,6 +27,7 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
   _processVehicle() async {
     final reservationsListCubit = context.read<ReservationsListCubit>();
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    final failedPlates = [];
     await Navigator.pushNamed(context, '/state_loading', arguments: () async {
       for (var element in scannedVehicleList) {
         final reservation = Reservation(
@@ -37,14 +38,38 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
             hostUserId: uid ?? '',
             plateNumber: element,
             timeCheckedIn: DateTime.now().toIso8601String());
-        final reservationData =
-            await reservationsListCubit.addReservation(reservation);
-        notifyRsvpAdded(reservationData);
-        // await reservationsListCubit.addReservation(reservation);
-        // await vehicleListCubit.add();
-        log('hereeeeee');
+        try {
+          final reservationData =
+              await reservationsListCubit.addReservation(reservation);
+          notifyRsvpAdded(reservationData);
+          // await reservationsListCubit.addReservation(reservation);
+          // await vehicleListCubit.add();
+          log('hereeeeee');
+        } catch (e) {
+          failedPlates.add(element);
+        }
       }
     });
+    if (failedPlates.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Beberapa kendaraan tidak dapat ditambahkan: '),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [...failedPlates.map((e) => Text(e)).toList()],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override

@@ -190,11 +190,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
     // (_detectedSpot!.farePerDay ?? 0) *
     //                             ()
     _prices = [
-      {
-        'name':
-            'Ongkos Penitipan ${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours % 24} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes % 60} Menit' : 'Baru Saja'}',
-        'price': charge
-      }
+      {'name': 'Ongkos Penitipan', 'price': charge}
     ];
   }
 
@@ -499,7 +495,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                                   Stream.periodic(const Duration(seconds: 1)),
                               builder: (context, snapshot) {
                                 return Text(
-                                  '${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes} Menit' : 'Baru Saja'}',
+                                  '${_storeDuration.inDays > 0 ? '${_storeDuration.inDays} Hari ' : ''}${_storeDuration.inHours > 0 ? '${_storeDuration.inHours % 24} Jam ' : ''}${_storeDuration.inMinutes > 0 ? '${_storeDuration.inMinutes % 60} Menit' : 'Baru Saja'}',
                                 );
                               },
                             ),
@@ -580,7 +576,9 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
                               Text(e['name']),
                               Text(
                                 NumberFormat.currency(
-                                        locale: 'id_ID', symbol: 'Rp')
+                                        locale: 'id_ID',
+                                        symbol: 'Rp',
+                                        decimalDigits: 0)
                                     .format(e['price']),
                               )
                             ],

@@ -89,6 +89,7 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
 
   stopScanning() async {
     log('_lastDetectedPlate $_lastDetectedPlate');
+    cameraController?.stopImageStream();
     setState(() {
       _isScanning = false;
     });
@@ -126,7 +127,7 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
         for (TextBlock block in recognisedText.blocks) {
           log('block.text ${block.text}');
           if (regexPlate.hasMatch(block.text)) {
-            // _itemDetected(block.text);
+            _itemDetected(block.text);
           }
         }
       }
@@ -146,9 +147,9 @@ class _ScanVehicleState extends State<ScanVehicle> with RouteAware {
     });
     startScanning();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      _itemDetected('B 3149 EGR');
-    });
+    // Future.delayed(const Duration(seconds: 3), () {
+    //   _itemDetected('B 3149 EGR');
+    // });
     super.initState();
   }
 
