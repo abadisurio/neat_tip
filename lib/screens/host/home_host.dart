@@ -96,7 +96,7 @@ class _HomeHostState extends State<HomeHost> with TickerProviderStateMixin {
                             builder: (context, snapshot) {
                               return Text(
                                 DateFormat(
-                                        'EEEE,\nD MMM yyyy\nhh:mm:ss', 'id_ID')
+                                        'EEEE,\nd MMMM yyyy\nhh:mm:ss', 'id_ID')
                                     .format(DateTime.now()),
                                 style: thinStyle,
                               );
@@ -137,22 +137,22 @@ class _HomeHostState extends State<HomeHost> with TickerProviderStateMixin {
                       const SizedBox(
                         height: 40,
                       ),
-                      Wrap(
-                          alignment: WrapAlignment.spaceBetween,
-                          spacing: 2.0, // gap between adjacent chips
-                          runSpacing: 2.0, // gap between lines
-                          children: [
-                            ...List.generate(
-                                (156 * storedVehicle / capacity).ceil(),
-                                ((index) {
-                              return const Icon(Icons.play_arrow);
-                            })),
-                            ...List.generate(
-                                (156 * (1 - storedVehicle / capacity)).floor(),
-                                ((index) {
-                              return const Icon(Icons.play_arrow_outlined);
-                            })),
-                          ]),
+                      // Wrap(
+                      //     alignment: WrapAlignment.spaceBetween,
+                      //     spacing: 2.0, // gap between adjacent chips
+                      //     runSpacing: 2.0, // gap between lines
+                      //     children: [
+                      //       ...List.generate(
+                      //           (156 * storedVehicle / capacity).ceil(),
+                      //           ((index) {
+                      //         return const Icon(Icons.play_arrow);
+                      //       })),
+                      //       ...List.generate(
+                      //           (156 * (1 - storedVehicle / capacity)).floor(),
+                      //           ((index) {
+                      //         return const Icon(Icons.play_arrow_outlined);
+                      //       })),
+                      //     ]),
                       const SizedBox(
                         height: 40,
                       ),

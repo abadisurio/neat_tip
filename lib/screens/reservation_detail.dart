@@ -67,9 +67,12 @@ class _ReservationDetailState extends State<ReservationDetail> {
     log('_reservationArgument ${widget.reservationArgument.reservationId}');
     final rsvpData = await _reservationsListCubit
         .findById(widget.reservationArgument.reservationId);
+    final vehicle =
+        await _vehicleListCubit.findByPlateFromFireStore(rsvpData!.plateNumber);
     setState(() {
       _reservation = rsvpData;
-      _vehicle = _vehicleListCubit.findByPlate(_reservation!.plateNumber);
+      _vehicle = vehicle;
+
       _spot = dummySpots[1];
       // _transactions = Transactions(
       //     id: 'id',
@@ -245,7 +248,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
                                 _reservation!.timeCheckedIn!,
                                 DateTime.now().toIso8601String());
                             return Text(
-                              '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours % 24} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes % 60} Menit' : 'Baru Saja'}',
+                              '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${(duration.inHours) > 0 ? '${duration.inHours % 24} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes % 60} Menit' : 'Baru Saja'}',
                             );
                           },
                         )
@@ -255,7 +258,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
                               _reservation!.timeCheckedIn!,
                               _reservation!.timeCheckedOut ?? '');
                           return Text(
-                            '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes} Menit' : 'Baru Saja'}',
+                            '${duration.inDays > 0 ? '${duration.inDays} Hari' : ''} ${duration.inHours > 0 ? '${duration.inHours % 24} Jam' : ''} ${duration.inMinutes > 0 ? '${duration.inMinutes % 60} Menit' : 'Baru Saja'}',
                           );
                         }()
                     ],
@@ -276,7 +279,8 @@ class _ReservationDetailState extends State<ReservationDetail> {
                     children: [
                       const Text('Total ongkos'),
                       Text(
-                        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
+                        NumberFormat.currency(
+                                locale: 'id_ID', symbol: 'Rp', decimalDigits: 0)
                             .format(_reservation!.charge ?? 0),
                       )
                     ],
@@ -290,7 +294,8 @@ class _ReservationDetailState extends State<ReservationDetail> {
                     children: [
                       const Expanded(child: Text('Saldo Neat Tip')),
                       Text(
-                        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
+                        NumberFormat.currency(
+                                locale: 'id_ID', symbol: 'Rp', decimalDigits: 0)
                             .format(_reservation!.charge ?? 0),
                       )
                     ],

@@ -101,8 +101,10 @@ class _MyAppState extends State<MyApp> {
 
     transactionsListCubit.initializeDB(database);
     transactionsListCubit.pullDataFromDB();
-
-    reservationsListCubit.initialize(localDB: database);
+    if (user != null) {
+      reservationsListCubit.initialize(
+          localDB: database, userOrSpotId: user!.id, role: user!.role);
+    }
     // reservationsListCubit.pullDataFromDB();
 
     cameras = await availableCameras();

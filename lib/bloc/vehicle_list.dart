@@ -344,6 +344,30 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     return data.isNotEmpty ? data.first : null;
   }
 
+  Future<Vehicle?> findByPlateFromFireStore(String plateNumber) async {
+    try {
+      final DocumentSnapshot vehicleSnapshot =
+          await _firestore.collection("vehicles").doc((plateNumber)).get();
+      // log('vehicleData ${vehicleData.data()}');
+      final vehicleData = vehicleSnapshot.data() as Map<String, dynamic>?;
+      log('vehicleData $vehicleData');
+      if (vehicleData != null) {
+        final vehicle = Vehicle.fromJson(vehicleData);
+        await _downloadImages(vehicle);
+        log('vehicle $vehicle');
+
+        return vehicle;
+        // vehicleList.add(vehicle);
+      }
+      return null;
+      // return vehicleList;
+      // log('data ${data[0].brand}');
+    } catch (e) {
+      // log('eee $e');
+      throw Exception(e);
+    }
+  }
+
   void removeByIndex(int index) {
     log('sss $index');
     log('ssblum $state');

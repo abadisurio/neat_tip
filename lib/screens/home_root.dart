@@ -17,6 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/screens/customer/vehicle_list.dart';
 import 'package:neat_tip/screens/notifications.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
+import 'package:neat_tip/screens/reservation_list.dart';
 import 'package:neat_tip/service/fb_cloud_messaging.dart';
 import 'package:neat_tip/widgets/snacbar_notification.dart';
 
@@ -67,7 +68,7 @@ class _HomeRootState extends State<HomeRoot> {
     // log('userRole $userRole');
     if (userRole != 'Pengguna') {
       _widgetOptions[0] = const HomeHost();
-      _widgetOptions[1] = const VehicleList();
+      _widgetOptions[1] = const ReservationList();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       PushNotificationService.setRunOpenedMessage((RemoteMessage message) {
