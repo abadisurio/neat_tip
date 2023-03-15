@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:neat_tip/models/vehicle.dart';
 import 'package:path_provider/path_provider.dart';
@@ -36,19 +38,31 @@ class VehicleItem extends StatelessWidget {
                       ),
                       if (firstName != '')
                         FutureBuilder(future: () async {
-                          final appDir = await getTemporaryDirectory();
-                          // log('${appDir.path}/$firstName');
-                          return File(
-                              '${appDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$firstName');
-                        }(), builder: ((context, snapshot) {
-                          //  if (cover.existsSync())
-                          if (snapshot.data != null) {
-                            return Image.file(
-                              snapshot.data!,
+                          if (firstName.contains('http')) {
+                            log('gapakedonlot');
+                            return CachedNetworkImage(
+                              imageUrl: firstName,
                               height: 150,
                               width: 150,
                               fit: BoxFit.cover,
                             );
+                          } else {
+                            final appDir = await getTemporaryDirectory();
+                            final file = File(
+                                '${appDir.path}${Platform.isIOS ? '/camera/pictures' : ''}/$firstName');
+                            return Image.file(
+                              file,
+                              height: 150,
+                              width: 150,
+                              fit: BoxFit.cover,
+                            );
+                          }
+
+                          // log('${appDir.path}/$firstName');
+                        }(), builder: ((context, snapshot) {
+                          //  if (cover.existsSync())
+                          if (snapshot.data != null) {
+                            return snapshot.data!;
                           }
                           return const SizedBox();
                         }))

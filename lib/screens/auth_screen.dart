@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
@@ -130,7 +129,7 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(),
       body: WillPopScope(
         onWillPop: () async {
-          Navigator.pop(context, isSuccess);
+          Navigator.pop(context, neatTipUserCubit.state);
           return isSuccess;
         },
         child: SafeArea(

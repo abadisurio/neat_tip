@@ -51,7 +51,7 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
       }
     });
     if (failedPlates.isNotEmpty) {
-      showDialog(
+      await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -70,6 +70,8 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
         },
       );
     }
+
+    if (mounted) Navigator.popUntil(context, ((route) => route.isFirst));
   }
 
   @override

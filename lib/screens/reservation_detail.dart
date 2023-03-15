@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:neat_tip/bloc/neattip_user.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:neat_tip/models/reservation.dart';
@@ -35,6 +36,7 @@ class ReservationDetail extends StatefulWidget {
 class _ReservationDetailState extends State<ReservationDetail> {
   late ReservationsListCubit _reservationsListCubit;
   late VehicleListCubit _vehicleListCubit;
+  late NeatTipUserCubit _neatTipUserCubit;
   String? _status;
   Reservation? _reservation;
   // Transactions? _transactions;
@@ -45,6 +47,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
   @override
   void initState() {
     super.initState();
+    _neatTipUserCubit = context.read<NeatTipUserCubit>();
     _vehicleListCubit = context.read<VehicleListCubit>();
     _reservationsListCubit = context.read<ReservationsListCubit>();
     // context.read<Spot>
@@ -67,7 +70,7 @@ class _ReservationDetailState extends State<ReservationDetail> {
     log('_reservationArgument ${widget.reservationArgument.reservationId}');
     final rsvpData = await _reservationsListCubit
         .findById(widget.reservationArgument.reservationId);
-    final vehicle =
+    final Vehicle? vehicle =
         await _vehicleListCubit.findByPlateFromFireStore(rsvpData!.plateNumber);
     setState(() {
       _reservation = rsvpData;
@@ -114,20 +117,33 @@ class _ReservationDetailState extends State<ReservationDetail> {
                                     : 'Selesai',
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
-                          if (_reservation != null && _status == 'ongoing')
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.yellow.shade800),
-                                onPressed: () => Navigator.pushNamed(
-                                    context, '/scan_vehicle_customer',
-                                    arguments: _reservation),
-                                child: const Text('Check-out sekarang'))
-                          else
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green),
-                                onPressed: () {},
-                                child: const Text('Lihat invoice'))
+                          () {
+                            if (_reservation != null && _status == 'ongoing') {
+                              if (_neatTipUserCubit.state?.role == "Pengguna") {
+                                return ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Colors.yellow.shade800),
+                                    onPressed: () => Navigator.pushNamed(
+                                        context, '/scan_vehicle_customer',
+                                        arguments: _reservation),
+                                    child: const Text('Check-out sekarang'));
+                              } else {
+                                return ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Colors.yellow.shade800),
+                                    onPressed: () {},
+                                    child: const Text('Masih Dititipkan'));
+                              }
+                            } else {
+                              return ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green),
+                                  onPressed: () {},
+                                  child: const Text('Lihat invoice'));
+                            }
+                          }()
                         ],
                       ),
                     const Divider(),

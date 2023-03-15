@@ -4,6 +4,7 @@ import 'package:introduction_screen/introduction_screen.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
 import 'package:neat_tip/bloc/vehicle_list.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neat_tip/models/neattip_user.dart';
 import 'package:neat_tip/service/fb_cloud_messaging.dart';
 import 'package:video_player/video_player.dart';
 
@@ -20,22 +21,23 @@ class _IntroductionState extends State<Introduction> {
   int _vehicleLength = 0;
   bool _isLoggedIn = false;
   bool _isPermissionsAllowed = false;
+  NeatTipUser? _user;
   late VideoPlayerController _videoController;
   late VehicleListCubit _vehicleListCubit;
   late ReservationsListCubit _reservationListCubit;
 
   Future<void> _reloadData() async {
     // await initializeFCM(cubit: context.read<NotificationListCubit>());
-    await _reservationListCubit.reload();
+    await _reservationListCubit.reload(role: _user!.role);
     PushNotificationService.reloadFcmToken();
   }
 
   navigateToAuthPage() async {
-    final isLoggedIn = await Navigator.pushNamed(context, '/auth') as bool;
-    log('isLoggedIn $isLoggedIn');
-    if (isLoggedIn && mounted) {
+    _user = await Navigator.pushNamed(context, '/auth') as NeatTipUser?;
+    log('_user $_user');
+    if (_user != null && mounted) {
       setState(() {
-        _isLoggedIn = isLoggedIn;
+        _isLoggedIn = true;
         _maxPage += 1;
       });
       await _vehicleListCubit.reload();

@@ -26,6 +26,10 @@ class ReservationList extends StatelessWidget {
             if (reservationList!.isEmpty) {
               return const Center(child: Text('Belum ada transaksi!'));
             }
+            reservationList.sort(((a, b) {
+              return 1 -
+                  a.status!.toLowerCase().compareTo(b.status!.toLowerCase());
+            }));
             // log('reservationList ${reservationList.first.toJson()}');
             return ListView.builder(
                 itemCount: reservationList.length,

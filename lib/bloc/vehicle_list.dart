@@ -317,6 +317,22 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
     }
   }
 
+  Future<void> _getUrlImages(Vehicle vehicle) async {
+    List<String> newImgSrc = [];
+    for (var photoName in (vehicle.imgSrcPhotos).split(',')) {
+      // log('photoName $photoName');
+      if (photoName != '') {
+        final storageRef = await _firebaseStorage
+            .ref("vehicles/${vehicle.plate}/$photoName")
+            .getDownloadURL();
+        log('message $storageRef');
+        newImgSrc.add(storageRef);
+        // final photoUrl = await storageRef.getDownloadURL();
+      }
+    }
+    vehicle.imgSrcPhotos = newImgSrc.join(",");
+  }
+
   Future<void> _pushDataFirestore() async {
     // String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     // final Map<String, dynamic> mappedList = {
@@ -353,7 +369,7 @@ class VehicleListCubit extends Cubit<List<Vehicle>> {
       log('vehicleData $vehicleData');
       if (vehicleData != null) {
         final vehicle = Vehicle.fromJson(vehicleData);
-        await _downloadImages(vehicle);
+        await _getUrlImages(vehicle);
         log('vehicle $vehicle');
 
         return vehicle;
