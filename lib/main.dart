@@ -92,18 +92,19 @@ class _MyAppState extends State<MyApp> {
     database =
         await $FloorNeatTipDatabase.databaseBuilder('database.db').build();
 
-    vehicleListCubit.initialize(localDB: database);
-    notificationListCubit.initialize(localDB: database);
-
     // await PushNotificationService.initialize(cubit: notificationListCubit);
 
     // vehicleListCubit.pullDataFromDB();
 
     transactionsListCubit.initializeDB(database);
     transactionsListCubit.pullDataFromDB();
+    vehicleListCubit.initialize(localDB: database);
+    notificationListCubit.initialize(localDB: database);
+    reservationsListCubit.initialize(localDB: database);
     if (user != null) {
-      reservationsListCubit.initialize(
-          localDB: database, userOrSpotId: user!.id, role: user!.role);
+      reservationsListCubit.reload(role: user!.role);
+      vehicleListCubit.reload();
+      // notificationListCubit.reload();
     }
     // reservationsListCubit.pullDataFromDB();
 

@@ -15,7 +15,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
   late NeatTipDatabase _db;
   late String _role;
   late FirebaseFirestore _firestore;
-  late String _userOrSpotId;
+  late String _userId;
   StreamSubscription<QuerySnapshot>? _streamSub;
   // get collection => state;
   // get length => state.length;
@@ -24,25 +24,20 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     _db = db;
   }
 
-  void initialize(
-      {required NeatTipDatabase localDB,
-      role = 'Pengguna',
-      required String userOrSpotId}) async {
+  void initialize({
+    required NeatTipDatabase localDB,
+  }) async {
     _firestore = FirebaseFirestore.instance;
-    _role = role;
-    // _firestore.settings = Settings();
-    _userOrSpotId = userOrSpotId;
-    // _firebaseStorage = FirebaseStorage.instance;
     _db = localDB;
-    if (_userOrSpotId != '') _load();
     // if (connectivityResult != ConnectivityResult.none) {
     //   // I am connected to a mobile network.
     // }
   }
 
   Future<void> _load() async {
+    _userId = FirebaseAuth.instance.currentUser!.uid;
     final connectivityResult = _checkConnection();
-    if (connectivityResult == ConnectivityResult.none) {
+    if (connectivityResult == ConnectivityResult.none && _role == "Pengguna") {
       final dataLocalDB = await _pullDataFromDB();
       log('dataLocalDB $dataLocalDB');
       // final dataFirestore = await _pullDataFirestore();
@@ -67,8 +62,8 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
     // log('tarikMang $state');
   }
 
-  Future<void> reload() async {
-    _userOrSpotId = FirebaseAuth.instance.currentUser?.uid ?? '';
+  Future<void> reload({String? role}) async {
+    if (role != null) _role = role;
     await _load();
   }
 
@@ -86,12 +81,12 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
   }
 
   Future<void> _listenDataFirestore() async {
-    log('_userOrSpotId $_userOrSpotId');
+    log('_userId $_userId');
     try {
       final snapshot = _firestore
           .collection("reservation")
-          .where(_role == "Pengguna" ? "customerId" : "spotId",
-              isEqualTo: _userOrSpotId)
+          .where(_role == "Pengguna" ? "customerId" : "hostUserId",
+              isEqualTo: _userId)
           // .where("status", isEqualTo: "ongoing")
           // .limit(10)
           .snapshots();
@@ -244,7 +239,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
       //     .then((value) {
       //   // log('DocumentSnapshot added with ID ${value.id}');
       // });
-      // await _firestore.collection("userVehicles").doc(_userOrSpotId).set(
+      // await _firestore.collection("userVehicles").doc(_userId).set(
       //     {"plates": state.map((e) => e.plateNumber).toList()}).then((value) {
       //   // .update({(state.length - 1).toString(): vehicle.plate}).then((value) {
       //   // log('DocumentSnapshot added with ID ${value.id}');
@@ -262,7 +257,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
       jsonReservation.removeWhere((key, value) => key == 'id');
       final firestoreReservation = await _firestore
           .collection("reservation")
-          // .doc(_userOrSpotId)
+          // .doc(_userId)
           // .collection(collectionPath)
           .add(jsonReservation);
       final data = await firestoreReservation.get();
@@ -271,7 +266,7 @@ class ReservationsListCubit extends Cubit<List<Reservation>?> {
         ...data.data()!.map((key, value) => MapEntry(Symbol(key), value)),
         #id: data.id,
         #spotId: 'hhhh',
-        #hostUserId: _userOrSpotId,
+        #hostUserId: _userId,
         // ...reservation
       });
       // return Reservation(

@@ -14,7 +14,6 @@ import 'package:neat_tip/screens/customer/home_customer.dart';
 import 'package:neat_tip/screens/host/home_host.dart';
 import 'package:neat_tip/screens/manage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neat_tip/screens/customer/vehicle_list.dart';
 import 'package:neat_tip/screens/notifications.dart';
 import 'package:neat_tip/screens/reservation_detail.dart';
 import 'package:neat_tip/screens/reservation_list.dart';

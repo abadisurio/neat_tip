@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/reservation_list.dart';
@@ -15,10 +17,12 @@ class ReservationList extends StatelessWidget {
       appBar: AppBar(title: const Text('Daftar Reservasi')),
       body: BlocBuilder<ReservationsListCubit, List<Reservation>?>(
           builder: (context, reservationList) {
+        log('reservationList $reservationList');
         return Skeleton(
           isLoading: reservationList == null,
           skeleton: SkeletonListView(),
           child: () {
+            // if (reservationList == null) return;
             if (reservationList!.isEmpty) {
               return const Center(child: Text('Belum ada transaksi!'));
             }
@@ -26,7 +30,6 @@ class ReservationList extends StatelessWidget {
             return ListView.builder(
                 itemCount: reservationList.length,
                 shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: ((context, index) {
                   final item = reservationList[index];
                   return Card(
