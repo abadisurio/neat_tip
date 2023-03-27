@@ -34,6 +34,7 @@ class _IntroductionState extends State<Introduction> {
 
   navigateToAuthPage() async {
     _user = await Navigator.pushNamed(context, '/auth') as NeatTipUser?;
+    // _user = await Navigator.pushNamed(context, '/auth') as NeatTipUser?;
     log('_user $_user');
     if (_user != null && mounted) {
       setState(() {

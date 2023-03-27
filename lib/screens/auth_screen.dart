@@ -58,7 +58,7 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() {
       isSuccess = true;
     });
-    Navigator.pop(context, true);
+    Navigator.pop(context, neatTipUserCubit.state);
   }
 
   void submitAuth() async {
@@ -129,8 +129,8 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(),
       body: WillPopScope(
         onWillPop: () async {
-          Navigator.pop(context, neatTipUserCubit.state);
-          return isSuccess;
+          Navigator.pop(context, null);
+          return false;
         },
         child: SafeArea(
           child: Form(
