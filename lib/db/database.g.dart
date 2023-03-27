@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: library_private_types_in_public_api
-
 part of 'database.dart';
 
 // **************************************************************************
@@ -65,6 +63,8 @@ class _$NeatTipDatabase extends NeatTipDatabase {
 
   VehicleDao? _vehicleDaoInstance;
 
+  RecordDao? _recordDaoInstance;
+
   NeatTipNotificationsDao? _neatTipNotificationsDaoInstance;
 
   TransactionsDao? _transactionsDaoInstance;
@@ -95,6 +95,8 @@ class _$NeatTipDatabase extends NeatTipDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Vehicle` (`plate` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `brand` TEXT NOT NULL, `model` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `imgSrcPhotos` TEXT NOT NULL, `wheel` INTEGER NOT NULL, PRIMARY KEY (`plate`))');
         await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Record` (`id` TEXT NOT NULL, `plateNumber` TEXT NOT NULL, `imgSrc` TEXT NOT NULL, `timeCheckedIn` TEXT, `timeCheckedOut` TEXT, `note` TEXT, PRIMARY KEY (`id`))');
+        await database.execute(
             'CREATE TABLE IF NOT EXISTS `Transactions` (`id` TEXT NOT NULL, `customerUserId` TEXT NOT NULL, `timeRequested` TEXT NOT NULL, `timeFinished` TEXT, `value` INTEGER, `service` TEXT, `status` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Reservation` (`id` TEXT NOT NULL, `spotId` TEXT NOT NULL, `hostUserId` TEXT NOT NULL, `plateNumber` TEXT NOT NULL, `spotName` TEXT, `customerId` TEXT, `timeCheckedIn` TEXT, `timeCheckedOut` TEXT, `note` TEXT, `charge` INTEGER, `status` TEXT, PRIMARY KEY (`id`))');
@@ -110,6 +112,11 @@ class _$NeatTipDatabase extends NeatTipDatabase {
   @override
   VehicleDao get vehicleDao {
     return _vehicleDaoInstance ??= _$VehicleDao(database, changeListener);
+  }
+
+  @override
+  RecordDao get recordDao {
+    return _recordDaoInstance ??= _$RecordDao(database, changeListener);
   }
 
   @override
@@ -201,6 +208,65 @@ class _$VehicleDao extends VehicleDao {
   @override
   Future<void> removeVehicle(Vehicle vehicle) async {
     await _vehicleDeletionAdapter.delete(vehicle);
+  }
+}
+
+class _$RecordDao extends RecordDao {
+  _$RecordDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
+        _recordInsertionAdapter = InsertionAdapter(
+            database,
+            'Record',
+            (Record item) => <String, Object?>{
+                  'id': item.id,
+                  'plateNumber': item.plateNumber,
+                  'imgSrc': item.imgSrc,
+                  'timeCheckedIn': item.timeCheckedIn,
+                  'timeCheckedOut': item.timeCheckedOut,
+                  'note': item.note
+                },
+            changeListener);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Record> _recordInsertionAdapter;
+
+  @override
+  Future<List<Record>> findAllRecord() async {
+    return _queryAdapter.queryList('SELECT * FROM Record',
+        mapper: (Map<String, Object?> row) => Record(
+            id: row['id'] as String,
+            plateNumber: row['plateNumber'] as String,
+            imgSrc: row['imgSrc'] as String,
+            timeCheckedIn: row['timeCheckedIn'] as String?,
+            timeCheckedOut: row['timeCheckedOut'] as String?,
+            note: row['note'] as String?));
+  }
+
+  @override
+  Stream<Record?> findRecordById(int id) {
+    return _queryAdapter.queryStream('SELECT * FROM Record WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => Record(
+            id: row['id'] as String,
+            plateNumber: row['plateNumber'] as String,
+            imgSrc: row['imgSrc'] as String,
+            timeCheckedIn: row['timeCheckedIn'] as String?,
+            timeCheckedOut: row['timeCheckedOut'] as String?,
+            note: row['note'] as String?),
+        arguments: [id],
+        queryableName: 'Record',
+        isView: false);
+  }
+
+  @override
+  Future<void> insertRecord(Record record) async {
+    await _recordInsertionAdapter.insert(record, OnConflictStrategy.abort);
   }
 }
 
