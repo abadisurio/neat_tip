@@ -7,36 +7,29 @@ import 'package:neat_tip/models/reservation.dart';
 import 'package:neat_tip/service/fb_cloud_functions.dart';
 
 class ConfirmScanVehicle extends StatefulWidget {
-  const ConfirmScanVehicle({Key? key}) : super(key: key);
+  final Map<String, String> plateList;
+  const ConfirmScanVehicle({Key? key, required this.plateList})
+      : super(key: key);
 
   @override
   State<ConfirmScanVehicle> createState() => _ConfirmScanVehicleState();
 }
 
 class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
-  late Map<String, dynamic> argument;
-  List<String> scannedVehicleList = [];
-
-  _getArgument() async {
-    setState(() {
-      scannedVehicleList = argument["scannedVehicleList"];
-    });
-    log('argument $argument');
-  }
-
   _processVehicle() async {
     final reservationsListCubit = context.read<ReservationsListCubit>();
+    final plate = widget.plateList;
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final failedPlates = [];
     await Navigator.pushNamed(context, '/state_loading', arguments: () async {
-      for (var element in scannedVehicleList) {
+      for (var element in plate.entries) {
         final reservation = Reservation(
             id: '',
             spotId: 'S1',
             spotName: 'Kurnia Motor',
             customerId: FirebaseAuth.instance.currentUser!.uid,
             hostUserId: uid ?? '',
-            plateNumber: element,
+            plateNumber: element.key,
             timeCheckedIn: DateTime.now().toIso8601String());
         try {
           final reservationData =
@@ -46,7 +39,7 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
           // await vehicleListCubit.add();
           log('hereeeeee');
         } catch (e) {
-          failedPlates.add(element);
+          failedPlates.add('B 3942 UII');
         }
       }
     });
@@ -76,24 +69,21 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _getArgument());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    argument =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ??
-            {};
+    final scannedPlateList = widget.plateList;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cek Plat Nomor'),
       ),
       body: ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: scannedVehicleList.length + 1,
+          itemCount: scannedPlateList.length + 1,
           itemBuilder: ((context, index) {
-            if (index == scannedVehicleList.length) {
+            if (index == scannedPlateList.length) {
               return ElevatedButton(
                   onPressed: _processVehicle,
                   child: const Text('Proses Kendaraan'));
@@ -101,7 +91,7 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
             return Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(scannedVehicleList[index]),
+                child: Text(scannedPlateList.entries.elementAt(index).key),
               ),
             );
           })),

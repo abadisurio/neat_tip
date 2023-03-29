@@ -52,6 +52,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       User? user = FirebaseAuth.instance.currentUser;
       user ??= await AppFirebase.signUpWithEmailPassword(email, password);
       // reloadFcmToken();
+      updateLocalInfo({});
       log('user $user');
     } catch (e) {
       log('$e');

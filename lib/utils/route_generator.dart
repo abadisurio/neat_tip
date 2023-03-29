@@ -66,7 +66,10 @@ Route<dynamic>? routeGenerator(RouteSettings settings) {
           settings: settings);
     case '/confirm_scan_vehicle':
       return CupertinoPageRoute(
-          builder: (_) => const ConfirmScanVehicle(), settings: settings);
+          builder: (_) => ConfirmScanVehicle(
+                plateList: settings.arguments as Map<String, String>,
+              ),
+          settings: settings);
     case '/profile':
       return CupertinoPageRoute(
           builder: (_) => const Manage(), settings: settings);
