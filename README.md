@@ -5,14 +5,31 @@
 ## Revolutionizing motorcycle storage by modern and hassle-free experience for commuters
 
 ## Tech Stack
-|![enter image description here](https://skmkuma.com/wp-content/uploads/2021/07/flutter_logo.png)  | ![enter image description here](https://developers.google.com/static/maps/images/google-maps-platform-1200x675.png) | ![enter image description here](https://venturebeat.com/wp-content/uploads/2018/05/mlkit-e1592933964486.png?w=1200&strip=all) |
-|--|--|--|--|
-| ![enter image description here](https://firebase.google.com/static/images/brand-guidelines/logo-standard.png?hl=id) | ![enter image description here](https://2.bp.blogspot.com/-2L3KX_48TEQ/XJ0AIfGqG9I/AAAAAAAADew/tiTNwPkS84Y2lPmM8z6IQadB_TRxETHLwCLcBGAs/s1600/Firebase%2BAuthentication%2B%25282-%2BHorizontal%2BLockup%252C%2BLight%2529.png) | ![enter image description here](https://res.cloudinary.com/practicaldev/image/fetch/s--VnDDBkku--/c_limit,f_auto,fl_progressive,q_auto,w_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/akm5od0383lcbhxvb9zb.png) |
-|
-| | ![enter image description here](https://res.cloudinary.com/practicaldev/image/fetch/s--PglSroKw--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/i/kzejttivtsmb5zakar1n.png) |||
-
-
-
+<table style="padding:10px">
+  <tr>
+    <td> 
+         <img src="https://skmkuma.com/wp-content/uploads/2021/07/flutter_logo.png"></td>
+      
+ <td><img src="https://developers.google.com/static/maps/images/google-maps-platform-1200x675.png" ></td>
+   <td><img src="https://venturebeat.com/wp-content/uploads/2018/05/mlkit-e1592933964486.png?w=1200&strip=all"></td>
+    
+  </tr>
+ <tr>
+    <td> 
+         <img src="https://firebase.google.com/static/images/brand-guidelines/logo-standard.png?hl=id"></td>
+      
+ <td><img src="https://sterfield.co.jp/wp-content/uploads/2022/07/qt24WLh5lVE6rJBGCXcHp0WyAl4011Xmo9I3g1wb.png" ></td>
+   <td><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--VnDDBkku--/c_limit,f_auto,fl_progressive,q_auto,w_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/akm5od0383lcbhxvb9zb.png"></td>
+   
+  </tr>
+ 
+ <tr>
+    <td>  </td>
+      
+ <td><img src="https://res.cloudinary.com/practicaldev/image/fetch/s--PglSroKw--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/i/kzejttivtsmb5zakar1n.png" ></td>
+   <td> </td>
+  </tr>
+</table>
 
 
 ## Installation
