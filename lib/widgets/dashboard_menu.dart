@@ -6,8 +6,12 @@ class DashboardMenu extends StatelessWidget {
   static const List<Map<String, dynamic>> menuList = [
     // {"name": "Spots", "route": "/spots", "icon": Icons.explore_outlined},
     {"name": "Reservasi", "route": "/reservations", "icon": Icons.menu_book},
-    // {"name": "Saldo", "route": "/wallet", "icon": Icons.wallet},
     {"name": "Kendaraan", "route": "/vehiclelist", "icon": Icons.motorcycle},
+    {
+      "name": "Simulasi Check-in",
+      "route": "/scan_vehicle",
+      "icon": Icons.input_rounded
+    },
     // {"name": "Pro", "route": "/spots", "icon": Icons.explore_outlined},
   ];
 

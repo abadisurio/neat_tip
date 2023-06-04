@@ -116,10 +116,12 @@ class _CameraCapturerState extends State<CameraCapturer>
 
     log('_cameraController $_cameraController');
 
-    await _cameraController!.initialize().then((_) {
-      widget.controller(_cameraController!);
-      return;
-    });
+    if (mounted) {
+      await _cameraController!.initialize().then((_) {
+        widget.controller(_cameraController!);
+        return;
+      });
+    }
     // Start streaming images from platform camera
 
     if (!mounted) {

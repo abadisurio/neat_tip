@@ -8,8 +8,27 @@ import 'package:neat_tip/screens/dialog_find_plate.dart';
 import 'package:neat_tip/widgets/peek_and_pop_able.dart';
 import 'package:neat_tip/widgets/vehicle_item.dart';
 
-class VehicleList extends StatelessWidget {
+class VehicleList extends StatefulWidget {
   const VehicleList({super.key});
+
+  @override
+  State<VehicleList> createState() => _VehicleListState();
+}
+
+class _VehicleListState extends State<VehicleList> {
+  late VehicleListCubit _vehicleListCubit;
+
+  _reloadData() async {
+    // _vehicleListCubit
+    await _vehicleListCubit.reload();
+  }
+
+  @override
+  void initState() {
+    _vehicleListCubit = context.read<VehicleListCubit>();
+    _reloadData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

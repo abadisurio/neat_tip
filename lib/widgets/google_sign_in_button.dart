@@ -1,14 +1,17 @@
 // ignore_for_file: avoid_print
 
 // import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neat_tip/bloc/neattip_user.dart';
-// import 'package:neat_tip/utils/firebase.dart';
 
+// import 'package:neat_tip/utils/firebase.dart';
 class GoogleSignInButton extends StatefulWidget {
   final VoidCallback? onSuccess;
-  const GoogleSignInButton({super.key, this.onSuccess});
+  final bool isSignUp;
+  const GoogleSignInButton({super.key, this.onSuccess, required this.isSignUp});
 
   @override
   State<GoogleSignInButton> createState() => _GoogleSignInButtonState();
@@ -39,6 +42,10 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                 await Navigator.pushNamed(context, '/state_loading',
                     arguments: () async {
                   await neatTipUserCubit.signInGoogle();
+                  log('widget.isSignUp ${widget.isSignUp}');
+                  if (widget.isSignUp) {
+                    await neatTipUserCubit.addUserToFirestore();
+                  }
                 });
                 // final User? user = await AppFirebase.signInWithGoogle();
                 setState(() {

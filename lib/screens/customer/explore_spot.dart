@@ -38,7 +38,7 @@ class _ExploreSpotState extends State<ExploreSpot> {
   final LatLng _initialcameraposition = const LatLng(-6.1753924, 106.8249641);
   late GoogleMapController _controller;
   final Location _location = Location();
-  late StreamSubscription<LocationData> _locationSubscription;
+  StreamSubscription<LocationData>? _locationSubscription;
   final Set<Marker> _markers = {};
   List<Spot>? _spots;
   // Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
@@ -107,7 +107,9 @@ class _ExploreSpotState extends State<ExploreSpot> {
 
   @override
   void dispose() {
-    _locationSubscription.cancel();
+    if (_locationSubscription != null) {
+      _locationSubscription?.cancel();
+    }
     _controller.dispose();
     super.dispose();
   }

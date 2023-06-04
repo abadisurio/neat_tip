@@ -83,12 +83,24 @@ class _AuthorizationState extends State<Authorization> {
                           .copyWith(color: Colors.white),
                     ),
                   const Text(
-                    'Masukkan PIN Anda\n',
+                    'Masukkan PIN Anda',
                     textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    'Psst... PIN random aja\n',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: Colors.grey.shade500),
                   ),
                   Form(
                     key: _formKey,
                     child: TextFormField(
+                        textInputAction: TextInputAction.go,
+                        onFieldSubmitted: (value) {
+                          _processAuthorization();
+                        },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Tidak boleh kosong. Masukkan PIN Anda!';

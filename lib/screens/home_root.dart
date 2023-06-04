@@ -212,8 +212,8 @@ class _HomeRootState extends State<HomeRoot> {
                   label: (userRole != 'Pengguna') ? 'Titipan' : 'Spots',
                 ),
                 const BottomNavigationBarItem(
-                  icon: Icon(Icons.remove),
-                  label: 'Pindai',
+                  icon: Icon(Icons.qr_code),
+                  label: 'Check-out',
                 ),
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.notifications_outlined),

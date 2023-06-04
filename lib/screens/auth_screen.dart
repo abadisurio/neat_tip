@@ -54,14 +54,14 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final List<bool> authType = <bool>[true, false];
 
-  void onSuccess() {
+  void _onSuccess() {
     setState(() {
       isSuccess = true;
     });
-    Navigator.pop(context, neatTipUserCubit.state);
+    Navigator.pop(context, isSuccess);
   }
 
-  void submitAuth() async {
+  void _submitAuth() async {
     // Validate returns true if the form is valid, or false otherwise.
     if (_formKey.currentState!.validate()) {
       // If the form is valid, display a snackbar. In the real world,
@@ -78,12 +78,12 @@ class _AuthScreenState extends State<AuthScreen> {
           await neatTipUserCubit.signUpEmailPassword(email, password);
           await neatTipUserCubit
               .updateDisplayName(authFieldControllers['Nama']!.text);
-          await neatTipUserCubit.updateLocalInfo({#role: selectedRole});
+          await neatTipUserCubit.updateLocalInfo({#role: 'Pengguna'});
           await neatTipUserCubit.addUserToFirestore();
         } else {
           await neatTipUserCubit.signInEmailPassword(email, password);
         }
-        onSuccess();
+        _onSuccess();
       } catch (e) {
         log('eeee $e');
         showDialog(
@@ -129,7 +129,7 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(),
       body: WillPopScope(
         onWillPop: () async {
-          Navigator.pop(context, null);
+          Navigator.pop(context, false);
           return false;
         },
         child: SafeArea(
@@ -239,72 +239,73 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                               );
                             }).toList(),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: DropdownButtonFormField<String>(
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Tidak boleh kosong. Pilih peran Anda!';
-                                  }
-                                  return null;
-                                },
-                                decoration: const InputDecoration(
-                                    isDense: true,
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Saya adalah'),
-                                value: selectedRole,
-                                icon: const Icon(Icons.arrow_drop_down),
-                                elevation: 16,
-                                style:
-                                    const TextStyle(color: Colors.deepPurple),
-                                // underline: Container(
-                                //   height: 2,
-                                //   color: Colors.deepPurpleAccent,
-                                // ),
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    selectedRole = value!;
-                                  });
-                                },
-                                items: roleList.map<DropdownMenuItem<String>>(
-                                    (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            )
+                            // Padding(
+                            //   padding:
+                            //       const EdgeInsets.symmetric(vertical: 8.0),
+                            //   child: DropdownButtonFormField<String>(
+                            //     validator: (value) {
+                            //       if (value == null || value.isEmpty) {
+                            //         return 'Tidak boleh kosong. Pilih peran Anda!';
+                            //       }
+                            //       return null;
+                            //     },
+                            //     decoration: const InputDecoration(
+                            //         isDense: true,
+                            //         border: OutlineInputBorder(),
+                            //         labelText: 'Saya adalah'),
+                            //     value: selectedRole,
+                            //     icon: const Icon(Icons.arrow_drop_down),
+                            //     elevation: 16,
+                            //     style:
+                            //         const TextStyle(color: Colors.deepPurple),
+                            //     // underline: Container(
+                            //     //   height: 2,
+                            //     //   color: Colors.deepPurpleAccent,
+                            //     // ),
+                            //     onChanged: (String? value) {
+                            //       setState(() {
+                            //         selectedRole = value!;
+                            //       });
+                            //     },
+                            //     items: roleList.map<DropdownMenuItem<String>>(
+                            //         (String value) {
+                            //       return DropdownMenuItem<String>(
+                            //         value: value,
+                            //         child: Text(value),
+                            //       );
+                            //     }).toList(),
+                            //   ),
+                            // )
                           ])),
                 ElevatedButton(
-                  onPressed: submitAuth,
+                  onPressed: _submitAuth,
                   child: const Text('Submit'),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(
-                          thickness: 2,
-                        ),
-                      ),
-                      Text(
-                        ' atau cara lain ',
-                        style: TextStyle(color: Colors.grey.shade500),
-                      ),
-                      const Expanded(
-                        child: Divider(
-                          thickness: 2,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                GoogleSignInButton(
-                  onSuccess: onSuccess,
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Row(
+                //     children: [
+                //       const Expanded(
+                //         child: Divider(
+                //           thickness: 2,
+                //         ),
+                //       ),
+                //       Text(
+                //         ' atau cara lain ',
+                //         style: TextStyle(color: Colors.grey.shade500),
+                //       ),
+                //       const Expanded(
+                //         child: Divider(
+                //           thickness: 2,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // GoogleSignInButton(
+                //   onSuccess: _onSuccess,
+                //   isSignUp: isSingingUp,
+                // ),
               ],
             ),
           ),

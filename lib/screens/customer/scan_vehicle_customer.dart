@@ -257,7 +257,7 @@ class _ScanVehicleCustomerState extends State<ScanVehicleCustomer>
         _reservation!.timeCheckedOut = DateTime.now().toIso8601String();
         // log('_reservation ${_reservation!.toJson()}');
         await _reservationsListCubit.updateReservation(_reservation!);
-        notifyRsvpFinished(_reservation!);
+        // notifyRsvpFinished(_reservation!);
         // log('_reservation!.id ${_reservation!.id}');
         if (mounted) {
           Navigator.pushNamedAndRemoveUntil(

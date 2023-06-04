@@ -39,7 +39,7 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
           // await vehicleListCubit.add();
           log('hereeeeee');
         } catch (e) {
-          failedPlates.add('B 3942 UII');
+          failedPlates.add(element.key);
         }
       }
     });
@@ -64,7 +64,10 @@ class _ConfirmScanVehicleState extends State<ConfirmScanVehicle> {
       );
     }
 
-    if (mounted) Navigator.popUntil(context, ((route) => route.isFirst));
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/homeroot', (route) => route.isFirst);
+    }
   }
 
   @override

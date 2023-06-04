@@ -52,7 +52,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       User? user = FirebaseAuth.instance.currentUser;
       user ??= await AppFirebase.signUpWithEmailPassword(email, password);
       // reloadFcmToken();
-      updateLocalInfo({});
+      await updateLocalInfo({});
       log('user $user');
     } catch (e) {
       log('$e');
@@ -66,7 +66,7 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
       if (user == null) {
         throw Exception('User not found!');
       }
-      updateLocalInfo({});
+      await updateLocalInfo({});
       // reloadFcmToken();
       log('user $user');
     } catch (e) {
@@ -82,7 +82,8 @@ class NeatTipUserCubit extends Cubit<NeatTipUser?> {
         throw Exception('User not found!');
       }
       // reloadFcmToken();
-      updateLocalInfo({});
+      await updateLocalInfo({});
+      await addUserToFirestore();
       log('user $user');
     } catch (e) {
       log('sinii $e');

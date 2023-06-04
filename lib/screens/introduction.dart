@@ -18,7 +18,7 @@ class Introduction extends StatefulWidget {
 class _IntroductionState extends State<Introduction> {
   double _maxPage = 0;
   int _pageIndex = 0;
-  int _vehicleLength = 0;
+  // int _vehicleLength = 0;
   bool _isLoggedIn = false;
   bool _isPermissionsAllowed = false;
   NeatTipUser? _user;
@@ -28,21 +28,21 @@ class _IntroductionState extends State<Introduction> {
 
   Future<void> _reloadData() async {
     // await initializeFCM(cubit: context.read<NotificationListCubit>());
-    await _reservationListCubit.reload(role: _user!.role);
+    await _reservationListCubit.reload(role: 'Pengguna');
     PushNotificationService.reloadFcmToken();
   }
 
   navigateToAuthPage() async {
-    _user = await Navigator.pushNamed(context, '/auth') as NeatTipUser?;
+    final bool isLoggedIn = await Navigator.pushNamed(context, '/auth') as bool;
     // _user = await Navigator.pushNamed(context, '/auth') as NeatTipUser?;
-    log('_user $_user');
-    if (_user != null && mounted) {
+    // log('_user $_user');
+    if (mounted && isLoggedIn) {
       setState(() {
         _isLoggedIn = true;
         _maxPage += 1;
       });
-      await _vehicleListCubit.reload();
-      _vehicleLength = _vehicleListCubit.state.length;
+      // await _vehicleListCubit.reload();
+      // _vehicleLength = _vehicleListCubit.state.length;
     }
   }
 
@@ -128,14 +128,14 @@ class _IntroductionState extends State<Introduction> {
                                 .titleLarge
                                 ?.copyWith(color: Colors.white),
                           ),
-                          Text(
-                            '\nscroll ke bawah buat kenalan',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .caption
-                                ?.copyWith(color: Colors.white),
-                          ),
+                          // Text(
+                          //   '\nscroll ke bawah buat kenalan',
+                          //   textAlign: TextAlign.center,
+                          //   style: Theme.of(context)
+                          //       .textTheme
+                          //       .caption
+                          //       ?.copyWith(color: Colors.white),
+                          // ),
                           SizedBox(
                             height: MediaQuery.of(context).size.height,
                           ),
@@ -294,11 +294,11 @@ class _IntroductionState extends State<Introduction> {
         _get1Page(),
         _get2Page(),
         _get3Page(),
-        _get4Page(),
+        // _get4Page(),
       ],
       onChange: setSuspend,
       showNextButton: _pageIndex <= _maxPage,
-      showDoneButton: _pageIndex <= _maxPage || _vehicleLength > 0,
+      showDoneButton: _pageIndex <= _maxPage,
       // overrideNext: _setPage(1),
       // overrideBack: _setPage(-1),
       freeze: _pageIndex > _maxPage,
